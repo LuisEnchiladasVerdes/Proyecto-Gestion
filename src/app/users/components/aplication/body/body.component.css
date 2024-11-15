@@ -1,0 +1,23 @@
+.section{
+  width: 700px;
+  height: 430px;
+}
+
+.galeria{
+  width: 0px;
+  flex-grow: 1;
+  object-fit: cover;
+  opacity: .8;
+  transition: .5s ease;
+}
+
+section img:hover{
+  cursor: crosshair;
+  width: 400px;
+  opacity: 1;
+  filter: contrast(110%);
+}
+
+.acerca{
+  height: 360px;
+}

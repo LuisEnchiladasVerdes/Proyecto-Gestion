@@ -1,0 +1,56 @@
+<!-- reservas.component.html -->
+<div class="min-h-screen bg-gray-50 py-6 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-6xl mx-auto">
+    <!-- Encabezado de la página -->
+    <div class="mb-6">
+      <h1 class="text-2xl font-bold text-gray-900 mb-2">Reservas</h1>
+      <p class="text-gray-600">Gestiona y revisa las reservas activas</p>
+    </div>
+
+    <!-- Lista de reservas -->
+    <div class="space-y-4">
+      <!-- Preview de reserva -->
+      <div class="bg-white rounded-lg shadow-sm p-4 flex flex-col sm:flex-row justify-between items-center">
+        <!-- Información de la reserva -->
+        <div class="flex items-center space-x-4">
+          <div class="h-10 w-10 flex-shrink-0">
+            <img class="h-10 w-10 rounded-full" src="" alt="Imagen de reserva">
+          </div>
+          <div>
+            <h2 class="text-lg font-semibold text-gray-900">Reserva de Oficina #1</h2>
+            <p class="text-sm text-gray-500">Fecha: 2024-11-10</p>
+            <p class="text-sm text-gray-500">Cliente: Juan Pérez</p>
+          </div>
+        </div>
+
+        <!-- Botón de detalles -->
+        <div class="mt-4 sm:mt-0">
+          <a class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" routerLink="/admin/reservas/detalles">
+            Detalles
+          </a>
+        </div>
+      </div>
+
+      <!-- Preview de reserva adicional (Ejemplo) -->
+      <div class="bg-white rounded-lg shadow-sm p-4 flex flex-col sm:flex-row justify-between items-center">
+        <div class="flex items-center space-x-4">
+          <div class="h-10 w-10 flex-shrink-0">
+            <img class="h-10 w-10 rounded-full" src="" alt="Imagen de reserva">
+          </div>
+          <div>
+            <h2 class="text-lg font-semibold text-gray-900">Reserva de Sala de Conferencias</h2>
+            <p class="text-sm text-gray-500">Fecha: 2024-11-11</p>
+            <p class="text-sm text-gray-500">Cliente: María López</p>
+          </div>
+        </div>
+
+        <div class="mt-4 sm:mt-0">
+          <a class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" routerLink="/admin/reservas/detalles">
+            Detalles
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+

@@ -1,0 +1,59 @@
+<div class="min-h-screen bg-gray-50 py-6 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-6xl mx-auto">
+        <!-- Encabezado de la página -->
+        <div class="mb-6">
+            <h1 class="text-2xl font-bold text-gray-900 mb-2">Editar Item</h1>
+            <p class="text-gray-600">Edita los detalles del item seleccionado</p>
+        </div>
+
+        <!-- Formulario para editar item -->
+        <div class="bg-white rounded-lg shadow-sm p-4 mb-6">
+            <form (ngSubmit)="guardarCambios()">
+                <div class="space-y-4">
+                    <div>
+                        <label for="name" class="block text-sm font-medium text-gray-700">Nombre</label>
+                        <input id="name" [(ngModel)]="item.name" name="name" type="text" required
+                            class="mt-1 px-4 py-2 border border-gray-300 rounded-md w-full"
+                            [class.border-red-500]="!formValid.name" />
+
+                        <div *ngIf="!formValid.name" class="text-sm text-red-500">El nombre es obligatorio.</div>
+                    </div>
+
+                    <div>
+                        <label for="categoria" class="block text-sm font-medium text-gray-700">Categoría</label>
+                        <select id="categoria" [(ngModel)]="item.categoria" name="categoria" required
+                            [class.border-red-500]="!formValid.categoria"
+                            class="mt-1 px-4 py-2 border border-gray-300 rounded-md w-full">
+                            <option value="1">Mesas</option>
+                            <option value="2">Sillas</option>
+                            <option value="3">Vajilla</option>
+                            <option value="4">Extras</option>
+                        </select>
+                        <div *ngIf="!formValid.categoria" class="text-sm text-red-500">Selecciona una categoría.</div>
+
+                    </div>
+
+                    <div>
+                        <label for="stock" class="block text-sm font-medium text-gray-700">Stock</label>
+                        <input id="stock" [(ngModel)]="item.stock" name="stock" type="number" required
+                            class="mt-1 px-4 py-2 border border-gray-300 rounded-md w-full"
+                            [class.border-red-500]="!formValid.stock" />
+                        <div *ngIf="!formValid.stock" class="text-sm text-red-500">El stock debe ser mayor que 0.</div>
+
+                    </div>
+
+                    <div class="flex justify-end">
+                        <a type="button"
+                            class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                            routerLink="/admin/inventario/general">
+                            Cancelar
+                        </a>
+                        <button type="submit" class="text-white bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded-md">
+                            Guardar Cambios
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

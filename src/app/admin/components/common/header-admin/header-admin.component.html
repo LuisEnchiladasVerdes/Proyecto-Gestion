@@ -1,0 +1,37 @@
+<!-- header.component.html -->
+<header class="bg-gray-300 shadow-md">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between items-center h-16">
+      <!-- Lado izquierdo - Inicio -->
+      <div class="flex items-center">
+        <a routerLink="/admin/home" class="text-gray-800 hover:text-indigo-600 text-lg font-medium">
+          Inicio
+        </a>
+      </div>
+
+      <!-- Lado derecho - Botones -->
+      <div class="flex items-center space-x-4">
+        <a routerLink="/admin/reservas/preview"
+           class="px-4 py-2 text-sm font-medium text-gray-700 hover:text-indigo-600 hover:bg-gray-50 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          Reservas
+        </a>
+        <a href="/admin/inventario/general"
+           class="px-4 py-2 text-sm font-medium text-gray-700 hover:text-indigo-600 hover:bg-gray-50 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          Inventario
+        </a>
+        <a href="/admin/login"
+          class="px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+          Logout
+        </a>
+
+        <!-- Botón menú móvil -->
+        <button class="md:hidden p-2 text-gray-500 hover:text-indigo-600 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          <span class="sr-only">Abrir menú</span>
+          <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</header>

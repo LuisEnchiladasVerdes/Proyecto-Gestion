@@ -16,6 +16,11 @@ const routes: Routes = [
     path: 'edit/:id',
     loadComponent: () => import('./pages/edit/edit.component')
       .then(m => m.EditComponent)
+  },
+  {
+    path: 'paquetes',
+    loadChildren: () => import('./pages/paquetes/paquetes.module')
+      .then(m => m.PaquetesModule)
   }
 ];
 

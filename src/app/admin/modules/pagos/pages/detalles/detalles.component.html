@@ -1,4 +1,3 @@
-<!-- detalles.component.html -->
 <div class="min-h-screen bg-gray-50 py-6 px-4 sm:px-6 lg:px-8">
   <div class="max-w-6xl mx-auto">
     <!-- Encabezado de la página -->
@@ -7,51 +6,77 @@
       <p class="text-gray-600">Gestiona y revisa los pagos</p>
     </div>
 
+    <!-- Barra de búsqueda y menú desplegable -->
+    <div class="mb-6 flex items-center space-x-4">
+      <!-- Cuadro de búsqueda -->
+      <input
+        type="text"
+        placeholder="Buscar por nombre o ID de pago"
+        class="w-full p-3 border border-gray-300 rounded-md focus:border-indigo-500 focus:ring-indigo-500"
+      />
+
+      <!-- Menú desplegable para método de pago -->
+      <select
+        class="p-3 border border-gray-300 rounded-md focus:border-indigo-500 focus:ring-indigo-500"
+      >
+        <option value="" disabled selected hidden>Todos los métodos</option>
+        <option value="tarjeta">Tarjeta</option>
+        <option value="mercado_pago">Mercado Pago</option>
+        <option value="transferencia">Transferencia</option>
+        <option value="efectivo">Efectivo</option>
+      </select>
+
+      <select
+        class="p-3 border border-gray-300 rounded-md focus:border-indigo-500 focus:ring-indigo-500"
+      >
+        <option value="" disabled selected hidden>Status del pago</option>
+        <option value="tarjeta">Confirmado</option>
+        <option value="mercado_pago">Sin Confirmar</option>
+      </select>
+    </div>
+
     <!-- Lista de reservas -->
     <div class="space-y-4">
       <!-- Preview de reserva -->
-      <div class="bg-white rounded-lg shadow-sm p-4 flex flex-col sm:flex-row justify-between items-center">
+      <div class="bg-white rounded-lg shadow-sm p-4 flex items-center justify-between">
         <!-- Información de la reserva -->
-        <div class="flex items-center space-x-4">
-          <div class="h-10 w-10 flex-shrink-0">
-            <img class="h-10 w-10 rounded-full" src="" alt="Imagen de reserva">
+        <div class="flex items-center space-x-12 flex-grow">
+          <!-- Ícono del método de pago -->
+          <div class="h-15 w-15 flex-shrink-0">
+            <img class="h-15 w-15 rounded-full" src="" alt="Método de pago">
           </div>
+
+          <!-- Detalles de la reserva -->
           <div>
-            <h2 class="text-lg font-semibold text-gray-900">Reserva de Oficina #1</h2>
-            <p class="text-sm text-gray-500">Fecha: 2024-11-10</p>
-            <p class="text-sm text-gray-500">Cliente: Juan Pérez</p>
+            <p class="text-sm text-gray-500">
+              ID del Pago: <span class="font-medium text-gray-900">#12345</span>
+            </p>
+            <p class="text-sm text-gray-500">
+              Cliente: <span class="font-medium text-gray-900">Juan Pérez</span>
+            </p>
+            <p class="text-sm text-gray-500">
+              Fecha y Hora: <span class="font-medium text-gray-900">2024-11-10, 15:30</span>
+            </p>
           </div>
-        </div>
 
-        <!-- Botón de detalles -->
-        <div class="mt-4 sm:mt-0">
-          <a class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" routerLink="/admin/reservas/detalles">
-            Detalles
-          </a>
-        </div>
-      </div>
-
-      <!-- Preview de reserva adicional (Ejemplo) -->
-      <div class="bg-white rounded-lg shadow-sm p-4 flex flex-col sm:flex-row justify-between items-center">
-        <div class="flex items-center space-x-4">
-          <div class="h-10 w-10 flex-shrink-0">
-            <img class="h-10 w-10 rounded-full" src="" alt="Imagen de reserva">
-          </div>
           <div>
-            <h2 class="text-lg font-semibold text-gray-900">Reserva de Sala de Conferencias</h2>
-            <p class="text-sm text-gray-500">Fecha: 2024-11-11</p>
-            <p class="text-sm text-gray-500">Cliente: María López</p>
+            <p class="text-sm text-gray-500">
+              Monto: <span class="font-medium text-gray-900">$1,500.00</span>
+            </p>
+            <p class="text-sm text-gray-500">
+              Método de Pago: <span class="font-medium text-gray-900">Tarjeta de Crédito</span>
+            </p>
           </div>
         </div>
 
-        <div class="mt-4 sm:mt-0">
-          <a class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" routerLink="/admin/reservas/detalles">
-            Detalles
-          </a>
+        <!-- Botón a la derecha -->
+        <div>
+          <button class="bg-blue-600 text-white font-medium py-2 px-4 rounded-md hover:bg-blue-500 transition duration-200">
+            Ver Detalles
+          </button>
         </div>
       </div>
     </div>
   </div>
 </div>
-
 

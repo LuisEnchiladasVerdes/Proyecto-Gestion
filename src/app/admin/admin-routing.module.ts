@@ -22,6 +22,11 @@ const routes: Routes = [
         path: 'reservas',
         loadChildren: () => import('./modules/reservas/reservas.module')
           .then(m => m.ReservasModule)
+      },
+      {
+        path: 'pagos',
+        loadChildren: () => import('./modules/pagos/pagos.module')
+          .then(m => m.PagosModule)
       }
 
     ]

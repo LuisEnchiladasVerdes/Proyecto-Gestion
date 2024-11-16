@@ -27,12 +27,12 @@
 
         <!-- Botones de acción -->
         <div class="flex space-x-3">
-          <a class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" routerLink="/admin/inventario/add">
+          <button class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" (click)="abrirModal()">
             <svg class="h-5 w-5 text-white mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
             </svg>
             Gestionar Categoria
-          </a>
+          </button>
 
           <a class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" routerLink="/admin/inventario/paquetes/general">
             <svg class="h-5 w-5 text-white mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -48,6 +48,164 @@
             Agregar Item
           </a>
         </div>
+
+
+
+        <!-- Modal -->
+        <div
+          *ngIf="mostrarModal"
+          class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50"
+          (click)="cerrarModalClickExterior($event)"
+        >
+          <!-- Contenedor del contenido del modal -->
+          <div
+            class="bg-white rounded-lg shadow-lg p-6 w-96 relative"
+            (click)="$event.stopPropagation()"
+          >
+            <!-- Botón de cierre en la esquina superior derecha -->
+            <button
+              class="absolute top-2 right-2 text-gray-500 hover:text-gray-700 focus:outline-none"
+              (click)="cerrarModal()"
+            >
+              ✖
+            </button>
+
+            <!-- Contenido del modal -->
+            <h2 class="text-xl font-bold mb-4">Categorías</h2>
+            <p class="text-gray-600 mb-6">
+              Selecciona una acción para administrar las categorías.
+            </p>
+
+            <!-- Botones de acción -->
+            <div class="flex flex-col space-y-4">
+              <button
+                class="w-full px-4 py-2 bg-blue-600 rounded-md text-sm font-medium text-white hover:bg-blue-700"
+                (click)="editarCategoria()"
+              >
+                Editar Categoría
+              </button>
+              <button
+                class="w-full px-4 py-2 bg-green-600 rounded-md text-sm font-medium text-white hover:bg-green-700"
+                (click)="abrirAgregarCategoriaModal()"
+              >
+                Agregar Categoría
+              </button>
+            </div>
+          </div>
+        </div>
+
+
+        <!-- Modal Editar Categoría -->
+        <div
+          *ngIf="mostrarModalEditar"
+          class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50"
+          (click)="cerrarEditarCategoriaClickExterior($event)"
+        >
+          <!-- Contenedor del contenido del modal editar -->
+          <div
+            class="bg-white rounded-lg shadow-lg p-6 w-96 relative"
+            (click)="$event.stopPropagation()"
+          >
+            <button
+              class="absolute top-2 right-2 text-gray-500 hover:text-gray-700 focus:outline-none"
+              (click)="cerrarEditarCategoriaModal()"
+            >
+              ✖
+            </button>
+            <button
+              class="absolute top-2 left-2 text-gray-500 hover:text-gray-700 focus:outline-none"
+              (click)="volverAlModalPrincipal()"
+            >
+              ←
+            </button>
+            <h2 class="text-xl font-bold mb-4">Editar Categoría</h2>
+            <p class="text-gray-600 mb-6">
+              Selecciona una categoría para editar.
+            </p>
+
+<!--            &lt;!&ndash; Lista desplegable &ndash;&gt;-->
+<!--            <select-->
+<!--              [(ngModel)]="categoriaSeleccionada"-->
+<!--              class="w-full border border-gray-300 rounded-md px-4 py-2 mb-4"-->
+<!--            >-->
+<!--              <option *ngFor="let categoria of categorias" [value]="categoria">-->
+<!--                {{ categoria }}-->
+<!--              </option>-->
+<!--            </select>-->
+
+            <!-- Campo editable -->
+            <div class="mb-4">
+              <label for="categorias" class="block text-sm font-medium text-gray-700">Seleccionar o editar categoría</label>
+              <input
+                type="text"
+                [(ngModel)]="categoriaSeleccionada"
+                id="categorias"
+                list="opcionesCategorias"
+                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              >
+              <datalist id="opcionesCategorias">
+                <option *ngFor="let categoria of categorias" [value]="categoria"></option>
+              </datalist>
+            </div>
+
+            <!-- Botones -->
+            <div class="flex flex-col space-y-4">
+              <button
+                class="w-full px-4 py-2 bg-red-600 rounded-md text-sm font-medium text-white hover:bg-red-700"
+                (click)="eliminarCategoria()"
+              >
+                Eliminar
+              </button>
+              <button
+                class="w-full px-4 py-2 bg-blue-600 rounded-md text-sm font-medium text-white hover:bg-blue-700"
+                (click)="actualizarCategoria()"
+              >
+                Actualizar
+              </button>
+            </div>
+          </div>
+        </div>
+
+
+
+<!--        Modal de agregar categoria-->
+        <div *ngIf="mostrarAgregarCategoriaModal" class="fixed inset-0 z-50 flex items-center justify-center bg-gray-800 bg-opacity-50">
+          <div class="bg-white p-6 rounded-lg shadow-lg relative w-96">
+            <!-- Botón para cerrar el modal -->
+            <button (click)="cerrarAgregarCategoriaModal()" class="absolute top-2 right-2 text-gray-500 hover:text-gray-800">
+              &times;
+            </button>
+
+            <button
+              class="absolute top-2 left-2 text-gray-500 hover:text-gray-700 focus:outline-none"
+              (click)="volverAlModalPrincipal()"
+            >
+              ←
+            </button>
+
+            <h2 class="text-lg font-bold mb-4">Agregar Nueva Categoría</h2>
+
+            <!-- Campo para ingresar la nueva categoría -->
+            <div class="mb-4">
+              <label for="nuevaCategoria" class="block text-sm font-medium text-gray-700">Nombre de la Categoría</label>
+              <input
+                type="text"
+                id="nuevaCategoria"
+                [(ngModel)]="nuevaCategoria"
+                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                placeholder="Escribe el nombre de la nueva categoría"
+              >
+            </div>
+
+            <!-- Botones -->
+            <div class="flex justify-end space-x-4">
+              <button (click)="adjuntarCategoria()" class="px-4 py-2 bg-indigo-500 text-white rounded hover:bg-indigo-600">Agregar</button>
+            </div>
+          </div>
+        </div>
+
+
+
       </div>
     </div>
 

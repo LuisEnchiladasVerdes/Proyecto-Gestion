@@ -4,41 +4,88 @@
     <!-- Encabezado -->
     <div class="mb-6">
       <h1 class="text-2xl font-bold text-gray-900">Detalles de la Reserva</h1>
-      <p class="text-gray-600">Información completa de la reserva seleccionada</p>
+      <p class="text-gray-600">Información completa de la reserva #0001</p>
     </div>
 
     <!-- Información detallada de la reserva -->
     <div class="space-y-4">
       <!-- Imagen de la reserva -->
-      <div class="flex justify-center">
-        <img class="h-40 w-40 rounded-full" src="" alt="Imagen de la reserva">
-      </div>
+<!--      <div class="flex justify-center">-->
+<!--        <img class="h-40 w-40 rounded-full" src="" alt="Imagen de la reserva">-->
+<!--      </div>-->
 
       <!-- Detalles de la reserva -->
       <div class="mt-4">
-        <h2 class="text-lg font-semibold text-gray-900">Reserva de Oficina #1</h2>
+        <h2 class="text-lg font-semibold text-gray-900">Reserva #0001</h2>
         <p class="text-sm text-gray-500">Cliente: Juan Pérez</p>
         <p class="text-sm text-gray-500">Fecha de reserva: 2024-11-10</p>
-        <p class="text-sm text-gray-500">Hora de inicio: 10:00 AM</p>
-        <p class="text-sm text-gray-500">Hora de fin: 4:00 PM</p>
-        <p class="text-sm text-gray-500">Estado: Confirmada</p>
+        <p class="text-sm text-gray-500">Hora de reserva: 10:00 AM</p>
+        <p class="text-sm text-gray-500">Fecha de entrega: 2024-11-10</p>
+        <p class="text-sm text-gray-500">Hora de entrega: 4:00 PM</p>
+        <br>
+        <p class="text-sm text-gray-500">Metodo de pago: Mercado Pago</p>
+        <p class="text-sm text-gray-500">Monto: $27,110</p>
+        <p class="text-md text-gray-500 ">Estado: Confirmada</p>
       </div>
 
       <!-- Descripción adicional -->
       <div class="mt-6">
         <h3 class="text-lg font-medium text-gray-900">Descripción</h3>
-        <p class="mt-2 text-gray-600">
-          Esta reserva es para la oficina principal en el área de trabajo compartido. La reserva incluye acceso a servicios básicos, Wi-Fi, y soporte de impresora.
-        </p>
+
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+          <tr>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Cantidad
+            </th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Item
+            </th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Nota
+            </th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Precio
+            </th>
+          </tr>
+          </thead>
+
+          <tbody class="bg-white divide-y divide-gray-200">
+
+          <!-- Filas -->
+<!--          *ngFor="let item of items"-->
+          <tr >
+
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="text-sm font-medium text-gray-900">Cantidad</div>
+            </td>
+
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="text-sm text-gray-900">Item</div>
+            </td>
+
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="text-sm text-gray-900">Nota</div>
+            </td>
+
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="text-sm text-gray-900">Precio</div>
+            </td>
+
+          </tr>
+
+          </tbody>
+        </table>
       </div>
     </div>
 
     <!-- Botón para regresar -->
     <div class="mt-8">
-      <button class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+      <button class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" routerLink="/admin/reservas/preview">
         Regresar a Reservas
       </button>
     </div>
+
   </div>
 </div>
 

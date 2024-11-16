@@ -66,8 +66,21 @@ export class AgregarComponent {
 
       this.limpiarCampos();
     }
+  }
 
 
+  rows: Array<{ cantidad: number; categoria: string; item: string; nota: string }> = [
+    { cantidad: 0, categoria: '', item: '', nota: '' },
+  ];
+
+  // Agregar una nueva fila
+  agregarFila() {
+    this.rows.push({ cantidad: 0, categoria: '', item: '', nota: '' });
+  }
+
+  // Eliminar una fila por índice
+  eliminarFila(index: number) {
+    this.rows.splice(index, 1);
   }
 
 

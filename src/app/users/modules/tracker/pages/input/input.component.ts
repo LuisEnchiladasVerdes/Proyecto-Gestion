@@ -12,4 +12,7 @@ import {RouterLink} from "@angular/router";
 })
 export class InputComponent {
 
+  onSubmit(event: Event): void {
+    event.preventDefault();
+  }
 }

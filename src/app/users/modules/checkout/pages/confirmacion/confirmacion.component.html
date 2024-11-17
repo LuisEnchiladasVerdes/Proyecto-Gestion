@@ -1,56 +1,50 @@
 <!-- confirmacion-compra.component.html -->
-<div class="container confirmacion py-20 px-10 bg-color3">
-  <h1 class="text-center mb-4 font-bold">CONFIRMACION DE COMPRA</h1>
+<div class="container confirmacion py-20 px-10 bg-gray-100">
+  <h1 class="text-center mb-4 text-xl font-bold">CONFIRMACION DE COMPRA</h1>
 
   <!-- Sección principal -->
   <div class="flex flex-wrap -mx-3">
     <!-- Lista de productos -->
     <div class="w-full md:w-2/3 px-3 mb-4">
       <div class="bg-gray-100 rounded-lg mb-4">
-        <div class="p-5">
-          <!-- Producto 1 -->
-          <div class="flex items-center gap-4 mb-4">
-            <div class="w-40">
-              <img src="assets/img/PROD/1.jpg" class="w-full h-auto rounded" alt="Mesa de madera">
-            </div>
-            <div class="flex-1">
-              <h5 class="font-semibold">Mesa de madera ...</h5>
-              <p class="text-gray-600">$50.00 C/U</p>
-            </div>
-          </div>
 
-          <!-- Producto 2 -->
-          <div class="flex items-center gap-4">
-            <div class="w-40">
-              <img src="assets/img/PROD/10.jpg" class="w-full h-auto rounded" alt="Mesa de madera">
-            </div>
-            <div class="flex-1">
-              <h5 class="font-semibold">Mesa de madera ...</h5>
-              <p class="text-gray-600">$50.00 C/U</p>
+        <div>
+          <div class="card bg-white rounded-lg shadow mb-4">
+            <div class="card-body p-4">
+              <h5 class="font-bold text-lg mb-4">DATOS</h5>
+              <form>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-3">
+                  <div>
+                    <label for="nombre" class="block font-medium">NOMBRE</label>
+                    <input type="text" class="mt-1 p-2 border border-gray-300 rounded w-full" id="nombre">
+                  </div>
+                  <div>
+                    <label for="apellido" class="block font-medium">APELLIDO</label>
+                    <input type="text" class="mt-1 p-2 border border-gray-300 rounded w-full" id="apellido">
+                  </div>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label for="numero" class="block font-medium">NUMERO</label>
+                    <input type="text" class="mt-1 p-2 border border-gray-300 rounded w-full" id="numero">
+                  </div>
+                  <div>
+                    <label for="correo" class="block font-medium">CORREO</label>
+                    <input type="email" class="mt-1 p-2 border border-gray-300 rounded w-full" id="correo">
+                  </div>
+                </div>
+              </form>
             </div>
           </div>
         </div>
+
       </div>
     </div>
 
     <!-- Columna lateral 1 -->
     <div class="w-full md:w-1/3 px-3 mb-4">
-      <!-- Datos del cliente -->
-      <div class="bg-gray-100 rounded-lg mb-4">
-        <div class="p-5">
-          <h5 class="font-bold mb-1">NOMBRE</h5>
-          <p>Luis Enrique Rodriguez</p>
-
-          <h5 class="font-bold mb-1">NUMERO</h5>
-          <p>9514131644</p>
-
-          <h5 class="font-bold mb-1">CORREO</h5>
-          <p>ej123&#64;gmail.com</p>
-        </div>
-      </div>
-
       <!-- Datos de pago -->
-      <div class="bg-gray-100 rounded-lg mb-4">
+      <div class="bg-white rounded-lg mb-4">
         <div class="p-5">
           <h5 class="font-bold mb-1">METODO DE PAGO</h5>
           <!-- Opción: Tarjeta -->
@@ -84,7 +78,7 @@
       </div>
 
       <!-- Total -->
-      <div class="bg-gray-100 rounded-lg">
+      <div class="bg-white rounded-lg">
         <div class="p-5">
           <h5 class="font-bold mb-1">TOTAL</h5>
           <p class="text-2xl font-bold mb-4">$845.25</p>

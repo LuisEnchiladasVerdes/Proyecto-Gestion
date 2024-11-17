@@ -1,35 +1,68 @@
 <div class="carrito bg-gray-100 p-10 pb-52">
-  <h2 class="text-center text-2xl font-bold mb-4 pt-10">CARRITO DE COMPRA</h2>
+  <h2 class="text-center text-xl font-bold mb-4 pt-10">CARRITO DE COMPRA</h2>
 
   <!-- Productos -->
   <div class="card mb-4 bg-white rounded-lg shadow">
     <div class="card-body mt-4 p-4">
 
-      <div class="eventos px-12 grid grid-cols-1 sm:grid-cols-1 md:grid-cols-4 lg:grid-cols-5 gap-4 pb-5">
+<!--      <div class="eventos px-12 grid grid-cols-1 sm:grid-cols-1 md:grid-cols-4 lg:grid-cols-5 gap-4 pb-5">-->
 
-        <div class="imgEventos flex flex-col items-center cursor-pointer pb-3">
-          <img src="assets/img/PROD/1.jpg" alt="imgXV" class="h-30vh object-cover mb-2">
-          <div class="text-lg font-medium text-gray-900">Nombre</div>
-          <div class="text-sm font-medium text-gray-900">$12,123.00</div>
+<!--        <div class="imgEventos flex flex-col items-center cursor-pointer pb-3">-->
+<!--          <img src="assets/img/PROD/1.jpg" alt="imgXV" class="h-30vh object-cover mb-2">-->
+<!--          <div class="text-lg font-medium text-gray-900">Nombre</div>-->
+<!--          <div class="text-sm font-medium text-gray-900">$12,123.00</div>-->
+<!--        </div>-->
+<!--        <div class="imgEventos flex flex-col items-center cursor-pointer pb-3">-->
+<!--          <img src="assets/img/PROD/2.jpg" alt="imgBaut" class="h-30vh object-cover mb-2">-->
+<!--        </div>-->
+<!--        <div class="imgEventos flex flex-col items-center cursor-pointer pb-3">-->
+<!--          <img src="assets/img/PROD/3.jpg" alt="imgBoda" class="h-30vh object-cover mb-2">-->
+<!--        </div>-->
+<!--        <div class="imgEventos flex flex-col items-center cursor-pointer pb-3">-->
+<!--          <img src="assets/img/PROD/4.jpg" alt="imgCumpleanios" class="h-30vh object-cover mb-2">-->
+<!--        </div>-->
+<!--        <div class="imgEventos flex flex-col items-center cursor-pointer pb-3">-->
+<!--          <img src="assets/img/PROD/5.jpg" alt="imgDespedida" class="h-30vh object-cover mb-2">-->
+<!--        </div>-->
+<!--        <div class="imgEventos flex flex-col items-center cursor-pointer pb-3">-->
+<!--          <img src="assets/img/PROD/6.jpg" alt="imgGraduacion" class="h-30vh object-cover mb-2">-->
+<!--        </div>-->
+<!--        <div class="imgEventos flex flex-col items-center cursor-pointer pb-3">-->
+<!--          <img src="assets/img/PROD/7.jpg" alt="imgGraduacion" class="h-30vh object-cover mb-2">-->
+<!--        </div>-->
+<!--      </div>-->
+
+
+      <div class="p-5 ">
+        <!-- Producto 1 -->
+        <div class="flex items-center gap-4 mb-4">
+          <div class="w-40">
+            <img src="assets/img/PROD/1.jpg" class="w-full h-auto rounded" alt="Mesa de madera">
+          </div>
+          <div class="flex-1">
+            <h5 class="font-semibold">Mesa de madera ...</h5>
+            <p class="text-gray-600">$50.00 C/U</p>
+          </div>
+          <div class="flex-1">
+            <h5 class="font-semibold">Cantidad</h5>
+            <p class="text-gray-600">5 pza</p>
+          </div>
+          <div class="flex-1">
+            <h5 class="font-semibold">Eliminar</h5>
+          </div>
         </div>
-        <div class="imgEventos flex flex-col items-center cursor-pointer pb-3">
-          <img src="assets/img/PROD/2.jpg" alt="imgBaut" class="h-30vh object-cover mb-2">
+
+        <!-- Producto 2 -->
+        <div class="flex items-center gap-4">
+          <div class="w-40">
+            <img src="assets/img/PROD/10.jpg" class="w-full h-auto rounded" alt="Mesa de madera">
+          </div>
+          <div class="flex-1">
+            <h5 class="font-semibold">Mesa de madera ...</h5>
+            <p class="text-gray-600">$50.00 C/U</p>
+          </div>
         </div>
-        <div class="imgEventos flex flex-col items-center cursor-pointer pb-3">
-          <img src="assets/img/PROD/3.jpg" alt="imgBoda" class="h-30vh object-cover mb-2">
-        </div>
-        <div class="imgEventos flex flex-col items-center cursor-pointer pb-3">
-          <img src="assets/img/PROD/4.jpg" alt="imgCumpleanios" class="h-30vh object-cover mb-2">
-        </div>
-        <div class="imgEventos flex flex-col items-center cursor-pointer pb-3">
-          <img src="assets/img/PROD/5.jpg" alt="imgDespedida" class="h-30vh object-cover mb-2">
-        </div>
-        <div class="imgEventos flex flex-col items-center cursor-pointer pb-3">
-          <img src="assets/img/PROD/6.jpg" alt="imgGraduacion" class="h-30vh object-cover mb-2">
-        </div>
-        <div class="imgEventos flex flex-col items-center cursor-pointer pb-3">
-          <img src="assets/img/PROD/7.jpg" alt="imgGraduacion" class="h-30vh object-cover mb-2">
-        </div>
+
       </div>
 
     </div>
@@ -37,35 +70,35 @@
 
   <!-- Formulario de datos -->
   <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-    <div>
-      <div class="card bg-white rounded-lg shadow mb-4">
-        <div class="card-body p-4">
-          <h5 class="font-bold text-lg mb-4">DATOS</h5>
-          <form>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-3">
-              <div>
-                <label for="nombre" class="block font-medium">NOMBRE</label>
-                <input type="text" class="mt-1 p-2 border border-gray-300 rounded w-full" id="nombre">
-              </div>
-              <div>
-                <label for="apellido" class="block font-medium">APELLIDO</label>
-                <input type="text" class="mt-1 p-2 border border-gray-300 rounded w-full" id="apellido">
-              </div>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label for="numero" class="block font-medium">NUMERO</label>
-                <input type="text" class="mt-1 p-2 border border-gray-300 rounded w-full" id="numero">
-              </div>
-              <div>
-                <label for="correo" class="block font-medium">CORREO</label>
-                <input type="email" class="mt-1 p-2 border border-gray-300 rounded w-full" id="correo">
-              </div>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
+<!--    <div>-->
+<!--      <div class="card bg-white rounded-lg shadow mb-4">-->
+<!--        <div class="card-body p-4">-->
+<!--          <h5 class="font-bold text-lg mb-4">DATOS</h5>-->
+<!--          <form>-->
+<!--            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-3">-->
+<!--              <div>-->
+<!--                <label for="nombre" class="block font-medium">NOMBRE</label>-->
+<!--                <input type="text" class="mt-1 p-2 border border-gray-300 rounded w-full" id="nombre">-->
+<!--              </div>-->
+<!--              <div>-->
+<!--                <label for="apellido" class="block font-medium">APELLIDO</label>-->
+<!--                <input type="text" class="mt-1 p-2 border border-gray-300 rounded w-full" id="apellido">-->
+<!--              </div>-->
+<!--            </div>-->
+<!--            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">-->
+<!--              <div>-->
+<!--                <label for="numero" class="block font-medium">NUMERO</label>-->
+<!--                <input type="text" class="mt-1 p-2 border border-gray-300 rounded w-full" id="numero">-->
+<!--              </div>-->
+<!--              <div>-->
+<!--                <label for="correo" class="block font-medium">CORREO</label>-->
+<!--                <input type="email" class="mt-1 p-2 border border-gray-300 rounded w-full" id="correo">-->
+<!--              </div>-->
+<!--            </div>-->
+<!--          </form>-->
+<!--        </div>-->
+<!--      </div>-->
+<!--    </div>-->
 
     <!-- Total y botón de pago -->
     <div>

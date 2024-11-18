@@ -1,4 +1,4 @@
 export interface Categoria {
-    CategoriaID: number; // Identificador único de la categoría
-    Nombre: string; // Nombre de la categoría
+    id?: number; // Identificador único de la categoría
+    name: string; // Nombre de la categoría
 }

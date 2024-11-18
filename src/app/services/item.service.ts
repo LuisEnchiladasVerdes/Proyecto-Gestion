@@ -8,7 +8,7 @@ import { Item } from '../models/item.model';
 })
 export class ItemService {
 
-  private apiUrl = 'http://localhost:3000/inventario'; // URL de tu API de categorías
+  private apiUrl = 'http://localhost:3000/producto'; // URL de tu API de categorías
 
   constructor(private http: HttpClient) { }
 
@@ -23,7 +23,7 @@ export class ItemService {
   getItemById(id: string) {
     return this.http.get<Item>(`${this.apiUrl}/${id}`);
   }
-  
+
   updateItem(item: Item) {
     return this.http.put(`${this.apiUrl}/${item.id}`, item);
   }

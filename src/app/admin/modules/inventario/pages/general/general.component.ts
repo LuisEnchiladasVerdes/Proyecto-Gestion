@@ -4,6 +4,8 @@ import { ItemService } from '../../../../../services/item.service';
 import { Item } from '../../../../../models/item.model';
 import { NgFor, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import {CategoriaService} from "../../../../../services/categoria.service";
+import { Categoria } from '../../../../../models/categoria.models';
 
 @Component({
   selector: 'app-general',
@@ -30,7 +32,7 @@ export class GeneralComponent {
 
   items: Item[] = []; // Definir un arreglo para los items
 
-  constructor(private itemService: ItemService) { }
+  constructor(private itemService: ItemService, private categoriaService : CategoriaService) { }
 
   ngOnInit(): void {
     this.cargar();
@@ -140,9 +142,21 @@ export class GeneralComponent {
 
   adjuntarCategoria(): void {
     if (this.nuevaCategoria.trim()) {
-      this.categorias.push(this.nuevaCategoria.trim());
-      alert(`Categoría "${this.nuevaCategoria}" agregada con éxito.`);
-      this.cerrarAgregarCategoriaModal(); // Cierra el modal tras agregar
+      // this.categorias.push(this.nuevaCategoria.trim());
+
+      const nuevaCategoria:Categoria = {
+        name: (document.getElementById('nuevaCategoria') as HTMLInputElement).value
+      };
+
+      this.categoriaService.addCategoria(nuevaCategoria).subscribe(
+        (response) => {
+          alert('Categoria agregada correctamente');
+          this.cerrarAgregarCategoriaModal(); // Cierra el modal tras agregar
+        },
+        (error) => {
+          console.error('Error al agregar la categoria', error);
+        }
+      );
     } else {
       alert('El nombre de la categoría no puede estar vacío.');
     }

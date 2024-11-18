@@ -6,6 +6,7 @@ import { MueblesService } from '../../../../../services/muebles.service';
 import { Categoria } from '../../../../../models/categoria.models';
 import { Item } from '../../../../../models/item.model';
 import { ItemService } from '../../../../../services/item.service';
+import {CategoriaService} from "../../../../../services/categoria.service";
 
 @Component({
   selector: 'app-add',
@@ -31,7 +32,7 @@ export class AddComponent {
   imageError = '';
 
   // constructor(private mueblesService : MueblesService) {}
-  constructor(private itemService : ItemService, private mueblesService : MueblesService) {}
+  constructor(private itemService : ItemService, private categoriasService : CategoriaService) {}
 
   validateName() {
     const nameInput = (document.getElementById('name') as HTMLInputElement).value;
@@ -72,7 +73,7 @@ export class AddComponent {
         // imagenUrl: 'url_de_imagen', // Actualiza esto según la carga de imagen que desees implementar
         categoria: this.selectedCategory as number // Solo el ID de la categoría
       };
-      
+
       this.itemService.addItem(nuevoItem).subscribe(
         (response) => {
           alert('Producto agregado correctamente');
@@ -88,10 +89,11 @@ export class AddComponent {
 
   ngOnInit(): void {
     // Obtener las categorías desde el servicio
-    this.mueblesService.getCategorias().subscribe(
+    this.categoriasService.getCategorias().subscribe(
       (data: Categoria[]) => {
         this.categorias = data;
         console.log(this.categorias); // Verificar los datos
+        alert('Categorias obtenidas')
       },
       (error) => {
         console.error('Error al cargar las categorías', error);

@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import {AdminLayoutComponent} from "./components/common/admin-layout/admin-layout.component";
+import {authGuard} from "../guards/auth.guard";
 
 const routes: Routes = [
   {
@@ -11,22 +12,26 @@ const routes: Routes = [
       {
         path: 'home',
         loadComponent: () => import('./components/aplication/home/home.component')
-          .then(m => m.HomeComponent)
+          .then(m => m.HomeComponent),
+        canActivate: [authGuard]
       },
       {
         path: 'inventario',
         loadChildren: () => import('./modules/inventario/inventario.module')
-          .then(m => m.InventarioModule)
+          .then(m => m.InventarioModule),
+        canActivate: [authGuard]
       },
       {
         path: 'reservas',
         loadChildren: () => import('./modules/reservas/reservas.module')
-          .then(m => m.ReservasModule)
+          .then(m => m.ReservasModule),
+        canActivate: [authGuard]
       },
       {
         path: 'pagos',
         loadChildren: () => import('./modules/pagos/pagos.module')
-          .then(m => m.PagosModule)
+          .then(m => m.PagosModule),
+        canActivate: [authGuard]
       }
 
     ]

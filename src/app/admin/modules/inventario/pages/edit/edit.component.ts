@@ -3,8 +3,6 @@ import { NgFor, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ItemService } from '../../../../../services/item.service';
-import { MueblesService } from '../../../../../services/muebles.service';
-import { Categoria } from '../../../../../models/categoria.models';
 import { Item } from '../../../../../models/item.model';
 
 @Component({

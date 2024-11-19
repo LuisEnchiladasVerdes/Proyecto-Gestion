@@ -2,7 +2,6 @@ import { Component } from '@angular/core';
 import {NgFor, NgIf} from "@angular/common";
 import {FormsModule} from "@angular/forms";
 import {RouterLink} from "@angular/router";
-import { MueblesService } from '../../../../../services/muebles.service';
 import { Categoria } from '../../../../../models/categoria.models';
 import { Item } from '../../../../../models/item.model';
 import { ItemService } from '../../../../../services/item.service';
@@ -31,7 +30,6 @@ export class AddComponent {
   descriptionError = '';
   imageError = '';
 
-  // constructor(private mueblesService : MueblesService) {}
   constructor(private itemService : ItemService, private categoriasService : CategoriaService) {}
 
   validateName() {

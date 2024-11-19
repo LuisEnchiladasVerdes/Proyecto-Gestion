@@ -19,4 +19,5 @@ export class MueblesService {
   getCategorias(): Observable<Categoria[]> {
     return this.http.get<Categoria[]>(this.apiUrl);
   }
+
 }

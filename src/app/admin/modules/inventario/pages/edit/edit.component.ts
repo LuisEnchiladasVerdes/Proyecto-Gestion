@@ -3,7 +3,7 @@ import { NgFor, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ItemService } from '../../../../../services/item.service';
-import { Item } from '../../../../../models/item.model';
+import { Item } from '../../../../../models/item.models';
 
 @Component({
   selector: 'app-edit',

@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { RouterLink } from "@angular/router";
 import { ItemService } from '../../../../../services/item.service';
-import { Item } from '../../../../../models/item.model';
+import { Item } from '../../../../../models/item.models';
 import { NgFor, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {CategoriaService} from "../../../../../services/categoria.service";

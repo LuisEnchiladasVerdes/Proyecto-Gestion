@@ -1,11 +1,11 @@
 import { Component } from '@angular/core';
 import { RouterLink } from "@angular/router";
-import { ItemService } from '../../../../../services/item.service';
-import { Item } from '../../../../../models/item.models';
 import { NgFor, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {CategoriaService} from "../../../../../services/categoria.service";
 import { Categoria } from '../../../../../models/categoria.models';
+import {ProductoService} from "../../../../../services/producto.service";
+import {Producto} from "../../../../../models/producto.models";
 
 @Component({
   selector: 'app-general',
@@ -30,9 +30,10 @@ export class GeneralComponent {
   categorias = ['Mesas', 'Sillas', 'Paquetes']; // Opciones del dropdown
   categoriaSeleccionada = ''; // Categoría seleccionada
 
-  items: Item[] = []; // Definir un arreglo para los items
+  productos: Producto[] = []; // Definir un arreglo para los items
 
-  constructor(private itemService: ItemService, private categoriaService : CategoriaService) { }
+  // constructor(private itemService: ItemService, private categoriaService : CategoriaService) { }
+  constructor(private productoService : ProductoService, private categoriaService : CategoriaService) { }
 
   ngOnInit(): void {
     this.cargar();
@@ -61,11 +62,11 @@ export class GeneralComponent {
   }
 
   cargar(){
-    this.itemService.getItems().subscribe(
-      (items: Item[]) => {
-        if (items && items.length > 0) {
-          this.items = items; // Asignar todos los items al arreglo
-          // console.log(this.items); // Ver el array completo de items
+    this.productoService.getProducto().subscribe(
+      (productos: Producto[]) => {
+        if (productos && productos.length > 0) {
+          this.productos = productos; // Asignar todos los items al arreglo
+          // console.log(this.productos); // Ver el array completo de items
         }
       },
       (error: any) => {
@@ -145,7 +146,7 @@ export class GeneralComponent {
       // this.categorias.push(this.nuevaCategoria.trim());
 
       const nuevaCategoria:Categoria = {
-        name: (document.getElementById('nuevaCategoria') as HTMLInputElement).value
+        nombre: (document.getElementById('nuevaCategoria') as HTMLInputElement).value
       };
 
       this.categoriaService.addCategoria(nuevaCategoria).subscribe(

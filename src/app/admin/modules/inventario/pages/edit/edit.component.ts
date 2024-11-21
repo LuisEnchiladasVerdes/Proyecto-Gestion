@@ -1,15 +1,14 @@
 import { Component, OnInit } from '@angular/core';
-import { NgFor, NgIf } from '@angular/common';
+import { NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { ItemService } from '../../../../../services/item.service';
-import { Item } from '../../../../../models/item.models';
+import {Producto} from "../../../../../models/producto.models";
+import {ProductoService} from "../../../../../services/producto.service";
 
 @Component({
   selector: 'app-edit',
   standalone: true,
   imports: [
-    NgFor,
     NgIf,
     FormsModule,
     RouterLink
@@ -18,11 +17,11 @@ import { Item } from '../../../../../models/item.models';
   styleUrl: './edit.component.css'
 })
 export class EditComponent implements OnInit {
-  item: Item = {
+  producto: Producto = {
     id: 0,
-    name: '',
+    nombre: '',
     categoria: 0,
-    desc: '',
+    descripcion: '',
     stock: 0
   }; // Definimos un item vacío para inicializar
 
@@ -33,7 +32,7 @@ export class EditComponent implements OnInit {
   };
 
   constructor(
-    private itemService: ItemService,
+    private productoService: ProductoService,
     private route: ActivatedRoute,
     private router: Router
   ) { }
@@ -47,12 +46,12 @@ export class EditComponent implements OnInit {
   }
 
   cargarItem(id: string): void {
-    this.itemService.getItemById(id).subscribe(
-      (item: Item) => {
-        this.item = item; // Asignamos los datos del item
+    this.productoService.getItemById(id).subscribe(
+      (producto: Producto) => {
+        this.producto = producto; // Asignamos los datos del item
       },
       (error: any) => {
-        console.error('Error al cargar el item', error);
+        alert('Error al cargar el producto');
       }
     );
   }
@@ -60,15 +59,15 @@ export class EditComponent implements OnInit {
   validarFormulario(): boolean {
     let valid = true;
     // Verificar cada campo
-    if (!this.item.name) {
+    if (!this.producto.nombre) {
       this.formValid.name = false;
       valid = false;
     }
-    if (this.item.categoria === 0) {
+    if (this.producto.categoria === 0) {
       this.formValid.categoria = false;
       valid = false;
     }
-    if (this.item.stock <= 0) {
+    if (this.producto.stock <= 0) {
       this.formValid.stock = false;
       valid = false;
     }
@@ -86,7 +85,7 @@ export class EditComponent implements OnInit {
     //   }
     // );
     if (this.validarFormulario()) {
-      this.itemService.updateItem(this.item).subscribe(
+      this.productoService.updateItem(this.producto).subscribe(
         (response) => {
           alert('Producto editado correctamente');
           this.router.navigate(['/admin/inventario/general']); // Redirigir al listado de items después de guardar

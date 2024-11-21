@@ -3,8 +3,6 @@ import {NgFor, NgIf} from "@angular/common";
 import {FormsModule} from "@angular/forms";
 import {RouterLink} from "@angular/router";
 import { Categoria } from '../../../../../models/categoria.models';
-import { Item } from '../../../../../models/item.models';
-import { ItemService } from '../../../../../services/item.service';
 import {CategoriaService} from "../../../../../services/categoria.service";
 
 @Component({
@@ -30,7 +28,9 @@ export class AddComponent {
   descriptionError = '';
   imageError = '';
 
-  constructor(private itemService : ItemService, private categoriasService : CategoriaService) {}
+  // constructor(private itemService : ItemService, private categoriasService : CategoriaService) {}
+
+  constructor(private categoriasService : CategoriaService) {}
 
   validateName() {
     const nameInput = (document.getElementById('name') as HTMLInputElement).value;
@@ -64,22 +64,22 @@ export class AddComponent {
 
     // Si no hay errores, muestra el mensaje de éxito                         && !this.imageError
     if (!this.nameError && !this.categoryError && !this.quantityError && !this.descriptionError ) {
-      const nuevoItem: Item = {
-        name: (document.getElementById('name') as HTMLInputElement).value,
-        stock: +(document.getElementById('quantity') as HTMLInputElement).value,
-        desc: (document.getElementById('description') as HTMLTextAreaElement).value,
-        // imagenUrl: 'url_de_imagen', // Actualiza esto según la carga de imagen que desees implementar
-        categoria: this.selectedCategory as number // Solo el ID de la categoría
-      };
+      // const nuevoItem: Item = {
+      //   name: (document.getElementById('name') as HTMLInputElement).value,
+      //   stock: +(document.getElementById('quantity') as HTMLInputElement).value,
+      //   desc: (document.getElementById('description') as HTMLTextAreaElement).value,
+      //   // imagenUrl: 'url_de_imagen', // Actualiza esto según la carga de imagen que desees implementar
+      //   categoria: this.selectedCategory as number // Solo el ID de la categoría
+      // };
 
-      this.itemService.addItem(nuevoItem).subscribe(
-        (response) => {
-          alert('Producto agregado correctamente');
-        },
-        (error) => {
-          console.error('Error al agregar el mueble', error);
-        }
-      );
+      // this.itemService.addItem(nuevoItem).subscribe(
+      //   (response) => {
+      //     alert('Producto agregado correctamente');
+      //   },
+      //   (error) => {
+      //     console.error('Error al agregar el mueble', error);
+      //   }
+      // );
       this.limpiarCampos();
     }
   }
@@ -91,12 +91,13 @@ export class AddComponent {
       (data: Categoria[]) => {
         this.categorias = data;
         console.log(this.categorias); // Verificar los datos
-        alert('Categorias obtenidas')
+        // alert('Categorias obtenidas')
       },
       (error) => {
         console.error('Error al cargar las categorías', error);
       }
     );
+
   }
 
   validateCategory(): void {

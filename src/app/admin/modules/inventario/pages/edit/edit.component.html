@@ -12,7 +12,7 @@
                 <div class="space-y-4">
                     <div>
                         <label for="name" class="block text-sm font-medium text-gray-700">Nombre</label>
-                        <input id="name" [(ngModel)]="item.name" name="name" type="text" required
+                        <input id="name" [(ngModel)]="producto.nombre" name="name" type="text" required
                             class="mt-1 px-4 py-2 border border-gray-300 rounded-md w-full"
                             [class.border-red-500]="!formValid.name" />
 
@@ -21,7 +21,7 @@
 
                     <div>
                         <label for="categoria" class="block text-sm font-medium text-gray-700">Categoría</label>
-                        <select id="categoria" [(ngModel)]="item.categoria" name="categoria" required
+                        <select id="categoria" [(ngModel)]="producto.categoria" name="categoria" required
                             [class.border-red-500]="!formValid.categoria"
                             class="mt-1 px-4 py-2 border border-gray-300 rounded-md w-full">
                             <option value="1">Mesas</option>
@@ -35,7 +35,7 @@
 
                     <div>
                         <label for="stock" class="block text-sm font-medium text-gray-700">Stock</label>
-                        <input id="stock" [(ngModel)]="item.stock" name="stock" type="number" required
+                        <input id="stock" [(ngModel)]="producto.stock" name="stock" type="number" required
                             class="mt-1 px-4 py-2 border border-gray-300 rounded-md w-full"
                             [class.border-red-500]="!formValid.stock" />
                         <div *ngIf="!formValid.stock" class="text-sm text-red-500">El stock debe ser mayor que 0.</div>

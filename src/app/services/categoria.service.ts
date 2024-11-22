@@ -9,8 +9,6 @@ import { Categoria } from '../models/categoria.models';
 export class CategoriaService {
 
   private apiUrl = 'http://127.0.0.1:8000/api/administrador/categorias/';
-  // private apiUrl = 'https://769b-2806-10ae-3-e8a9-5c68-5f6f-d886-971d.ngrok-free.app/categorias';
-
 
   constructor(private http: HttpClient) { }
 

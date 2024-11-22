@@ -27,16 +27,37 @@ export class GeneralComponent {
   mostrarAgregarCategoriaModal: boolean = false; // Controla la visibilidad del modal
   nuevaCategoria: string = ''; // Almacena el valor de la nueva categoría
 
-  categorias = ['Mesas', 'Sillas', 'Paquetes']; // Opciones del dropdown
+  categorias: any[] = []; // Array para almacenar las categorías
+  // categorias = ['Mesas', 'Sillas', 'Paquetes']; // Opciones del dropdown
   categoriaSeleccionada = ''; // Categoría seleccionada
 
   productos: Producto[] = []; // Definir un arreglo para los items
 
-  // constructor(private itemService: ItemService, private categoriaService : CategoriaService) { }
   constructor(private productoService : ProductoService, private categoriaService : CategoriaService) { }
 
+  // CARGA AL INICIAR LOS PRODUCTOS Y LAS CATEGORIAS
   ngOnInit(): void {
-    this.cargar();
+    this.productoService.getProducto().subscribe(
+      (productos: Producto[]) => {
+        if (productos && productos.length > 0) {
+          this.productos = productos; // Asignar todos los items al arreglo
+          // console.log(this.productos); // Ver el array completo de items
+        }
+      },
+      (error: any) => {
+        console.error('Error al cargar los items', error);
+      }
+    );
+    this.categoriaService.getCategorias().subscribe(
+      (data: Categoria[]) => {
+        this.categorias = data;
+        console.log(this.categorias); // Verificar los datos
+        // alert('Categorias obtenidas')
+      },
+      (error) => {
+        console.error('Error al cargar las categorías', error);
+      }
+    );
   }
 
   validarCategoria(categoria:number){
@@ -61,20 +82,55 @@ export class GeneralComponent {
     }
   }
 
-  cargar(){
-    this.productoService.getProducto().subscribe(
-      (productos: Producto[]) => {
-        if (productos && productos.length > 0) {
-          this.productos = productos; // Asignar todos los items al arreglo
-          // console.log(this.productos); // Ver el array completo de items
-        }
-      },
-      (error: any) => {
-        console.error('Error al cargar los items', error);
-      }
-    );
+
+  // CRUD DE CATEGORIAS
+  eliminarCategoria(): void {
+    if (this.categoriaSeleccionada) {
+      // this.categorias = this.categorias.filter(cat => cat !== this.categoriaSeleccionada);
+      this.categoriaSeleccionada = ''; // Limpia el campo
+      alert('Categoría eliminada exitosamente');
+    } else {
+      alert('Selecciona una categoría válida para eliminar.');
+    }
   }
 
+  actualizarCategoria(): void {
+    if (this.categoriaSeleccionada) {
+      const categoriaIndex = this.categorias.findIndex(cat => cat === this.categoriaSeleccionada);
+      if (categoriaIndex !== -1) {
+        alert('Categoría actualizada: ' + this.categoriaSeleccionada);
+      }
+      this.categoriaSeleccionada = ''; // Limpia el campo
+    } else {
+      alert('Escribe o selecciona una categoría válida.');
+    }
+  }
+
+  adjuntarCategoria(): void {
+    if (this.nuevaCategoria.trim()) {
+      // this.categorias.push(this.nuevaCategoria.trim());
+
+      const nuevaCategoria:Categoria = {
+        nombre: (document.getElementById('nuevaCategoria') as HTMLInputElement).value
+      };
+
+      this.categoriaService.addCategoria(nuevaCategoria).subscribe(
+        (response) => {
+          alert('Categoria agregada correctamente');
+          this.cerrarAgregarCategoriaModal(); // Cierra el modal tras agregar
+        },
+        (error) => {
+          console.error('Error al agregar la categoria', error);
+        }
+      );
+    } else {
+      alert('El nombre de la categoría no puede estar vacío.');
+    }
+  }
+
+
+
+  // MODALES
   abrirModal(): void {
     this.mostrarModal = true;
   }
@@ -103,28 +159,6 @@ export class GeneralComponent {
     this.mostrarModalEditar = false;
   }
 
-  eliminarCategoria(): void {
-    if (this.categoriaSeleccionada) {
-      this.categorias = this.categorias.filter(cat => cat !== this.categoriaSeleccionada);
-      this.categoriaSeleccionada = ''; // Limpia el campo
-      alert('Categoría eliminada exitosamente');
-    } else {
-      alert('Selecciona una categoría válida para eliminar.');
-    }
-  }
-
-  actualizarCategoria(): void {
-    if (this.categoriaSeleccionada) {
-      const categoriaIndex = this.categorias.findIndex(cat => cat === this.categoriaSeleccionada);
-      if (categoriaIndex !== -1) {
-        alert('Categoría actualizada: ' + this.categoriaSeleccionada);
-      }
-      this.categoriaSeleccionada = ''; // Limpia el campo
-    } else {
-      alert('Escribe o selecciona una categoría válida.');
-    }
-  }
-
   volverAlModalPrincipal(): void {
     this.cerrarEditarCategoriaModal(); // Cierra el modal de editar categoría
     this.cerrarAgregarCategoriaModal();
@@ -139,28 +173,6 @@ export class GeneralComponent {
   cerrarAgregarCategoriaModal(): void {
     this.mostrarAgregarCategoriaModal = false;
     this.nuevaCategoria = ''; // Limpia el campo al cerrar
-  }
-
-  adjuntarCategoria(): void {
-    if (this.nuevaCategoria.trim()) {
-      // this.categorias.push(this.nuevaCategoria.trim());
-
-      const nuevaCategoria:Categoria = {
-        nombre: (document.getElementById('nuevaCategoria') as HTMLInputElement).value
-      };
-
-      this.categoriaService.addCategoria(nuevaCategoria).subscribe(
-        (response) => {
-          alert('Categoria agregada correctamente');
-          this.cerrarAgregarCategoriaModal(); // Cierra el modal tras agregar
-        },
-        (error) => {
-          console.error('Error al agregar la categoria', error);
-        }
-      );
-    } else {
-      alert('El nombre de la categoría no puede estar vacío.');
-    }
   }
 
 }

@@ -28,7 +28,6 @@ export class GeneralComponent {
   nuevaCategoria: string = ''; // Almacena el valor de la nueva categoría
 
   categorias: any[] = []; // Array para almacenar las categorías
-  // categorias = ['Mesas', 'Sillas', 'Paquetes']; // Opciones del dropdown
   categoriaSeleccionada = ''; // Categoría seleccionada
 
   productos: Producto[] = []; // Definir un arreglo para los items
@@ -173,6 +172,23 @@ export class GeneralComponent {
   cerrarAgregarCategoriaModal(): void {
     this.mostrarAgregarCategoriaModal = false;
     this.nuevaCategoria = ''; // Limpia el campo al cerrar
+  }
+
+
+  isEditing: boolean = false;
+
+  // Activar el modo de edición cuando se selecciona una categoría
+  onCategoriaSeleccionada() {
+    this.isEditing = true;
+  }
+
+  // Guardar la edición y actualizar la lista
+  guardarEdicion() {
+    const categoriaEditada = this.categorias.find(categoria => categoria.nombre === this.categoriaSeleccionada);
+    if (categoriaEditada) {
+      categoriaEditada.nombre = this.categoriaSeleccionada;
+      this.isEditing = false; // Desactivar la edición
+    }
   }
 
 }

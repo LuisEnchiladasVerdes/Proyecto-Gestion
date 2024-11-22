@@ -135,17 +135,30 @@
 
             <!-- Campo editable -->
             <div class="mb-4">
-              <label for="categorias" class="block text-sm font-medium text-gray-700">Seleccionar o editar categoría</label>
-              <input
-                type="text"
-                [(ngModel)]="categoriaSeleccionada"
-                id="categorias"
-                list="opcionesCategorias"
-                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-              >
-              <datalist id="opcionesCategorias">
-                <option *ngFor="let categoria of categorias" [value]="categoria.nombre"></option>
-              </datalist>
+<!--              <label for="categorias" class="block text-sm font-medium text-gray-700">Seleccionar o editar categoría</label>-->
+<!--              <input-->
+<!--                type="text"-->
+<!--                [(ngModel)]="categoriaSeleccionada"-->
+<!--                id="categorias"-->
+<!--                list="opcionesCategorias"-->
+<!--                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"-->
+<!--              >-->
+<!--              <datalist id="opcionesCategorias">-->
+<!--                <option *ngFor="let categoria of categorias" [value]="categoria.nombre"></option>-->
+<!--              </datalist>-->
+
+              <label for="categoria" class="block text-sm font-medium text-gray-700">Seleccionar o editar categoría</label>
+
+              <!-- Lista desplegable -->
+              <select [(ngModel)]="categoriaSeleccionada" (change)="onCategoriaSeleccionada()" id="categoria" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                <option *ngFor="let categoria of categorias" [value]="categoria.nombre">{{ categoria.nombre }}</option>
+              </select>
+
+              <!-- Campo para editar la categoría seleccionada -->
+              <div *ngIf="isEditing">
+                <input [(ngModel)]="categoriaSeleccionada" type="text" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                <button (click)="guardarEdicion()" class="mt-2 text-sm bg-blue-500 text-white px-4 py-2 rounded">Guardar</button>
+              </div>
             </div>
 
             <!-- Botones -->

@@ -59,6 +59,19 @@ export class GeneralComponent {
     );
   }
 
+  obtenerCategoria(){
+    this.categoriaService.getCategorias().subscribe(
+      (data: Categoria[]) => {
+        this.categorias = data;
+        console.log(this.categorias); // Verificar los datos
+        // alert('Categorias obtenidas')
+      },
+      (error) => {
+        console.error('Error al cargar las categorías', error);
+      }
+    );
+  }
+
   validarCategoria(categoria:number){
     if(categoria === 1){
       return 'Mesas';
@@ -93,6 +106,22 @@ export class GeneralComponent {
     }
   }
 
+  // eliminarCategoria(id: number): void {
+  //   if (confirm('¿Estás seguro de que deseas eliminar esta categoría?')) {
+  //     this.categoriaService.deleteCategorias(id).subscribe({
+  //       next: () => {
+  //         alert('Categoría eliminada correctamente.');
+  //         this.obtenerCategoria(); // Actualiza la lista de categorías
+  //       },
+  //       error: (err) => {
+  //         console.error('Error al eliminar la categoría:', err);
+  //         alert('Ocurrió un error al intentar eliminar la categoría.');
+  //       }
+  //     });
+  //   }
+  // }
+
+
   actualizarCategoria(): void {
     if (this.categoriaSeleccionada) {
       const categoriaIndex = this.categorias.findIndex(cat => cat === this.categoriaSeleccionada);
@@ -104,6 +133,20 @@ export class GeneralComponent {
       alert('Escribe o selecciona una categoría válida.');
     }
   }
+
+  // actualizarCategoria(categoria: Categoria): void {
+  //   this.categoriaService.updateCategorias(categoria).subscribe({
+  //     next: () => {
+  //       alert('Categoría actualizada correctamente.');
+  //       this.obtenerCategoria(); // Actualiza la lista de categorías
+  //     },
+  //     error: (err) => {
+  //       console.error('Error al actualizar la categoría:', err);
+  //       alert('Ocurrió un error al intentar actualizar la categoría.');
+  //     }
+  //   });
+  // }
+
 
   adjuntarCategoria(): void {
     if (this.nuevaCategoria.trim()) {

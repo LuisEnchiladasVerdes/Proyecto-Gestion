@@ -29,7 +29,7 @@ export class CategoriaService {
     return this.http.put(`${this.apiUrl}/${categoria.id}`, categoria);
   }
 
-  deleteCategorias(id: string) {
+  deleteCategorias(id: number) {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
 

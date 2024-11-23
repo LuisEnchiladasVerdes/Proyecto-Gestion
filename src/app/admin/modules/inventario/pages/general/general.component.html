@@ -124,26 +124,26 @@
             </p>
 
 
-              <!-- Campo editable -->
-              <div class="mb-4">
+<!--              &lt;!&ndash; Campo editable &ndash;&gt;-->
+<!--              <div class="mb-4">-->
 
-                <label for="categoria" class="block text-sm font-medium text-gray-700">Seleccionar o editar categoría</label>
+<!--                <label for="categoria" class="block text-sm font-medium text-gray-700">Seleccionar o editar categoría</label>-->
 
-                <!-- Lista desplegable -->
-                <select [(ngModel)]="categoriaSeleccionada" (change)="onCategoriaSeleccionada()" id="categoria" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                  <option *ngFor="let categoria of categorias" [value]="categoria.nombre">{{ categoria.nombre }}</option>
-                </select>
+<!--                &lt;!&ndash; Lista desplegable &ndash;&gt;-->
+<!--                <select [(ngModel)]="categoriaSeleccionada" (change)="onCategoriaSeleccionada()" id="categoria" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">-->
+<!--                  <option *ngFor="let categoria of categorias" [value]="categoria.nombre">{{ categoria.nombre }}</option>-->
+<!--                </select>-->
 
-                <!-- Campo para editar la categoría seleccionada -->
-                <div *ngIf="isEditing">
-                  <input [(ngModel)]="categoriaSeleccionada" type="text" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                  <button (click)="guardarEdicion()" class="mt-2 text-sm bg-blue-500 text-white px-4 py-2 rounded">Guardar</button>
-                </div>
+<!--                &lt;!&ndash; Campo para editar la categoría seleccionada &ndash;&gt;-->
+<!--                <div *ngIf="isEditing">-->
+<!--                  <input [(ngModel)]="categoriaSeleccionada" type="text" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">-->
+<!--                  <button (click)="guardarEdicion()" class="mt-2 text-sm bg-blue-500 text-white px-4 py-2 rounded">Guardar</button>-->
+<!--                </div>-->
 
-              </div>
+<!--              </div>-->
 
-              <!-- Botones -->
-              <div class="flex flex-col space-y-4">
+<!--              &lt;!&ndash; Botones &ndash;&gt;-->
+<!--              <div class="flex flex-col space-y-4">-->
 <!--                <button-->
 <!--                  class="w-full px-4 py-2 bg-red-600 rounded-md text-sm font-medium text-white hover:bg-red-700"-->
 <!--                  (click)="eliminarCategoria(categoriaId)"-->
@@ -152,11 +152,43 @@
 <!--                </button>-->
 <!--                <button-->
 <!--                  class="w-full px-4 py-2 bg-blue-600 rounded-md text-sm font-medium text-white hover:bg-blue-700"-->
-<!--                  (click)="actualizarCategoria({ id: categoriaId, nombre: categoriaSeleccionada })"-->
+<!--                  (click)="editCategoria()"-->
 <!--                >-->
 <!--                  Actualizar-->
 <!--                </button>-->
+<!--              </div>-->
+
+
+            <!-- Campo editable -->
+            <div class="mb-4">
+              <label for="categoria" class="block text-sm font-medium text-gray-700">Seleccionar o editar categoría</label>
+
+              <!-- Lista desplegable para seleccionar categoría -->
+              <select [(ngModel)]="categoriaSeleccionada" (change)="onCategoriaSeleccionada()" id="categoria" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                <option *ngFor="let categoria of categorias" [value]="categoria.nombre">{{ categoria.nombre }}</option>
+              </select>
+
+              <!-- Campo para editar la categoría seleccionada -->
+              <div *ngIf="isEditing">
+                <input [(ngModel)]="categoriaSeleccionada" type="text" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                <button (click)="guardarEdicion()" class="mt-2 text-sm bg-blue-500 text-white px-4 py-2 rounded">Guardar</button>
               </div>
+
+            </div>
+
+            <!-- Botones -->
+            <div class="flex flex-col space-y-4">
+              <!-- Botón de Eliminar Categoría -->
+              <button *ngIf="!isEditing" class="w-full px-4 py-2 bg-red-600 rounded-md text-sm font-medium text-white hover:bg-red-700" (click)="eliminarCategoria(categoriaId)">
+                Eliminar
+              </button>
+
+              <!-- Botón de Actualizar Categoría -->
+              <button *ngIf="!isEditing" class="w-full px-4 py-2 bg-blue-600 rounded-md text-sm font-medium text-white hover:bg-blue-700" (click)="editCategoria()">
+                Actualizar
+              </button>
+            </div>
+
 
           </div>
         </div>
@@ -188,13 +220,13 @@
                 id="nuevaCategoria"
                 [(ngModel)]="nuevaCategoria"
                 class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                placeholder="Escribe el nombre de la nueva categoría"
+                placeholder="Nuevo nombre de categoría"
               >
             </div>
 
             <!-- Botones -->
             <div class="flex justify-end space-x-4">
-<!--              <button (click)="adjuntarCategoria()" class="px-4 py-2 bg-indigo-500 text-white rounded hover:bg-indigo-600">Agregar</button>-->
+              <button (click)="agregarCategoria()" class="px-4 py-2 bg-indigo-500 text-white rounded hover:bg-indigo-600">Agregar</button>
             </div>
           </div>
         </div>

@@ -95,10 +95,62 @@ export class GeneralComponent implements OnInit{
   //     if(stock < 50) return 'Bajo Stock'
   //     else return 'En Stock'
   //   }
-  // }
 
 
 
+  // CRUD CATEDORIAS
+  agregarCategoria(): void {
+    if (this.nuevaCategoria.trim()) {
+      this.categoriaService.addCategoria({ nombre: this.nuevaCategoria }).subscribe(
+        (categoria: Categoria) => {
+          this.categorias.push(categoria); // Añadir la nueva categoría al arreglo
+          this.cerrarAgregarCategoriaModal(); // Cerrar el modal
+          alert('Categoria agregada con exito')
+        },
+        (error) => {
+          console.error('Error al agregar la categoría', error);
+          alert('Error al agregar la categoria')
+        }
+      );
+    }
+  }
+
+  editCategoria(): void {
+    if (this.categoriaId && this.categoriaSeleccionada.trim()) {
+      const categoriaEditada = {
+        id: this.categoriaId,
+        nombre: this.categoriaSeleccionada
+      };
+
+      this.categoriaService.editarCategoria(categoriaEditada).subscribe(
+        (categoriaActualizada: Categoria) => {
+          const index = this.categorias.findIndex(c => c.id === categoriaEditada.id);
+          if (index !== -1) {
+            this.categorias[index] = categoriaActualizada; // Actualiza la categoría en el arreglo
+          }
+          this.cerrarEditarCategoriaModal(); // Cerrar el modal de edición
+          alert('Categoria editada con exito')
+        },
+        (error) => {
+          console.error('Error al editar la categoría', error);
+          alert('Error al editar la categoria')
+        }
+      );
+    }
+  }
+
+  eliminarCategoria(categoriaId: number) {
+    if (categoriaId > 0) {
+      this.categoriaService.deleteCategorias(categoriaId).subscribe(() => {
+        // Eliminar categoría exitosa
+        this.categorias = this.categorias.filter(c => c.id !== categoriaId);  // Elimina la categoría del array
+        alert('Categoría eliminada con éxito');
+      }, (error) => {
+        console.error('Error al eliminar la categoría:', error);
+        alert('Categoria no eliminada')
+      });
+    }
+  }
 
 
 
@@ -152,17 +204,25 @@ export class GeneralComponent implements OnInit{
 
   // Activar el modo de edición cuando se selecciona una categoría
   onCategoriaSeleccionada() {
-    this.isEditing = true;
+    this.isEditing = true;  // Activa el modo de edición
     const selectedCategory = this.categorias.find(c => c.nombre === this.categoriaSeleccionada);
     this.categoriaId = selectedCategory ? selectedCategory.id : 0;  // Asigna el id basado en el nombre
   }
 
-  // Guardar la edición y actualizar la lista
   guardarEdicion() {
-    const categoriaEditada = this.categorias.find(categoria => categoria.nombre === this.categoriaSeleccionada);
-    if (categoriaEditada) {
-      categoriaEditada.nombre = this.categoriaSeleccionada;
-      this.isEditing = false; // Desactivar la edición
+    if (this.categoriaSeleccionada) {
+      // Actualiza la categoría en el array
+      const categoriaEditada = this.categorias.find(categoria => categoria.id === this.categoriaId);
+      if (categoriaEditada) {
+        categoriaEditada.nombre = this.categoriaSeleccionada;
+        // Llamar al servicio para guardar la categoría editada (si se necesita)
+        this.categoriaService.editarCategoria(categoriaEditada).subscribe(() => {
+          // Actualización exitosa
+          this.isEditing = false;  // Desactiva el modo de edición
+        }, (error) => {
+          console.error('Error al guardar la categoría:', error);
+        });
+      }
     }
   }
 

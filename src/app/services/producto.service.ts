@@ -20,7 +20,7 @@ export class ProductoService {
     return this.http.post<Producto>(`${this.apiUrl}`,producto);
   }
 
-  getItemById(id: string) {
+  getItemById(id: string) : Observable<Producto> {
     return this.http.get<Producto>(`${this.apiUrl}${id}/`);
   }
 

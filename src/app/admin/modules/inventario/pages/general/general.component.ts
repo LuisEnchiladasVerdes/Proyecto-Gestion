@@ -20,18 +20,22 @@ import {Producto} from "../../../../../models/producto.models";
   styleUrls: ['./general.component.css']
 })
 export class GeneralComponent {
-  searchText: string = '';
 
+  //ATRIBUTOS DE MODALES
   mostrarModal: boolean = false;
   mostrarModalEditar = false;
   mostrarAgregarCategoriaModal: boolean = false; // Controla la visibilidad del modal
   nuevaCategoria: string = ''; // Almacena el valor de la nueva categoría
 
+  // ATRIBUTOS DE CATEGORIAS
   categorias: any[] = []; // Array para almacenar las categorías
   categoriaSeleccionada = ''; // Categoría seleccionada
+  categoriaId: number = 0;
 
+  // ATRIBUTO DE PRODUCTOS
   productos: Producto[] = []; // Definir un arreglo para los items
 
+  // CONSTRUCTOS
   constructor(private productoService : ProductoService, private categoriaService : CategoriaService) { }
 
   // CARGA AL INICIAR LOS PRODUCTOS Y LAS CATEGORIAS
@@ -96,56 +100,55 @@ export class GeneralComponent {
 
 
   // CRUD DE CATEGORIAS
-  eliminarCategoria(): void {
-    if (this.categoriaSeleccionada) {
-      // this.categorias = this.categorias.filter(cat => cat !== this.categoriaSeleccionada);
-      this.categoriaSeleccionada = ''; // Limpia el campo
-      alert('Categoría eliminada exitosamente');
-    } else {
-      alert('Selecciona una categoría válida para eliminar.');
-    }
-  }
-
-  // eliminarCategoria(id: number): void {
-  //   if (confirm('¿Estás seguro de que deseas eliminar esta categoría?')) {
-  //     this.categoriaService.deleteCategorias(id).subscribe({
-  //       next: () => {
-  //         alert('Categoría eliminada correctamente.');
-  //         this.obtenerCategoria(); // Actualiza la lista de categorías
-  //       },
-  //       error: (err) => {
-  //         console.error('Error al eliminar la categoría:', err);
-  //         alert('Ocurrió un error al intentar eliminar la categoría.');
-  //       }
-  //     });
+  // eliminarCategoria(): void {
+  //   if (this.categoriaSeleccionada) {
+  //     // this.categorias = this.categorias.filter(cat => cat !== this.categoriaSeleccionada);
+  //     this.categoriaSeleccionada = ''; // Limpia el campo
+  //     alert('Categoría eliminada exitosamente');
+  //   } else {
+  //     alert('Selecciona una categoría válida para eliminar.');
   //   }
   // }
 
+  // actualizarCategoria(): void {
+  //   if (this.categoriaSeleccionada) {
+  //     const categoriaIndex = this.categorias.findIndex(cat => cat === this.categoriaSeleccionada);
+  //     if (categoriaIndex !== -1) {
+  //       alert('Categoría actualizada: ' + this.categoriaSeleccionada);
+  //     }
+  //     this.categoriaSeleccionada = ''; // Limpia el campo
+  //   } else {
+  //     alert('Escribe o selecciona una categoría válida.');
+  //   }
+  // }
 
-  actualizarCategoria(): void {
-    if (this.categoriaSeleccionada) {
-      const categoriaIndex = this.categorias.findIndex(cat => cat === this.categoriaSeleccionada);
-      if (categoriaIndex !== -1) {
-        alert('Categoría actualizada: ' + this.categoriaSeleccionada);
-      }
-      this.categoriaSeleccionada = ''; // Limpia el campo
-    } else {
-      alert('Escribe o selecciona una categoría válida.');
+  eliminarCategoria(id: number): void {
+    if (confirm('¿Estás seguro de que deseas eliminar esta categoría?')) {
+      this.categoriaService.deleteCategorias(id).subscribe({
+        next: () => {
+          alert('Categoría eliminada correctamente.');
+          this.obtenerCategoria(); // Actualiza la lista de categorías
+        },
+        error: (err) => {
+          console.error('Error al eliminar la categoría:', err);
+          alert('Ocurrió un error al intentar eliminar la categoría.');
+        }
+      });
     }
   }
 
-  // actualizarCategoria(categoria: Categoria): void {
-  //   this.categoriaService.updateCategorias(categoria).subscribe({
-  //     next: () => {
-  //       alert('Categoría actualizada correctamente.');
-  //       this.obtenerCategoria(); // Actualiza la lista de categorías
-  //     },
-  //     error: (err) => {
-  //       console.error('Error al actualizar la categoría:', err);
-  //       alert('Ocurrió un error al intentar actualizar la categoría.');
-  //     }
-  //   });
-  // }
+  actualizarCategoria(categoria: Categoria): void {
+    this.categoriaService.updateCategorias(categoria).subscribe({
+      next: () => {
+        alert('Categoría actualizada correctamente.');
+        this.obtenerCategoria(); // Actualiza la lista de categorías
+      },
+      error: (err) => {
+        console.error('Error al actualizar la categoría:', err);
+        alert('Ocurrió un error al intentar actualizar la categoría.');
+      }
+    });
+  }
 
 
   adjuntarCategoria(): void {
@@ -223,6 +226,8 @@ export class GeneralComponent {
   // Activar el modo de edición cuando se selecciona una categoría
   onCategoriaSeleccionada() {
     this.isEditing = true;
+    const selectedCategory = this.categorias.find(c => c.nombre === this.categoriaSeleccionada);
+    this.categoriaId = selectedCategory ? selectedCategory.id : 0;  // Asigna el id basado en el nombre
   }
 
   // Guardar la edición y actualizar la lista

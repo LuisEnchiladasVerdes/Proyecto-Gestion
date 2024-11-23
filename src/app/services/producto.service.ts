@@ -9,6 +9,7 @@ import {Producto} from "../models/producto.models";
 export class ProductoService {
 
   private apiUrl = 'http://127.0.0.1:8000/api/administrador/productos/'; // URL de tu API de categorías
+  private mediaBaseUrl = 'http://127.0.0.1:8000'; // Base URL del servidor
 
   constructor(private http: HttpClient) { }
 
@@ -27,4 +28,9 @@ export class ProductoService {
   updateItem(producto: Producto) {
     return this.http.put(`${this.apiUrl}${producto.id}`, producto);
   }
+
+  getMediaBaseUrl(): string {
+    return this.mediaBaseUrl;
+  }
+
 }

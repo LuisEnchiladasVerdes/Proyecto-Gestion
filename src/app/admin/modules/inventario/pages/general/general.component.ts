@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import { RouterLink } from "@angular/router";
 import { NgFor, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -19,7 +19,7 @@ import {Producto} from "../../../../../models/producto.models";
   templateUrl: './general.component.html',
   styleUrls: ['./general.component.css']
 })
-export class GeneralComponent {
+export class GeneralComponent implements OnInit{
 
   //ATRIBUTOS DE MODALES
   mostrarModal: boolean = false;
@@ -27,20 +27,27 @@ export class GeneralComponent {
   mostrarAgregarCategoriaModal: boolean = false; // Controla la visibilidad del modal
   nuevaCategoria: string = ''; // Almacena el valor de la nueva categoría
 
+
   // ATRIBUTOS DE CATEGORIAS
   categorias: any[] = []; // Array para almacenar las categorías
   categoriaSeleccionada = ''; // Categoría seleccionada
   categoriaId: number = 0;
 
+
   // ATRIBUTO DE PRODUCTOS
   productos: Producto[] = []; // Definir un arreglo para los items
+
+
+  // ATRIBUTO PARA IMAGENES
+  mediaBaseUrl: string = '';
+
 
   // CONSTRUCTOS
   constructor(private productoService : ProductoService, private categoriaService : CategoriaService) { }
 
   // CARGA AL INICIAR LOS PRODUCTOS Y LAS CATEGORIAS
   ngOnInit(): void {
-    this.productoService.getProducto().subscribe(
+    this.productoService.getProducto().subscribe(   //CARGAR PRODUCTOS
       (productos: Producto[]) => {
         if (productos && productos.length > 0) {
           this.productos = productos; // Asignar todos los items al arreglo
@@ -51,7 +58,7 @@ export class GeneralComponent {
         console.error('Error al cargar los items', error);
       }
     );
-    this.categoriaService.getCategorias().subscribe(
+    this.categoriaService.getCategorias().subscribe(  //CARGAR CATEGORIAS
       (data: Categoria[]) => {
         this.categorias = data;
         console.log(this.categorias); // Verificar los datos
@@ -61,6 +68,8 @@ export class GeneralComponent {
         console.error('Error al cargar las categorías', error);
       }
     );
+
+    this.mediaBaseUrl = this.productoService.getMediaBaseUrl(); // Obtiene la base URL del servicio
   }
 
   obtenerCategoria(){
@@ -76,102 +85,20 @@ export class GeneralComponent {
     );
   }
 
-  validarCategoria(categoria:number){
-    if(categoria === 1){
-      return 'Mesas';
-    }
-    else if(categoria === 2){
-      return 'Sillas';
-    }
-    else if (categoria === 3){
-      return 'Vajilla'
-    }else return 'Extras'
-  }
-
-  validarStock(categoria : number, stock : number){
-    if(categoria === 1 || categoria === 4){
-      if(stock < 10) return 'Bajo Stock'
-      else return 'En Stock'
-    }else {
-      if(stock < 50) return 'Bajo Stock'
-      else return 'En Stock'
-    }
-  }
 
 
-  // CRUD DE CATEGORIAS
-  // eliminarCategoria(): void {
-  //   if (this.categoriaSeleccionada) {
-  //     // this.categorias = this.categorias.filter(cat => cat !== this.categoriaSeleccionada);
-  //     this.categoriaSeleccionada = ''; // Limpia el campo
-  //     alert('Categoría eliminada exitosamente');
-  //   } else {
-  //     alert('Selecciona una categoría válida para eliminar.');
+  // validarStock(categoria : number, stock : number){
+  //   if(categoria === 1 || categoria === 4){
+  //     if(stock < 10) return 'Bajo Stock'
+  //     else return 'En Stock'
+  //   }else {
+  //     if(stock < 50) return 'Bajo Stock'
+  //     else return 'En Stock'
   //   }
   // }
 
-  // actualizarCategoria(): void {
-  //   if (this.categoriaSeleccionada) {
-  //     const categoriaIndex = this.categorias.findIndex(cat => cat === this.categoriaSeleccionada);
-  //     if (categoriaIndex !== -1) {
-  //       alert('Categoría actualizada: ' + this.categoriaSeleccionada);
-  //     }
-  //     this.categoriaSeleccionada = ''; // Limpia el campo
-  //   } else {
-  //     alert('Escribe o selecciona una categoría válida.');
-  //   }
-  // }
-
-  eliminarCategoria(id: number): void {
-    if (confirm('¿Estás seguro de que deseas eliminar esta categoría?')) {
-      this.categoriaService.deleteCategorias(id).subscribe({
-        next: () => {
-          alert('Categoría eliminada correctamente.');
-          this.obtenerCategoria(); // Actualiza la lista de categorías
-        },
-        error: (err) => {
-          console.error('Error al eliminar la categoría:', err);
-          alert('Ocurrió un error al intentar eliminar la categoría.');
-        }
-      });
-    }
-  }
-
-  actualizarCategoria(categoria: Categoria): void {
-    this.categoriaService.updateCategorias(categoria).subscribe({
-      next: () => {
-        alert('Categoría actualizada correctamente.');
-        this.obtenerCategoria(); // Actualiza la lista de categorías
-      },
-      error: (err) => {
-        console.error('Error al actualizar la categoría:', err);
-        alert('Ocurrió un error al intentar actualizar la categoría.');
-      }
-    });
-  }
 
 
-  adjuntarCategoria(): void {
-    if (this.nuevaCategoria.trim()) {
-      // this.categorias.push(this.nuevaCategoria.trim());
-
-      const nuevaCategoria:Categoria = {
-        nombre: (document.getElementById('nuevaCategoria') as HTMLInputElement).value
-      };
-
-      this.categoriaService.addCategoria(nuevaCategoria).subscribe(
-        (response) => {
-          alert('Categoria agregada correctamente');
-          this.cerrarAgregarCategoriaModal(); // Cierra el modal tras agregar
-        },
-        (error) => {
-          console.error('Error al agregar la categoria', error);
-        }
-      );
-    } else {
-      alert('El nombre de la categoría no puede estar vacío.');
-    }
-  }
 
 
 

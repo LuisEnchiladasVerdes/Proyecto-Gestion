@@ -25,9 +25,30 @@ export class ProductoService {
     return this.http.get<Producto>(`${this.apiUrl}${id}/`);
   }
 
-  updateItem(producto: Producto) {
-    return this.http.put(`${this.apiUrl}${producto.id}`, producto);
+  // updateItem(producto: Producto) : Observable<Producto> {
+  //   return this.http.put(`${this.apiUrl}${producto.id}`, producto);
+  //
+  //   return this.http.put(`${this.apiUrl}${producto.id}`, {
+  //     nombre: producto.nombre,
+  //     stock: producto.stock,
+  //     precio_actual: producto.precio_actual
+  //   });
+  //
+  //   const payload = {
+  //     nombre: producto.nombre,
+  //     descripcion: producto.descripcion,
+  //     stock: producto.stock,
+  //     precio: producto.precio_actual,
+  //     media_relacionado: producto.media_relacionado
+  //   };
+  //   return this.http.put<Producto>(`${this.apiUrl}${producto.id}`, payload);
+  // }
+
+  updateItem(formData: FormData, id: number): Observable<any> {
+    const url = `${this.apiUrl}${id}/`;  // URL con el ID del producto
+    return this.http.put(url, formData);
   }
+
 
   getMediaBaseUrl(): string {
     return this.mediaBaseUrl;

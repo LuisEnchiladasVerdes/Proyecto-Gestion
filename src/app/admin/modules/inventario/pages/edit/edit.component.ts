@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit, signal} from '@angular/core';
 import {NgForOf, NgIf} from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
@@ -36,10 +36,30 @@ export class EditComponent implements OnInit {
     nombre: true,
     categoria: true,
     stock: true,
-    precio: true
+    precio: true,
+    descripcion: true
   };
 
-  imageError = '';
+  selectedImage: File | null = null; // Para almacenar el archivo seleccionado
+  imageUrl = signal<string | null>(null);
+
+  onImageSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input?.files && input.files.length === 1) {
+      const file = input.files[0];
+      const reader = new FileReader();
+
+      reader.onload = () => {
+        const imageString = reader.result as string;
+        this.imageUrl.set(imageString); // Actualiza la vista previa
+        // console.log(imageString); // Imprime la cadena en la consola
+        this.selectedImage = file;
+        console.log(this.imageUrl)
+      };
+
+      reader.readAsDataURL(file); // Lee el archivo como Base64
+    }
+  }
 
   constructor(
     private productoService: ProductoService,
@@ -85,16 +105,17 @@ export class EditComponent implements OnInit {
   guardarCambios(): void {
     if (this.validarFormulario()) {
       const formData = new FormData();
+
+      // Comprobar si la imagen no es null
+      if (this.selectedImage) {
+        formData.append('media', this.selectedImage, this.selectedImage.name);
+      }
+
       formData.append('nombre', this.producto.nombre);
-      // formData.append('descripcion', this.producto.descripcion);
+      formData.append('descripcion', this.producto.descripcion);
       formData.append('stock', this.producto.stock.toString());  // Asegúrate de enviar el stock como texto
       formData.append('precio', this.producto.precio_actual.toString());  // Asegúrate de enviar el precio como texto
       // formData.append('categoria', this.producto.categoria.id.toString()); // Solo enviar el ID de la categoría
-
-      // Si se seleccionó un archivo, agregarlo al FormData
-      // if (this.selectedFile) {
-      //   formData.append('media', this.selectedFile, this.selectedFile.name);  // Aquí enviamos el archivo
-      // }
 
 
       if (this.producto.id !== undefined && this.producto.id !== null) {
@@ -131,9 +152,6 @@ export class EditComponent implements OnInit {
     return valid;
   }
 
-  validateImage() {
-    const imageInput = (document.getElementById('file-upload') as HTMLInputElement).files;
-    this.imageError = imageInput && imageInput.length > 0 ? '' : 'Se debe seleccionar una imagen';
-  }
+
 
 }

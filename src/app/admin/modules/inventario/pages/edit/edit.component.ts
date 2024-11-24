@@ -44,6 +44,9 @@ export class EditComponent implements OnInit {
   selectedImage: File | null = null; // Para almacenar el archivo seleccionado
   imageUrl = signal<string | null>(null);
 
+  // ATRIBUTO PARA IMAGENES
+  mediaBaseUrl: string = '';
+
   onImageSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (input?.files && input.files.length === 1) {
@@ -75,68 +78,77 @@ export class EditComponent implements OnInit {
       this.cargarProducto(id);
     }
     this.cargarCategorias(); // Cargar las categorías al inicio
+    this.mediaBaseUrl = this.productoService.getMediaBaseUrl();
   }
 
   cargarProducto(id: string): void {
     this.productoService.getItemById(id).subscribe(
       (producto: Producto) => {
-        this.producto = producto; // Asignamos los datos del producto
-        console.log(this.producto)
+        this.producto = producto;
+        this.producto.categoria_id = producto.categoria?.id || undefined;
       },
       (error) => {
-        console.error('Error al cargar el producto', error);
-        alert('Error al cargar el producto');
+        console.error('Error al cargar el producto:', error);
+        alert('Error al cargar el producto.');
       }
     );
   }
+
 
   cargarCategorias(): void {
-    // Supongo que tienes un servicio para obtener las categorías
     this.categoriaService.getCategorias().subscribe(
       (categorias: Categoria[]) => {
-        this.categorias = categorias; // Asignamos las categorías disponibles
+        this.categorias = categorias;
       },
       (error) => {
-        console.error('Error al cargar las categorías', error);
-        alert('Error al cargar las categorías');
+        console.error('Error al cargar las categorías:', error);
+        alert('Error al cargar las categorías.');
       }
     );
   }
 
+
   guardarCambios(): void {
+    console.log('Producto antes de guardar:', this.producto);
+
     if (this.validarFormulario()) {
       const formData = new FormData();
 
-      // Comprobar si la imagen no es null
-      if (this.selectedImage) {
-        formData.append('media', this.selectedImage, this.selectedImage.name);
-      }
-
       formData.append('nombre', this.producto.nombre);
       formData.append('descripcion', this.producto.descripcion);
-      formData.append('stock', this.producto.stock.toString());  // Asegúrate de enviar el stock como texto
-      formData.append('precio', this.producto.precio_actual.toString());  // Asegúrate de enviar el precio como texto
-      // formData.append('categoria', this.producto.categoria.id.toString()); // Solo enviar el ID de la categoría
+      formData.append('stock', this.producto.stock.toString());
+      formData.append('precio', this.producto.precio_actual.toString());
 
+      if (this.producto.categoria_id) {
+        formData.append('categoria_id', this.producto.categoria_id.toString());
+      } else {
+        alert('Por favor selecciona una categoría antes de guardar.');
+        return;
+      }
 
-      if (this.producto.id !== undefined && this.producto.id !== null) {
+      if (this.selectedImage) {
+        formData.append('media', this.selectedImage); // Agregar el archivo al FormData
+      }
+
+      if (this.producto.id) {
         this.productoService.updateItem(formData, this.producto.id).subscribe(
           (response) => {
-            alert('Producto editado correctamente');
+            alert('Producto actualizado correctamente.');
             this.router.navigate(['/admin/inventario/general']);
           },
           (error) => {
-            console.error('Error al guardar los cambios', error);
-            alert('Hubo un error al guardar los cambios');
+            console.error('Error al guardar los cambios:', error);
+            alert('Hubo un error al guardar los cambios.');
           }
         );
       } else {
-        alert('ID de producto no válido');
+        alert('ID de producto no válido.');
       }
     } else {
       alert('Por favor, complete todos los campos correctamente.');
     }
   }
+
 
   validarFormulario(): boolean {
     let valid = true;
@@ -153,6 +165,10 @@ export class EditComponent implements OnInit {
     return valid;
   }
 
+  onCategoriaChange(event: Event): void {
+    const selectElement = event.target as HTMLSelectElement;
+    this.producto.categoria_id = Number(selectElement.value);
+  }
 
 
 }

@@ -20,14 +20,14 @@
 
           <div>
             <label for="categoria" class="block text-sm font-medium text-gray-700">Categoría</label>
-            <select id="categoria" [(ngModel)]="producto.categoria.nombre" name="categoria" required
+            <select id="categoria" [(ngModel)]="producto.categoria_id" name="categoria" (change)="onCategoriaChange($event)"
                     class="mt-1 px-4 py-2 border border-gray-300 rounded-md w-full"
-                    [class.border-red-500]="!formValid.categoria"
-            >
-              <option *ngFor="let categoria of categorias" [value]="categoria.nombre">{{ categoria.nombre }}</option>
+                    [class.border-red-500]="!formValid.categoria">
+              <option *ngFor="let categoria of categorias" [value]="categoria.id">{{ categoria.nombre }}</option>
             </select>
             <div *ngIf="!formValid.categoria" class="text-sm text-red-500">Selecciona una categoría.</div>
           </div>
+
 
           <div>
             <label for="stock" class="block text-sm font-medium text-gray-700">Stock</label>
@@ -38,7 +38,7 @@
           </div>
 
           <div>
-            <label for="stock" class="block text-sm font-medium text-gray-700">Precio</label>
+            <label for="precio" class="block text-sm font-medium text-gray-700">Precio</label>
             <input id="precio" [(ngModel)]="producto.precio_actual" name="precio" type="number" required
                    class="mt-1 px-4 py-2 border border-gray-300 rounded-md w-full"
                    [class.border-red-500]="!formValid.precio" />
@@ -46,7 +46,7 @@
           </div>
 
           <div>
-            <label for="stock" class="block text-sm font-medium text-gray-700">Descripcion</label>
+            <label for="descripcion" class="block text-sm font-medium text-gray-700">Descripcion</label>
             <input id="descripcion" [(ngModel)]="producto.descripcion" name="descripcion" type="text" required
                    class="mt-1 px-4 py-2 border border-gray-300 rounded-md w-full"
                    [class.border-red-500]="!formValid.descripcion" />
@@ -54,6 +54,18 @@
           </div>
 
           <!-- Imagen -->
+          <div>
+            <label for="imagen" class="block text-sm font-medium text-gray-700">Imagen del Producto</label>
+            <img id="imagen"
+                 *ngIf="producto.media_relacionado"
+                 class="h-40 w-40 rounded-lg border border-gray-300"
+                 [src]="mediaBaseUrl + producto.media_relacionado"
+                 alt="{{ producto.nombre }}" />
+            <div *ngIf="!producto.media_relacionado" class="text-sm text-red-500">No hay imagen disponible.</div>
+          </div>
+
+
+
           <div>
             <label class="block text-sm font-medium text-gray-700">Imagen del ítem</label>
             <div

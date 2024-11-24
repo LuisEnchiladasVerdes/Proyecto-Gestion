@@ -27,6 +27,7 @@ export class EditComponent implements OnInit {
     descripcion: '',
     stock: 0,
     precio_actual : 0,
+    precio: 0,
     media_relacionado: []
   };
 

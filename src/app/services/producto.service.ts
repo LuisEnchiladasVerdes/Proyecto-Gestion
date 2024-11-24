@@ -17,8 +17,13 @@ export class ProductoService {
     return this.http.get<Producto[]>(this.apiUrl);
   }
 
-  addItem(producto : Producto): Observable<Producto>{
-    return this.http.post<Producto>(`${this.apiUrl}`,producto);
+  // addItem(producto : Producto): Observable<Producto>{
+  //   return this.http.post<Producto>(`${this.apiUrl}`,producto);
+  // }
+
+  addProducto(formData: FormData): Observable<Producto> {
+    // El formData ya debería tener la categoría como número
+    return this.http.post<Producto>(this.apiUrl, formData);
   }
 
   getItemById(id: string) : Observable<Producto> {

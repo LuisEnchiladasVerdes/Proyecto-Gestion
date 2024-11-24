@@ -53,16 +53,46 @@
             <div *ngIf="!formValid.descripcion" class="text-sm text-red-500">La descripcion no puede estar vacia.</div>
           </div>
 
-          <!-- Imagen -->
+<!--          &lt;!&ndash; Imagen &ndash;&gt;-->
+<!--          <div>-->
+<!--            <label for="imagen" class="block text-sm font-medium text-gray-700">Imagen del Producto</label>-->
+<!--            <img id="imagen"-->
+<!--                 *ngIf="producto.media_relacionado"-->
+<!--                 class="h-40 w-40 rounded-lg border border-gray-300"-->
+<!--                 [src]="mediaBaseUrl + producto.media_relacionado"-->
+<!--                 alt="{{ producto.nombre }}" />-->
+<!--            <div *ngIf="!producto.media_relacionado" class="text-sm text-red-500">No hay imagen disponible.</div>-->
+<!--          </div>-->
+
+          <!-- Imágenes del Producto -->
           <div>
             <label for="imagen" class="block text-sm font-medium text-gray-700">Imagen del Producto</label>
-            <img id="imagen"
-                 *ngIf="producto.media_relacionado"
-                 class="h-40 w-40 rounded-lg border border-gray-300"
-                 [src]="mediaBaseUrl + producto.media_relacionado"
-                 alt="{{ producto.nombre }}" />
-            <div *ngIf="!producto.media_relacionado" class="text-sm text-red-500">No hay imagen disponible.</div>
-          </div>
+
+            <div *ngIf="producto.media_relacionado && producto.media_relacionado.length > 0" class="flex space-x-4">
+              <!-- Iterar sobre cada imagen -->
+              <div class="relative" *ngFor="let media of producto.media_relacionado; let i = index">
+                <!-- Imagen -->
+                <img id="imagen"
+                  [src]="mediaBaseUrl + media"
+                  alt="{{ producto.nombre }}"
+                  class="h-20 w-20 rounded-full border border-gray-300 object-cover"
+                />
+                <!-- Botón "X" -->
+                <button
+                  type="button"
+                  (click)="eliminarImagen(i)"
+                  class="absolute top-0 right-0 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center transform -translate-y-2 -translate-x-2"
+                  title="Eliminar imagen">
+                  &times;
+                </button>
+              </div>
+            </div>
+
+            <!-- Mensaje cuando no hay imágenes -->
+            <div *ngIf="!producto.media_relacionado || producto.media_relacionado.length === 0" class="text-sm text-red-500">
+              No hay imágenes disponibles.
+            </div>
+            </div>
 
 
 

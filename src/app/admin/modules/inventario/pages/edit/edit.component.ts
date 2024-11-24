@@ -170,5 +170,12 @@ export class EditComponent implements OnInit {
     this.producto.categoria_id = Number(selectElement.value);
   }
 
+  eliminarImagen(index: number): void {
+    if (confirm('¿Estás seguro de que deseas eliminar esta imagen?')) {
+      this.producto.media_relacionado.splice(index, 1); // Eliminar la imagen de la lista
+    }
+  }
+
+
 
 }

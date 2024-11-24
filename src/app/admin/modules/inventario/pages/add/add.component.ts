@@ -97,10 +97,11 @@ export class AddComponent {
   }
 
   validatePrecio(): void {
-    this.quantityError = this.producto.precio_actual > 0
+    this.precioError = this.producto.precio > 0
       ? ''
-      : 'La precio debe ser mayor que 0';
+      : 'El precio debe ser mayor que 0.';
   }
+
 
   validateImage(): void {
     this.imageError = this.selectedImage ? '' : 'Se debe seleccionar una imagen';
@@ -124,63 +125,96 @@ export class AddComponent {
     if (this.validarFormulario()) {
       const formData = new FormData();
 
-      // Datos básicos del producto
+      // Asignar categoria_id desde selectedCategory
+      this.producto.categoria_id = this.selectedCategory!;
+
+      // Agregar campos al FormData
       formData.append('nombre', this.producto.nombre);
-      console.log(this.producto.nombre);
       formData.append('descripcion', this.producto.descripcion);
-      console.log(this.producto.descripcion);
       formData.append('stock', this.producto.stock.toString());
-      console.log(this.producto.stock);
-      formData.append('precio', this.producto.precio.toString()); // Cambiado a precio_actual
-      console.log(this.producto.precio);
+      formData.append('precio', this.producto.precio.toString());
+      formData.append('categoria_id', this.producto.categoria_id.toString());
 
-      // Categoria
-      if (this.selectedCategory) {
-        formData.append('categoria_id', this.selectedCategory.toString());
-        console.log(this.selectedCategory);
-      }
-
-      // Imagen
+      // Agregar imagen (o imágenes)
       if (this.selectedImage) {
         formData.append('media', this.selectedImage);
-        console.log(this.selectedImage);
       }
 
+      // Enviar datos al servicio
       this.productoService.addProducto(formData).subscribe({
         next: (response) => {
-          alert('Producto creado exitosamente');
+          alert('Producto creado exitosamente.');
           this.resetForm();
         },
-        error: (error) => {
-          console.error('Error al crear el producto', error);
-          alert('Hubo un error al crear el producto');
+        error: (err) => {
+          console.error('Error al crear el producto', err);
+          alert('Hubo un error al crear el producto.');
         }
       });
     } else {
-      alert('Por favor, complete todos los campos correctamente.');
+      alert('Por favor, completa todos los campos obligatorios.');
     }
   }
+
 
   validarFormulario(): boolean {
+    console.log('Validando formulario:');
+    console.log('Nombre:', this.producto.nombre);
+    console.log('Descripción:', this.producto.descripcion);
+    console.log('Stock:', this.producto.stock);
+    console.log('Precio:', this.producto.precio);
+    console.log('Categoría:', this.selectedCategory);
+    console.log('Imagen seleccionada:', this.selectedImage);
+
     let valid = true;
 
-    if (!this.producto.nombre || !this.producto.descripcion) {
+    if (!this.producto.nombre.trim()) {
+      this.nameError = 'El nombre es obligatorio.';
       valid = false;
+    } else {
+      this.nameError = '';
     }
+
+    if (!this.producto.descripcion.trim()) {
+      this.descriptionError = 'La descripción es obligatoria.';
+      valid = false;
+    } else {
+      this.descriptionError = '';
+    }
+
     if (this.producto.stock <= 0) {
+      this.quantityError = 'El stock debe ser mayor que 0.';
       valid = false;
+    } else {
+      this.quantityError = '';
     }
-    if (this.producto.precio_actual <= 0) {
+
+    if (this.producto.precio <= 0) {
+      this.precioError = 'El precio debe ser mayor que 0.';
       valid = false;
+    } else {
+      this.precioError = '';
     }
+
     if (!this.selectedCategory) {
+      this.categoryError = 'Por favor selecciona una categoría.';
       valid = false;
+    } else {
+      this.categoryError = '';
     }
-    if (!this.selectedImage) { // Validación opcional para la imagen
+
+    if (!this.selectedImage) {
+      this.imageError = 'Se debe seleccionar al menos una imagen.';
       valid = false;
+    } else {
+      this.imageError = '';
     }
+
+    console.log('Formulario válido:', valid);
     return valid;
   }
+
+
 
   resetForm(): void {
     this.producto = {

@@ -47,7 +47,7 @@ export class GeneralComponent implements OnInit{
 
   // CARGA AL INICIAR LOS PRODUCTOS Y LAS CATEGORIAS
   ngOnInit(): void {
-    this.productoService.getProducto().subscribe(   //CARGAR PRODUCTOS
+    this.productoService.getProductos().subscribe(   //CARGAR PRODUCTOS
       (productos: Producto[]) => {
         if (productos && productos.length > 0) {
           this.productos = productos; // Asignar todos los items al arreglo

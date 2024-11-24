@@ -1,7 +1,9 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import {Producto} from "../models/producto.models";
+import { catchError } from 'rxjs/operators';
+
 
 @Injectable({
   providedIn: 'root'
@@ -13,17 +15,22 @@ export class ProductoService {
 
   constructor(private http: HttpClient) { }
 
-  getProducto(): Observable<Producto[]>{
-    return this.http.get<Producto[]>(this.apiUrl);
+  getProductos(): Observable<Producto[]> {
+    return this.http.get<Producto[]>(this.apiUrl).pipe(
+      catchError((error) => {
+        console.error('Error al obtener productos:', error);
+        return throwError(() => new Error('Error al obtener productos.'));
+      })
+    );
   }
 
-  // addItem(producto : Producto): Observable<Producto>{
-  //   return this.http.post<Producto>(`${this.apiUrl}`,producto);
-  // }
-
   addProducto(formData: FormData): Observable<Producto> {
-    // El formData ya debería tener la categoría como número
-    return this.http.post<Producto>(this.apiUrl, formData);
+    return this.http.post<Producto>(this.apiUrl, formData).pipe(
+      catchError((error) => {
+        console.error('Error al agregar producto:', error);
+        return throwError(() => new Error('Error al agregar producto.'));
+      })
+    );
   }
 
   getItemById(id: string) : Observable<Producto> {
@@ -31,14 +38,13 @@ export class ProductoService {
   }
 
   updateItem(formData: FormData, id: number): Observable<any> {
-    const url = `${this.apiUrl}${id}/`;  // URL con el ID del producto
+    const url = (`${this.apiUrl}${id}/`);  // URL con el ID del producto
     return this.http.put(url, formData);
   }
 
   deleteItem(id: number | undefined): Observable<any> {
     return this.http.delete(`${this.apiUrl}${id}/`);
   }
-
 
   getMediaBaseUrl(): string {
     return this.mediaBaseUrl;

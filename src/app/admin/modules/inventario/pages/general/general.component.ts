@@ -226,4 +226,24 @@ export class GeneralComponent implements OnInit{
     }
   }
 
+  eliminarProducto(id: number | undefined): void {
+    if (!id) {
+      alert('El ID del producto no es válido.');
+      return;
+    }
+
+    if (confirm('¿Estás seguro de que deseas eliminar este producto?')) {
+      this.productoService.deleteItem(id).subscribe(
+        () => {
+          this.productos = this.productos.filter((producto) => producto.id !== id);
+          alert('Producto eliminado correctamente.');
+        },
+        (error) => {
+          console.error('Error al eliminar el producto:', error);
+          alert('Ocurrió un error al eliminar el producto.');
+        }
+      );
+    }
+  }
+
 }

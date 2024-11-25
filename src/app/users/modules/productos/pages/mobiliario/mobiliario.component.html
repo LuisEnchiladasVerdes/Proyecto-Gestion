@@ -1,4 +1,4 @@
-<div class="principal flex flex-col items-center bg-gray-200 pt-20 pb-10">
+<div class="flex flex-col items-center bg-gray-200 pt-20 pb-10">
   <h2 class="text-3xl font-bold mb-4 pt-5">CATÁLOGO</h2>
 
   <div class="flex ms-auto items-start me-5 pe-4 py-3">
@@ -6,9 +6,11 @@
       <select
         id="category"
         name="category"
-        class="mt-1 block w-full px-3 py-2 border bg-gray-600 text-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+        [(ngModel)]="categoriaSeleccionada"
+        (change)="filterProductosPorCategoria()"
+        class="mt-1 block w-full px-3 py-2 border bg-white text-black rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
       >
-        <option value="" disabled selected hidden>Selecciona una categoria</option>
+        <option value="">Todas las categorías</option>
         <option *ngFor="let categoria of categorias" [value]="categoria.id">
           {{ categoria.nombre }}
         </option>
@@ -16,8 +18,8 @@
     </div>
   </div>
 
-  <div class="eventos px-12 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-    <div class="imgEventos group bg-white rounded-lg shadow-sm overflow-hidden h-[400px] relative mb-3" *ngFor="let producto of productos">
+  <div class="px-12 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+    <div class="group bg-white rounded-lg shadow-sm overflow-hidden h-[400px] relative mb-3" *ngFor="let producto of productos">
       <!-- Contenedor de la imagen -->
       <div class="w-full h-[250px]">
         <img class="w-full h-full object-cover"

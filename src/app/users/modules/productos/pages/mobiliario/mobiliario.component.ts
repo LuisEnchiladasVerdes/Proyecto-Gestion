@@ -22,16 +22,13 @@ export class MobiliarioComponent implements OnInit{
   categoriaSeleccionada = ''; // Categoría seleccionada
   categoriaId: number = 0;
 
-  // ATRIBUTO DE PRODUCTOS
   productos: Producto[] = []; // Definir un arreglo para los items
 
-  // ATRIBUTO PARA IMAGENES
   mediaBaseUrl: string = '';
 
-  // CONSTRUCTOS
   constructor(private productoService : ProductoService, private categoriaService : CategoriaService) { }
 
-  // CARGA AL INICIAR LOS PRODUCTOS Y LAS CATEGORIAS
+
   ngOnInit(): void {
     this.productoService.getProductos().subscribe(   //CARGAR PRODUCTOS
       (productos: Producto[]) => {
@@ -53,4 +50,29 @@ export class MobiliarioComponent implements OnInit{
     );
     this.mediaBaseUrl = this.productoService.getMediaBaseUrl(); // Obtiene la base URL del servicio
   }
+
+  filterProductosPorCategoria(): void {
+    if (!this.categoriaSeleccionada) {
+      // Si no hay categoría seleccionada (opción de "todas"), carga todos los productos
+      this.productoService.getProductos().subscribe(
+        (productos: Producto[]) => {
+          this.productos = productos;
+        },
+        (error) => {
+          console.error('Error al cargar todos los productos', error);
+        }
+      );
+    } else {
+      const categoriaId = parseInt(this.categoriaSeleccionada, 10);
+      this.productoService.getProductosPorCategoria(categoriaId).subscribe(
+        (productos: Producto[]) => {
+          this.productos = productos;
+        },
+        (error) => {
+          console.error('Error al filtrar productos por categoría', error);
+        }
+      );
+    }
+  }
+
 }

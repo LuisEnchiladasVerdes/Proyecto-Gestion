@@ -246,4 +246,29 @@ export class GeneralComponent implements OnInit{
     }
   }
 
+  filterProductosPorCategoria(): void {
+    if (!this.categoriaSeleccionada) {
+      // Si no hay categoría seleccionada (opción de "todas"), carga todos los productos
+      this.productoService.getProductos().subscribe(
+        (productos: Producto[]) => {
+          this.productos = productos;
+        },
+        (error) => {
+          console.error('Error al cargar todos los productos', error);
+        }
+      );
+    } else {
+      const categoriaId = parseInt(this.categoriaSeleccionada, 10);
+      this.productoService.getProductosPorCategoria(categoriaId).subscribe(
+        (productos: Producto[]) => {
+          this.productos = productos;
+        },
+        (error) => {
+          console.error('Error al filtrar productos por categoría', error);
+        }
+      );
+    }
+  }
+
+
 }

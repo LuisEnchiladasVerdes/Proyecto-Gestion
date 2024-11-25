@@ -50,4 +50,15 @@ export class ProductoService {
     return this.mediaBaseUrl;
   }
 
+  getProductosPorCategoria(categoriaId: number): Observable<Producto[]> {
+    const url = `${this.apiUrl}?categoria_id=${categoriaId}`;
+    return this.http.get<Producto[]>(url).pipe(
+      catchError((error) => {
+        console.error('Error al filtrar productos:', error);
+        return throwError(() => new Error('Error al filtrar productos.'));
+      })
+    );
+  }
+
+
 }

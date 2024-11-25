@@ -6,6 +6,7 @@ import {CategoriaService} from "../../../../../services/categoria.service";
 import { Categoria } from '../../../../../models/categoria.models';
 import {ProductoService} from "../../../../../services/producto.service";
 import {Producto} from "../../../../../models/producto.models";
+import {ToastrService} from "ngx-toastr";
 
 @Component({
   selector: 'app-general',
@@ -43,21 +44,22 @@ export class GeneralComponent implements OnInit{
 
 
   // CONSTRUCTOS
-  constructor(private productoService : ProductoService, private categoriaService : CategoriaService) { }
+  constructor(private productoService : ProductoService, private categoriaService : CategoriaService, private toastr: ToastrService) { }
 
   // CARGA AL INICIAR LOS PRODUCTOS Y LAS CATEGORIAS
   ngOnInit(): void {
-    this.productoService.getProductos().subscribe(   //CARGAR PRODUCTOS
-      (productos: Producto[]) => {
-        if (productos && productos.length > 0) {
-          this.productos = productos; // Asignar todos los items al arreglo
-          // console.log(this.productos); // Ver el array completo de items
-        }
-      },
-      (error: any) => {
-        console.error('Error al cargar los items', error);
-      }
-    );
+    // this.productoService.getProductos().subscribe(   //CARGAR PRODUCTOS
+    //   (productos: Producto[]) => {
+    //     if (productos && productos.length > 0) {
+    //       this.productos = productos; // Asignar todos los items al arreglo
+    //       // console.log(this.productos); // Ver el array completo de items
+    //     }
+    //   },
+    //   (error: any) => {
+    //     console.error('Error al cargar los items', error);
+    //   }
+    // );
+    this.obtenerProductos();
     this.categoriaService.getCategorias().subscribe(  //CARGAR CATEGORIAS
       (data: Categoria[]) => {
         this.categorias = data;
@@ -70,6 +72,20 @@ export class GeneralComponent implements OnInit{
     );
 
     this.mediaBaseUrl = this.productoService.getMediaBaseUrl(); // Obtiene la base URL del servicio
+  }
+
+  obtenerProductos(){
+    this.productoService.getProductos().subscribe(   //CARGAR PRODUCTOS
+      (productos: Producto[]) => {
+        if (productos && productos.length > 0) {
+          this.productos = productos; // Asignar todos los items al arreglo
+          // console.log(this.productos); // Ver el array completo de items
+        }
+      },
+      (error: any) => {
+        console.error('Error al cargar los items', error);
+      }
+    );
   }
 
   obtenerCategoria(){
@@ -236,7 +252,9 @@ export class GeneralComponent implements OnInit{
       this.productoService.deleteItem(id).subscribe(
         () => {
           this.productos = this.productos.filter((producto) => producto.id !== id);
-          alert('Producto eliminado correctamente.');
+          // alert('Producto eliminado correctamente.');
+          this.toastr.success('Producto eliminado correctamente.', 'Exito');
+          this.obtenerProductos();
         },
         (error) => {
           console.error('Error al eliminar el producto:', error);

@@ -1,52 +1,48 @@
-<div class="principal flex flex-col items-center bg-gray-100 pt-20">
+<div class="principal flex flex-col items-center bg-gray-200 pt-20 pb-10">
   <h2 class="text-3xl font-bold mb-4 pt-5">CATÁLOGO</h2>
 
-  <div class="desplegable flex ms-auto items-start me-5 pe-4 py-3">
+  <div class="flex ms-auto items-start me-5 pe-4 py-3">
     <div class="relative">
-      <select class="btn bg-gray-600 text-white rounded-md px-4 py-2" type="button" id="dropdownMenuButton1" aria-expanded="false">
-        Mueble
-        <option>Mesas</option>
-        <option>Sillas</option>
+      <select
+        id="category"
+        name="category"
+        class="mt-1 block w-full px-3 py-2 border bg-gray-600 text-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+      >
+        <option value="" disabled selected hidden>Selecciona una categoria</option>
+        <option *ngFor="let categoria of categorias" [value]="categoria.id">
+          {{ categoria.nombre }}
+        </option>
       </select>
-      <ul class="dropdown-menu absolute hidden bg-white shadow-lg mt-1 rounded-md w-48" aria-labelledby="dropdownMenuButton1">
-        <li><a class="dropdown-item block px-4 py-2 text-gray-700 hover:bg-gray-200" href="#">Mesas</a></li>
-        <li><a class="dropdown-item block px-4 py-2 text-gray-700 hover:bg-gray-200" href="#">Sillas</a></li>
-        <li><a class="dropdown-item block px-4 py-2 text-gray-700 hover:bg-gray-200" href="#">Centros de Mesa</a></li>
-      </ul>
     </div>
   </div>
 
-  <div class="eventos px-12 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 pb-5">
-
-<!--    <div class="imgEventos flex flex-col items-center cursor-pointer pb-3" *ngFor="let producto of productos">-->
-<!--      <img class="w-48 h-48 object-cover mb-2"-->
-<!--           *ngFor="let img of producto.media_relacionado"-->
-<!--           [src]="mediaBaseUrl + img"-->
-<!--           alt="{{ producto.nombre }}"-->
-<!--      >-->
-<!--      <div class="text-lg font-medium text-gray-900">{{ producto.nombre }}</div>-->
-<!--      <div class="text-sm font-medium text-gray-900">${{ producto.precio_actual }}.00</div>-->
-<!--    </div>-->
-
-    <div class="imgEventos group relative flex flex-col items-center cursor-pointer pb-3" *ngFor="let producto of productos">
-      <!-- Contenedor de la imagen con overlay al hover -->
-      <div class="relative w-48 h-48 mb-2">
+  <div class="eventos px-12 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+    <div class="imgEventos group bg-white rounded-lg shadow-sm overflow-hidden h-[400px] relative mb-3" *ngFor="let producto of productos">
+      <!-- Contenedor de la imagen -->
+      <div class="w-full h-[250px]">
         <img class="w-full h-full object-cover"
              *ngFor="let img of producto.media_relacionado"
              [src]="mediaBaseUrl + img"
              alt="{{ producto.nombre }}"
         >
-        <!-- Overlay y botón que aparecen al hover -->
-        <div class="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-          <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md transform translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
+      </div>
+
+      <!-- Contenido de la card con padding -->
+      <div class="px-4 py-3">
+        <!-- Información del producto -->
+        <div class="text-lg font-medium text-gray-900">{{ producto.nombre }}</div>
+        <div class="text-sm font-medium text-gray-900">${{ producto.precio_actual }}.00</div>
+
+        <!-- Botón de agregar que aparece en hover -->
+        <div class="absolute bottom-4 left-4 right-4 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
+          <button class="w-full bg-teal-600 hover:bg-teal-700 text-white py-2 px-4 rounded-md font-medium flex items-center justify-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
             Agregar al carrito
           </button>
         </div>
       </div>
-      <div class="text-lg font-medium text-gray-900">{{ producto.nombre }}</div>
-      <div class="text-sm font-medium text-gray-900">${{ producto.precio_actual }}.00</div>
     </div>
-
-
   </div>
 </div>

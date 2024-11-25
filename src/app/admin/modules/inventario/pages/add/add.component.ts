@@ -1,124 +1,238 @@
-import { Component } from '@angular/core';
-import {NgFor, NgIf} from "@angular/common";
-import {FormsModule} from "@angular/forms";
-import {RouterLink} from "@angular/router";
-import { MueblesService } from '../../../../../services/muebles.service';
+import { Component, signal } from '@angular/core';
+import { NgFor, NgIf } from "@angular/common";
+import { FormsModule } from "@angular/forms";
+import { RouterLink } from "@angular/router";
 import { Categoria } from '../../../../../models/categoria.models';
-import { Item } from '../../../../../models/item.model';
-import { ItemService } from '../../../../../services/item.service';
+import { CategoriaService } from "../../../../../services/categoria.service";
+import { ProductoService } from "../../../../../services/producto.service";
+import {Producto} from "../../../../../models/producto.models";
 
 @Component({
   selector: 'app-add',
   standalone: true,
-  imports: [
-    NgFor,
-    NgIf,
-    FormsModule,
-    RouterLink
-  ],
+  imports: [NgFor, NgIf, FormsModule, RouterLink],
   templateUrl: './add.component.html',
   styleUrl: './add.component.css'
 })
 export class AddComponent {
+  producto: Producto = {
+    id: 0,
+    nombre: '',
+    categoria: { id: 0, nombre: '' },
+    descripcion: '',
+    stock: 0,
+    precio_actual: 0,
+    precio: 0,
+    media_relacionado: []
+  };
 
-  categorias: any[] = []; // Array para almacenar las categorías
-  selectedCategory: number | null = null; // Para almacenar la categoría seleccionada
+  categorias: Categoria[] = [];
+  selectedCategory: number | null = null;
 
   nameError = '';
   categoryError = '';
   quantityError = '';
   descriptionError = '';
+  precioError = '';
   imageError = '';
 
-  // constructor(private mueblesService : MueblesService) {}
-  constructor(private itemService : ItemService, private mueblesService : MueblesService) {}
+  selectedImage: File | null = null;
+  imageUrl = signal<string | null>(null);
 
-  validateName() {
-    const nameInput = (document.getElementById('name') as HTMLInputElement).value;
-    this.nameError = /^[^0-9]+$/.test(nameInput) ? '' : 'El nombre no debe contener números';
+  constructor(
+    private categoriasService: CategoriaService,
+    private productoService: ProductoService
+  ) {}
+
+  ngOnInit(): void {
+    this.loadCategorias();
   }
 
-  validateQuantity() {
-    const quantityInput = (document.getElementById('quantity') as HTMLInputElement).value;
-    this.quantityError = +quantityInput > 0 ? '' : 'La cantidad debe ser mayor que 0';
+  loadCategorias(): void {
+    this.categoriasService.getCategorias().subscribe({
+      next: (data: Categoria[]) => (this.categorias = data),
+      error: (err) => console.error('Error al cargar categorías', err),
+    });
   }
 
-  validateDescription() {
-    const descriptionInput = (document.getElementById('description') as HTMLTextAreaElement).value;
-    this.descriptionError = descriptionInput ? '' : 'La descripción no debe estar vacía';
+  onImageSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input?.files?.[0]) {
+      const file = input.files[0];
+      const reader = new FileReader();
+
+      reader.onload = () => {
+        this.imageUrl.set(reader.result as string);
+        this.selectedImage = file;
+      };
+
+      reader.readAsDataURL(file);
+    }
   }
 
-  validateImage() {
-    const imageInput = (document.getElementById('file-upload') as HTMLInputElement).files;
-    this.imageError = imageInput && imageInput.length > 0 ? '' : 'Se debe seleccionar una imagen';
+  validateName(): void {
+    this.nameError = this.producto.nombre.trim()
+      ? /^[^0-9]+$/.test(this.producto.nombre)
+        ? ''
+        : 'El nombre no debe contener números'
+      : 'El nombre es obligatorio';
   }
 
-  onSaveItem(event: Event) {
-    event.preventDefault(); // Evita la recarga de la página
+  validateCategory(): void {
+    this.categoryError = this.selectedCategory
+      ? ''
+      : 'Por favor selecciona una categoría';
+  }
 
-    // Ejecuta todas las validaciones
+  validateQuantity(): void {
+    this.quantityError = this.producto.stock > 0
+      ? ''
+      : 'La cantidad debe ser mayor que 0';
+  }
+
+  validateDescription(): void {
+    this.descriptionError = this.producto.descripcion.trim()
+      ? ''
+      : 'La descripción no debe estar vacía';
+  }
+
+  validatePrecio(): void {
+    this.precioError = this.producto.precio > 0
+      ? ''
+      : 'El precio debe ser mayor que 0.';
+  }
+
+
+  validateImage(): void {
+    this.imageError = this.selectedImage ? '' : 'Se debe seleccionar una imagen';
+  }
+
+  onSaveItem(event: Event): void {
+    event.preventDefault();
+
     this.validateName();
     this.validateCategory();
     this.validateQuantity();
     this.validateDescription();
     this.validateImage();
 
-    // Si no hay errores, muestra el mensaje de éxito                         && !this.imageError
-    if (!this.nameError && !this.categoryError && !this.quantityError && !this.descriptionError ) {
-      const nuevoItem: Item = {
-        name: (document.getElementById('name') as HTMLInputElement).value,
-        stock: +(document.getElementById('quantity') as HTMLInputElement).value,
-        desc: (document.getElementById('description') as HTMLTextAreaElement).value,
-        // imagenUrl: 'url_de_imagen', // Actualiza esto según la carga de imagen que desees implementar
-        categoria: this.selectedCategory as number // Solo el ID de la categoría
-      };
-      
-      this.itemService.addItem(nuevoItem).subscribe(
-        (response) => {
-          alert('Producto agregado correctamente');
+
+    this.agregarProducto();
+
+  }
+
+  agregarProducto(): void {
+    if (this.validarFormulario()) {
+      const formData = new FormData();
+
+      // Asignar categoria_id desde selectedCategory
+      this.producto.categoria_id = this.selectedCategory!;
+
+      // Agregar campos al FormData
+      formData.append('nombre', this.producto.nombre);
+      formData.append('descripcion', this.producto.descripcion);
+      formData.append('stock', this.producto.stock.toString());
+      formData.append('precio', this.producto.precio.toString());
+      formData.append('categoria_id', this.producto.categoria_id.toString());
+
+      // Agregar imagen (o imágenes)
+      if (this.selectedImage) {
+        formData.append('media', this.selectedImage);
+      }
+
+      // Enviar datos al servicio
+      this.productoService.addProducto(formData).subscribe({
+        next: (response) => {
+          alert('Producto creado exitosamente.');
+          this.resetForm();
         },
-        (error) => {
-          console.error('Error al agregar el mueble', error);
+        error: (err) => {
+          console.error('Error al crear el producto', err);
+          alert('Hubo un error al crear el producto.');
         }
-      );
-      this.limpiarCampos();
+      });
+    } else {
+      alert('Por favor, completa todos los campos obligatorios.');
     }
   }
 
 
-  ngOnInit(): void {
-    // Obtener las categorías desde el servicio
-    this.mueblesService.getCategorias().subscribe(
-      (data: Categoria[]) => {
-        this.categorias = data;
-        console.log(this.categorias); // Verificar los datos
-      },
-      (error) => {
-        console.error('Error al cargar las categorías', error);
-      }
-    );
-  }
+  validarFormulario(): boolean {
+    console.log('Validando formulario:');
+    console.log('Nombre:', this.producto.nombre);
+    console.log('Descripción:', this.producto.descripcion);
+    console.log('Stock:', this.producto.stock);
+    console.log('Precio:', this.producto.precio);
+    console.log('Categoría:', this.selectedCategory);
+    console.log('Imagen seleccionada:', this.selectedImage);
 
-  validateCategory(): void {
+    let valid = true;
+
+    if (!this.producto.nombre.trim()) {
+      this.nameError = 'El nombre es obligatorio.';
+      valid = false;
+    } else {
+      this.nameError = '';
+    }
+
+    if (!this.producto.descripcion.trim()) {
+      this.descriptionError = 'La descripción es obligatoria.';
+      valid = false;
+    } else {
+      this.descriptionError = '';
+    }
+
+    if (this.producto.stock <= 0) {
+      this.quantityError = 'El stock debe ser mayor que 0.';
+      valid = false;
+    } else {
+      this.quantityError = '';
+    }
+
+    if (this.producto.precio <= 0) {
+      this.precioError = 'El precio debe ser mayor que 0.';
+      valid = false;
+    } else {
+      this.precioError = '';
+    }
+
     if (!this.selectedCategory) {
-      this.categoryError = 'Por favor selecciona una categoría';
+      this.categoryError = 'Por favor selecciona una categoría.';
+      valid = false;
     } else {
       this.categoryError = '';
     }
+
+    if (!this.selectedImage) {
+      this.imageError = 'Se debe seleccionar al menos una imagen.';
+      valid = false;
+    } else {
+      this.imageError = '';
+    }
+
+    console.log('Formulario válido:', valid);
+    return valid;
   }
 
-  limpiarCampos() {
-    (document.getElementById('name') as HTMLInputElement).value = '';
-    (document.getElementById('quantity') as HTMLInputElement).value = '';
-    (document.getElementById('description') as HTMLTextAreaElement).value = '';
-    (document.getElementById('file-upload') as HTMLInputElement).value = '';
-    this.selectedCategory = null;
 
+
+  resetForm(): void {
+    this.producto = {
+      id: 0,
+      nombre: '',
+      categoria: { id: 0, nombre: '' },
+      descripcion: '',
+      stock: 0,
+      precio_actual: 0,
+      precio: 0,
+      media_relacionado: []
+    };
+    this.selectedCategory = null;
+    this.imageUrl.set(null);
     this.nameError = '';
     this.categoryError = '';
     this.quantityError = '';
     this.descriptionError = '';
     this.imageError = '';
   }
-
 }

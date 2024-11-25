@@ -1,9 +1,11 @@
-import { Component } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import { RouterLink } from "@angular/router";
-import { ItemService } from '../../../../../services/item.service';
-import { Item } from '../../../../../models/item.model';
 import { NgFor, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import {CategoriaService} from "../../../../../services/categoria.service";
+import { Categoria } from '../../../../../models/categoria.models';
+import {ProductoService} from "../../../../../services/producto.service";
+import {Producto} from "../../../../../models/producto.models";
 
 @Component({
   selector: 'app-general',
@@ -17,61 +19,142 @@ import { FormsModule } from '@angular/forms';
   templateUrl: './general.component.html',
   styleUrls: ['./general.component.css']
 })
-export class GeneralComponent {
-  searchText: string = '';
+export class GeneralComponent implements OnInit{
 
+  //ATRIBUTOS DE MODALES
   mostrarModal: boolean = false;
   mostrarModalEditar = false;
   mostrarAgregarCategoriaModal: boolean = false; // Controla la visibilidad del modal
   nuevaCategoria: string = ''; // Almacena el valor de la nueva categoría
 
-  categorias = ['Mesas', 'Sillas', 'Paquetes']; // Opciones del dropdown
+
+  // ATRIBUTOS DE CATEGORIAS
+  categorias: any[] = []; // Array para almacenar las categorías
   categoriaSeleccionada = ''; // Categoría seleccionada
+  categoriaId: number = 0;
 
-  items: Item[] = []; // Definir un arreglo para los items
 
-  constructor(private itemService: ItemService) { }
+  // ATRIBUTO DE PRODUCTOS
+  productos: Producto[] = []; // Definir un arreglo para los items
 
+
+  // ATRIBUTO PARA IMAGENES
+  mediaBaseUrl: string = '';
+
+
+  // CONSTRUCTOS
+  constructor(private productoService : ProductoService, private categoriaService : CategoriaService) { }
+
+  // CARGA AL INICIAR LOS PRODUCTOS Y LAS CATEGORIAS
   ngOnInit(): void {
-    this.cargar();
-  }
-
-  validarCategoria(categoria:number){
-    if(categoria === 1){
-      return 'Mesas';
-    }
-    else if(categoria === 2){
-      return 'Sillas';
-    }
-    else if (categoria === 3){
-      return 'Vajilla'
-    }else return 'Extras'
-  }
-
-  validarStock(categoria : number, stock : number){
-    if(categoria === 1 || categoria === 4){
-      if(stock < 10) return 'Bajo Stock'
-      else return 'En Stock'
-    }else {
-      if(stock < 50) return 'Bajo Stock'
-      else return 'En Stock'
-    }
-  }
-
-  cargar(){
-    this.itemService.getItems().subscribe(
-      (items: Item[]) => {
-        if (items && items.length > 0) {
-          this.items = items; // Asignar todos los items al arreglo
-          // console.log(this.items); // Ver el array completo de items
+    this.productoService.getProductos().subscribe(   //CARGAR PRODUCTOS
+      (productos: Producto[]) => {
+        if (productos && productos.length > 0) {
+          this.productos = productos; // Asignar todos los items al arreglo
+          // console.log(this.productos); // Ver el array completo de items
         }
       },
       (error: any) => {
         console.error('Error al cargar los items', error);
       }
     );
+    this.categoriaService.getCategorias().subscribe(  //CARGAR CATEGORIAS
+      (data: Categoria[]) => {
+        this.categorias = data;
+        console.log(this.categorias); // Verificar los datos
+        // alert('Categorias obtenidas')
+      },
+      (error) => {
+        console.error('Error al cargar las categorías', error);
+      }
+    );
+
+    this.mediaBaseUrl = this.productoService.getMediaBaseUrl(); // Obtiene la base URL del servicio
   }
 
+  obtenerCategoria(){
+    this.categoriaService.getCategorias().subscribe(
+      (data: Categoria[]) => {
+        this.categorias = data;
+        console.log(this.categorias); // Verificar los datos
+        // alert('Categorias obtenidas')
+      },
+      (error) => {
+        console.error('Error al cargar las categorías', error);
+      }
+    );
+  }
+
+
+
+  // validarStock(categoria : number, stock : number){
+  //   if(categoria === 1 || categoria === 4){
+  //     if(stock < 10) return 'Bajo Stock'
+  //     else return 'En Stock'
+  //   }else {
+  //     if(stock < 50) return 'Bajo Stock'
+  //     else return 'En Stock'
+  //   }
+
+
+
+  // CRUD CATEDORIAS
+  agregarCategoria(): void {
+    if (this.nuevaCategoria.trim()) {
+      this.categoriaService.addCategoria({ nombre: this.nuevaCategoria }).subscribe(
+        (categoria: Categoria) => {
+          this.categorias.push(categoria); // Añadir la nueva categoría al arreglo
+          this.cerrarAgregarCategoriaModal(); // Cerrar el modal
+          alert('Categoria agregada con exito')
+        },
+        (error) => {
+          console.error('Error al agregar la categoría', error);
+          alert('Error al agregar la categoria')
+        }
+      );
+    }
+  }
+
+  editCategoria(): void {
+    if (this.categoriaId && this.categoriaSeleccionada.trim()) {
+      const categoriaEditada = {
+        id: this.categoriaId,
+        nombre: this.categoriaSeleccionada
+      };
+
+      this.categoriaService.editarCategoria(categoriaEditada).subscribe(
+        (categoriaActualizada: Categoria) => {
+          const index = this.categorias.findIndex(c => c.id === categoriaEditada.id);
+          if (index !== -1) {
+            this.categorias[index] = categoriaActualizada; // Actualiza la categoría en el arreglo
+          }
+          this.cerrarEditarCategoriaModal(); // Cerrar el modal de edición
+          alert('Categoria editada con exito')
+        },
+        (error) => {
+          console.error('Error al editar la categoría', error);
+          alert('Error al editar la categoria')
+        }
+      );
+    }
+  }
+
+  eliminarCategoria(categoriaId: number) {
+    if (categoriaId > 0) {
+      this.categoriaService.deleteCategorias(categoriaId).subscribe(() => {
+        // Eliminar categoría exitosa
+        this.categorias = this.categorias.filter(c => c.id !== categoriaId);  // Elimina la categoría del array
+        alert('Categoría eliminada con éxito');
+      }, (error) => {
+        console.error('Error al eliminar la categoría:', error);
+        alert('Categoria no eliminada')
+      });
+    }
+  }
+
+
+
+  // MODALES
   abrirModal(): void {
     this.mostrarModal = true;
   }
@@ -100,28 +183,6 @@ export class GeneralComponent {
     this.mostrarModalEditar = false;
   }
 
-  eliminarCategoria(): void {
-    if (this.categoriaSeleccionada) {
-      this.categorias = this.categorias.filter(cat => cat !== this.categoriaSeleccionada);
-      this.categoriaSeleccionada = ''; // Limpia el campo
-      alert('Categoría eliminada exitosamente');
-    } else {
-      alert('Selecciona una categoría válida para eliminar.');
-    }
-  }
-
-  actualizarCategoria(): void {
-    if (this.categoriaSeleccionada) {
-      const categoriaIndex = this.categorias.findIndex(cat => cat === this.categoriaSeleccionada);
-      if (categoriaIndex !== -1) {
-        alert('Categoría actualizada: ' + this.categoriaSeleccionada);
-      }
-      this.categoriaSeleccionada = ''; // Limpia el campo
-    } else {
-      alert('Escribe o selecciona una categoría válida.');
-    }
-  }
-
   volverAlModalPrincipal(): void {
     this.cerrarEditarCategoriaModal(); // Cierra el modal de editar categoría
     this.cerrarAgregarCategoriaModal();
@@ -138,13 +199,50 @@ export class GeneralComponent {
     this.nuevaCategoria = ''; // Limpia el campo al cerrar
   }
 
-  adjuntarCategoria(): void {
-    if (this.nuevaCategoria.trim()) {
-      this.categorias.push(this.nuevaCategoria.trim());
-      alert(`Categoría "${this.nuevaCategoria}" agregada con éxito.`);
-      this.cerrarAgregarCategoriaModal(); // Cierra el modal tras agregar
-    } else {
-      alert('El nombre de la categoría no puede estar vacío.');
+
+  isEditing: boolean = false;
+
+  // Activar el modo de edición cuando se selecciona una categoría
+  onCategoriaSeleccionada() {
+    this.isEditing = true;  // Activa el modo de edición
+    const selectedCategory = this.categorias.find(c => c.nombre === this.categoriaSeleccionada);
+    this.categoriaId = selectedCategory ? selectedCategory.id : 0;  // Asigna el id basado en el nombre
+  }
+
+  guardarEdicion() {
+    if (this.categoriaSeleccionada) {
+      // Actualiza la categoría en el array
+      const categoriaEditada = this.categorias.find(categoria => categoria.id === this.categoriaId);
+      if (categoriaEditada) {
+        categoriaEditada.nombre = this.categoriaSeleccionada;
+        // Llamar al servicio para guardar la categoría editada (si se necesita)
+        this.categoriaService.editarCategoria(categoriaEditada).subscribe(() => {
+          // Actualización exitosa
+          this.isEditing = false;  // Desactiva el modo de edición
+        }, (error) => {
+          console.error('Error al guardar la categoría:', error);
+        });
+      }
+    }
+  }
+
+  eliminarProducto(id: number | undefined): void {
+    if (!id) {
+      alert('El ID del producto no es válido.');
+      return;
+    }
+
+    if (confirm('¿Estás seguro de que deseas eliminar este producto?')) {
+      this.productoService.deleteItem(id).subscribe(
+        () => {
+          this.productos = this.productos.filter((producto) => producto.id !== id);
+          alert('Producto eliminado correctamente.');
+        },
+        (error) => {
+          console.error('Error al eliminar el producto:', error);
+          alert('Ocurrió un error al eliminar el producto.');
+        }
+      );
     }
   }
 

@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
-import {RouterLink} from "@angular/router";
+import {Router, RouterLink} from "@angular/router";
+import {AuthService} from "../../../../services/auth.service";
 
 @Component({
   selector: 'app-header-admin',
@@ -12,4 +13,10 @@ import {RouterLink} from "@angular/router";
 })
 export class HeaderAdminComponent {
 
+  constructor(private authService: AuthService, private router: Router) {}
+
+  onLogout(): void {
+    this.authService.logout(); // Finaliza la sesión
+    this.router.navigate(['/admin/login']); // Redirige al login
+  }
 }

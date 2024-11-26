@@ -182,12 +182,6 @@ export class GeneralComponent implements OnInit{
 
   isEditing: boolean = false;
 
-  // Activar el modo de edición cuando se selecciona una categoría
-  // onCategoriaSeleccionada() {
-  //   this.isEditing = true;  // Activa el modo de edición
-  //   const selectedCategory = this.categorias.find(c => c.nombre === this.categoriaSeleccionada);
-  //   this.categoriaId = selectedCategory ? selectedCategory.id : 0;  // Asigna el id basado en el nombre
-  // }
   onCategoriaSeleccionada() {
     this.isEditing = true; // Activar modo de edición
     const selectedCategory = this.categorias.find(c => c.nombre === this.categoriaSeleccionada);
@@ -195,22 +189,6 @@ export class GeneralComponent implements OnInit{
     this.categoriaOriginal = this.categoriaSeleccionada; // Guardar el nombre original de la categoría
   }
 
-
-  // guardarEdicion() {
-  //   if (this.categoriaSeleccionada) {
-  //     // Actualiza la categoría en el array
-  //     const categoriaEditada = this.categorias.find(categoria => categoria.id === this.categoriaId);
-  //     if (categoriaEditada) {
-  //       categoriaEditada.nombre = this.categoriaSeleccionada;
-  //       // Llamar al servicio para guardar la categoría editada (si se necesita)
-  //       this.categoriaService.editarCategoria(categoriaEditada).subscribe(() => {
-  //         this.isEditing = false;  // Desactiva el modo de edición
-  //       }, (error) => {
-  //         this.toastr.error('Error al guardar la categoria.', 'Error',{timeOut: 3000});
-  //       });
-  //     }
-  //   }
-  // }
   guardarEdicion() {
     if (this.categoriaSeleccionada.trim() === this.categoriaOriginal.trim()) {
       this.toastr.warning('No se han detectado cambios en el nombre de la categoría.', 'Advertencia', { timeOut: 3000 });

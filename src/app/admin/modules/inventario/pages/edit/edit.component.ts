@@ -1,12 +1,12 @@
-import {Component, OnInit, signal} from '@angular/core';
-import {NgForOf, NgIf} from '@angular/common';
+import { Component, OnInit, signal } from '@angular/core';
+import { NgForOf, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import {Producto} from "../../../../../models/producto.models";
-import {ProductoService} from "../../../../../services/producto.service";
-import {Categoria} from "../../../../../models/categoria.models";
-import {CategoriaService} from "../../../../../services/categoria.service";
-import {ToastrService} from "ngx-toastr";
+import { Producto } from "../../../../../models/producto.models";
+import { ProductoService } from "../../../../../services/producto.service";
+import { Categoria } from "../../../../../models/categoria.models";
+import { CategoriaService } from "../../../../../services/categoria.service";
+import { ToastrService } from "ngx-toastr";
 
 @Component({
   selector: 'app-edit',
@@ -21,19 +21,19 @@ import {ToastrService} from "ngx-toastr";
   styleUrl: './edit.component.css'
 })
 export class EditComponent implements OnInit {
+  productoOriginal: Producto | null = null; // Para guardar el estado original del producto
   producto: Producto = {
     id: 0,
     nombre: '',
-    categoria: { id: 0, nombre: '' }, // Inicialización de categoria como un objeto vacío
+    categoria: { id: 0, nombre: '' },
     descripcion: '',
     stock: 0,
-    precio_actual : 0,
+    precio_actual: 0,
     precio: 0,
     media_relacionado: []
   };
 
-  categorias: Categoria[] = []; // Lista de categorías disponibles
-
+  categorias: Categoria[] = [];
   formValid = {
     nombre: true,
     categoria: true,
@@ -44,59 +44,37 @@ export class EditComponent implements OnInit {
 
   selectedImage: File | null = null; // Para almacenar el archivo seleccionado
   imageUrl = signal<string | null>(null);
-
-  // ATRIBUTO PARA IMAGENES
   mediaBaseUrl: string = '';
-
-  onImageSelected(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    if (input?.files && input.files.length === 1) {
-      const file = input.files[0];
-      const reader = new FileReader();
-
-      reader.onload = () => {
-        const imageString = reader.result as string;
-        this.imageUrl.set(imageString); // Actualiza la vista previa
-        // console.log(imageString); // Imprime la cadena en la consola
-        this.selectedImage = file;
-        // console.log(this.imageUrl)
-      };
-
-      reader.readAsDataURL(file); // Lee el archivo como Base64
-    }
-  }
 
   constructor(
     private productoService: ProductoService,
     private route: ActivatedRoute,
     private router: Router,
-    private categoriaService : CategoriaService,
+    private categoriaService: CategoriaService,
     private toastr: ToastrService
-  ) { }
+  ) {}
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
       this.cargarProducto(id);
     }
-    this.cargarCategorias(); // Cargar las categorías al inicio
+    this.cargarCategorias();
     this.mediaBaseUrl = this.productoService.getMediaBaseUrl();
   }
 
   cargarProducto(id: string): void {
     this.productoService.getItemById(id).subscribe(
       (producto: Producto) => {
-        this.producto = producto;
+        this.producto = { ...producto };
+        this.productoOriginal = { ...producto }; // Guardar copia exacta para comparar cambios
         this.producto.categoria_id = producto.categoria?.id || undefined;
       },
       (error) => {
-        // console.error('Error al cargar el producto:', error);
-        // alert('Error al cargar el producto.');
-        this.toastr.error('Error al cargar el producto.', 'Error',{timeOut: 3000});
+        this.toastr.error('Error al cargar el producto.', 'Error', { timeOut: 3000 });
       }
     );
   }
-
 
   cargarCategorias(): void {
     this.categoriaService.getCategorias().subscribe(
@@ -104,20 +82,19 @@ export class EditComponent implements OnInit {
         this.categorias = categorias;
       },
       (error) => {
-        // console.error('Error al cargar las categorías:', error);
-        // alert('Error al cargar las categorías.');
-        this.toastr.error('Error al cargar las categorias.', 'Error',{timeOut: 3000});
+        this.toastr.error('Error al cargar las categorías.', 'Error', { timeOut: 3000 });
       }
     );
   }
 
-
   guardarCambios(): void {
-    console.log('Producto antes de guardar:', this.producto);
+    if (!this.verificarCambios()) {
+      this.toastr.info('No hay cambios en el formulario.', 'Sin cambios', { timeOut: 3000 });
+      return;
+    }
 
     if (this.validarFormulario()) {
       const formData = new FormData();
-
       formData.append('nombre', this.producto.nombre);
       formData.append('descripcion', this.producto.descripcion);
       formData.append('stock', this.producto.stock.toString());
@@ -131,46 +108,47 @@ export class EditComponent implements OnInit {
       }
 
       if (this.selectedImage) {
-        formData.append('media', this.selectedImage); // Agregar el archivo al FormData
+        formData.append('media', this.selectedImage);
       }
 
       if (this.producto.id) {
         this.productoService.updateItem(formData, this.producto.id).subscribe(
           (response) => {
-            // alert('Producto actualizado correctamente.');
-            this.toastr.success('Producto actualizado correctamente.', 'Exito',{timeOut: 3000});
+            this.toastr.success('Producto actualizado correctamente.', 'Éxito', { timeOut: 3000 });
             this.router.navigate(['/admin/inventario/general']);
           },
           (error) => {
-            // console.error('Error al guardar los cambios:', error);
-            // alert('Hubo un error al guardar los cambios.');
-            this.toastr.error('Error al guardar los cambios.', 'Error',{timeOut: 3000});
+            this.toastr.error('Error al guardar los cambios.', 'Error', { timeOut: 3000 });
           }
         );
       } else {
-        // alert('ID de producto no válido.');
-        this.toastr.error('ID del producto no valido.', 'Error',{timeOut: 3000});
+        this.toastr.error('ID del producto no válido.', 'Error', { timeOut: 3000 });
       }
     } else {
-      // alert('Por favor, complete todos los campos correctamente.');
-      this.toastr.error('Por favor, complete todos los compos correctamente.', 'Error',{timeOut: 3000});
+      this.toastr.error('Por favor, complete todos los campos correctamente.', 'Error', { timeOut: 3000 });
     }
   }
 
-
   validarFormulario(): boolean {
     let valid = true;
-    // Verificar que los campos editables sean correctos
-    if (!this.producto.nombre || !this.producto.descripcion) {
-      valid = false;
-    }
-    if (this.producto.stock <= 0) {
-      valid = false;
-    }
-    if (this.producto.precio_actual <= 0) {
-      valid = false;
-    }
+    if (!this.producto.nombre || !this.producto.descripcion) valid = false;
+    if (this.producto.stock <= 0) valid = false;
+    if (this.producto.precio_actual <= 0) valid = false;
     return valid;
+  }
+
+  verificarCambios(): boolean {
+    if (!this.productoOriginal) {
+      return true; // Si no hay datos originales, asume que hay cambios
+    }
+
+    return (
+      this.producto.nombre !== this.productoOriginal.nombre ||
+      this.producto.descripcion !== this.productoOriginal.descripcion ||
+      this.producto.stock !== this.productoOriginal.stock ||
+      this.producto.precio_actual !== this.productoOriginal.precio_actual ||
+      this.producto.categoria_id !== this.productoOriginal.categoria?.id
+    );
   }
 
   onCategoriaChange(event: Event): void {
@@ -180,10 +158,23 @@ export class EditComponent implements OnInit {
 
   eliminarImagen(index: number): void {
     if (confirm('¿Estás seguro de que deseas eliminar esta imagen?')) {
-      this.producto.media_relacionado.splice(index, 1); // Eliminar la imagen de la lista
+      this.producto.media_relacionado.splice(index, 1);
     }
   }
 
+  onImageSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input?.files && input.files.length === 1) {
+      const file = input.files[0];
+      const reader = new FileReader();
 
+      reader.onload = () => {
+        const imageString = reader.result as string;
+        this.imageUrl.set(imageString);
+        this.selectedImage = file;
+      };
 
+      reader.readAsDataURL(file);
+    }
+  }
 }

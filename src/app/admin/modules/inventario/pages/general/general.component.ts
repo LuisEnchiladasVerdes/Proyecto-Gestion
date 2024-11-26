@@ -21,7 +21,6 @@ import {ToastrService} from "ngx-toastr";
   styleUrls: ['./general.component.css']
 })
 export class GeneralComponent implements OnInit{
-
   //ATRIBUTOS DE MODALES
   mostrarModal: boolean = false;
   mostrarModalEditar = false;
@@ -32,6 +31,7 @@ export class GeneralComponent implements OnInit{
   categorias: any[] = []; // Array para almacenar las categorías
   categoriaSeleccionada = ''; // Categoría seleccionada
   categoriaId: number = 0;
+  categoriaOriginal: string = ''; // Guardar el nombre original de la categoría
 
   // ATRIBUTO DE PRODUCTOS
   productos: Producto[] = []; // Definir un arreglo para los items
@@ -44,29 +44,8 @@ export class GeneralComponent implements OnInit{
 
   // CARGA AL INICIAR LOS PRODUCTOS Y LAS CATEGORIAS
   ngOnInit(): void {
-    // this.productoService.getProductos().subscribe(   //CARGAR PRODUCTOS
-    //   (productos: Producto[]) => {
-    //     if (productos && productos.length > 0) {
-    //       this.productos = productos; // Asignar todos los items al arreglo
-    //       // console.log(this.productos); // Ver el array completo de items
-    //     }
-    //   },
-    //   (error: any) => {
-    //     console.error('Error al cargar los items', error);
-    //   }
-    // );
     this.obtenerProductos();
-    this.categoriaService.getCategorias().subscribe(  //CARGAR CATEGORIAS
-      (data: Categoria[]) => {
-        this.categorias = data;
-        // console.log(this.categorias); // Verificar los datos
-        // alert('Categorias obtenidas')
-      },
-      (error) => {
-        // console.error('Error al cargar las categorías', error);
-        this.toastr.error('Error al cargar las categorias.', 'Error',{timeOut: 3000});
-      }
-    );
+    this.obtenerCategoria();
 
     this.mediaBaseUrl = this.productoService.getMediaBaseUrl(); // Obtiene la base URL del servicio
   }
@@ -75,12 +54,10 @@ export class GeneralComponent implements OnInit{
     this.productoService.getProductos().subscribe(   //CARGAR PRODUCTOS
       (productos: Producto[]) => {
         if (productos && productos.length > 0) {
-          this.productos = productos; // Asignar todos los items al arreglo
-          // console.log(this.productos); // Ver el array completo de items
+          this.productos = productos;
         }
       },
       (error: any) => {
-        // console.error('Error al cargar los items', error);
         this.toastr.error('Error al cargar los items.', 'Error',{timeOut: 3000});
       }
     );
@@ -98,8 +75,6 @@ export class GeneralComponent implements OnInit{
     );
   }
 
-
-
   // validarStock(categoria : number, stock : number){
   //   if(categoria === 1 || categoria === 4){
   //     if(stock < 10) return 'Bajo Stock'
@@ -109,8 +84,6 @@ export class GeneralComponent implements OnInit{
   //     else return 'En Stock'
   //   }
 
-
-
   // CRUD CATEDORIAS
   agregarCategoria(): void {
     if (this.nuevaCategoria.trim()) {
@@ -118,7 +91,6 @@ export class GeneralComponent implements OnInit{
         (categoria: Categoria) => {
           this.categorias.push(categoria); // Añadir la nueva categoría al arreglo
           this.cerrarAgregarCategoriaModal(); // Cerrar el modal
-          // alert('Categoria agregada con exito')
           this.toastr.success('Categoria agregada correctamente.', 'Exito',{timeOut: 3000});
         },
         (error) => {
@@ -144,12 +116,10 @@ export class GeneralComponent implements OnInit{
             this.categorias[index] = categoriaActualizada; // Actualiza la categoría en el arreglo
           }
           this.cerrarEditarCategoriaModal(); // Cerrar el modal de edición
-          // alert('Categoria editada con exito')
           this.toastr.success('Categoria editada correctamente.', 'Exito',{timeOut: 3000});
         },
         (error) => {
           console.error('Error al editar la categoría', error);
-          // alert('Error al editar la categoria')
           this.toastr.error('Error al editar la categoria.', 'Error',{timeOut: 3000});
         }
       );
@@ -159,19 +129,14 @@ export class GeneralComponent implements OnInit{
   eliminarCategoria(categoriaId: number) {
     if (categoriaId > 0) {
       this.categoriaService.deleteCategorias(categoriaId).subscribe(() => {
-        // Eliminar categoría exitosa
         this.categorias = this.categorias.filter(c => c.id !== categoriaId);  // Elimina la categoría del array
-        // alert('Categoría eliminada con éxito');
         this.toastr.success('Categoria eliminada correctamente.', 'Exito',{timeOut: 3000});
       }, (error) => {
         console.error('Error al eliminar la categoría:', error);
-        // alert('Categoria no eliminada')
         this.toastr.error('Error al eliminar la categoria.', 'Error',{timeOut: 3000});
       });
     }
   }
-
-
 
   // MODALES
   abrirModal(): void {
@@ -179,17 +144,14 @@ export class GeneralComponent implements OnInit{
   }
 
   cerrarModalClickExterior(event: MouseEvent): void {
-    // Este método se ejecuta si el usuario hace clic fuera del contenido del modal
     this.cerrarModal();
   }
 
   cerrarModal(): void {
-    // Cierra el modal estableciendo la variable a false
     this.mostrarModal = false;
   }
 
   editarCategoria(): void {
-    // alert('Editar Categoría seleccionado.');
     this.cerrarModal(); // Opcional: cerrar el modal después de seleccionar
     this.mostrarModalEditar = true;
   }
@@ -218,33 +180,65 @@ export class GeneralComponent implements OnInit{
     this.nuevaCategoria = ''; // Limpia el campo al cerrar
   }
 
-
   isEditing: boolean = false;
 
   // Activar el modo de edición cuando se selecciona una categoría
+  // onCategoriaSeleccionada() {
+  //   this.isEditing = true;  // Activa el modo de edición
+  //   const selectedCategory = this.categorias.find(c => c.nombre === this.categoriaSeleccionada);
+  //   this.categoriaId = selectedCategory ? selectedCategory.id : 0;  // Asigna el id basado en el nombre
+  // }
   onCategoriaSeleccionada() {
-    this.isEditing = true;  // Activa el modo de edición
+    this.isEditing = true; // Activar modo de edición
     const selectedCategory = this.categorias.find(c => c.nombre === this.categoriaSeleccionada);
-    this.categoriaId = selectedCategory ? selectedCategory.id : 0;  // Asigna el id basado en el nombre
+    this.categoriaId = selectedCategory ? selectedCategory.id : 0; // Asignar ID de la categoría seleccionada
+    this.categoriaOriginal = this.categoriaSeleccionada; // Guardar el nombre original de la categoría
   }
 
+
+  // guardarEdicion() {
+  //   if (this.categoriaSeleccionada) {
+  //     // Actualiza la categoría en el array
+  //     const categoriaEditada = this.categorias.find(categoria => categoria.id === this.categoriaId);
+  //     if (categoriaEditada) {
+  //       categoriaEditada.nombre = this.categoriaSeleccionada;
+  //       // Llamar al servicio para guardar la categoría editada (si se necesita)
+  //       this.categoriaService.editarCategoria(categoriaEditada).subscribe(() => {
+  //         this.isEditing = false;  // Desactiva el modo de edición
+  //       }, (error) => {
+  //         this.toastr.error('Error al guardar la categoria.', 'Error',{timeOut: 3000});
+  //       });
+  //     }
+  //   }
+  // }
   guardarEdicion() {
-    if (this.categoriaSeleccionada) {
-      // Actualiza la categoría en el array
-      const categoriaEditada = this.categorias.find(categoria => categoria.id === this.categoriaId);
-      if (categoriaEditada) {
-        categoriaEditada.nombre = this.categoriaSeleccionada;
-        // Llamar al servicio para guardar la categoría editada (si se necesita)
-        this.categoriaService.editarCategoria(categoriaEditada).subscribe(() => {
-          // Actualización exitosa
-          this.isEditing = false;  // Desactiva el modo de edición
-        }, (error) => {
-          // console.error('Error al guardar la categoría:', error);
-          this.toastr.error('Error al guardar la categoria.', 'Error',{timeOut: 3000});
-        });
-      }
+    if (this.categoriaSeleccionada.trim() === this.categoriaOriginal.trim()) {
+      this.toastr.warning('No se han detectado cambios en el nombre de la categoría.', 'Advertencia', { timeOut: 3000 });
+      return; // Detener el proceso de edición
     }
+
+    // Si hubo cambios, proceder con la actualización de la categoría
+    const categoriaEditada = {
+      id: this.categoriaId,
+      nombre: this.categoriaSeleccionada
+    };
+
+    this.categoriaService.editarCategoria(categoriaEditada).subscribe(
+      (categoriaActualizada: Categoria) => {
+        const index = this.categorias.findIndex(c => c.id === categoriaEditada.id);
+        if (index !== -1) {
+          this.categorias[index] = categoriaActualizada; // Actualiza la categoría en el arreglo
+        }
+        this.cerrarEditarCategoriaModal(); // Cierra el modal de edición
+        this.toastr.success('Categoría editada correctamente.', 'Éxito', { timeOut: 3000 });
+      },
+      (error) => {
+        console.error('Error al editar la categoría', error);
+        this.toastr.error('Error al editar la categoría.', 'Error', { timeOut: 3000 });
+      }
+    );
   }
+
 
   eliminarProducto(id: number | undefined): void {
     if (!id) {
@@ -256,13 +250,10 @@ export class GeneralComponent implements OnInit{
       this.productoService.deleteItem(id).subscribe(
         () => {
           this.productos = this.productos.filter((producto) => producto.id !== id);
-          // alert('Producto eliminado correctamente.');
           this.toastr.success('Producto eliminado correctamente.', 'Exito');
           this.obtenerProductos();
         },
         (error) => {
-          // console.error('Error al eliminar el producto:', error);
-          // alert('Ocurrió un error al eliminar el producto.');
           this.toastr.error('Ocurrio un error al eliminar el producto.', 'Error',{timeOut: 3000});
         }
       );
@@ -277,7 +268,6 @@ export class GeneralComponent implements OnInit{
           this.productos = productos;
         },
         (error) => {
-          // console.error('Error al cargar todos los productos', error);
           this.toastr.error('Error al cargar todos los productos.', 'Error',{timeOut: 3000});
         }
       );
@@ -288,7 +278,6 @@ export class GeneralComponent implements OnInit{
           this.productos = productos;
         },
         (error) => {
-          // console.error('Error al filtrar productos por categoría', error);
           this.toastr.error('Error al filtrar productos por categoria.', 'Error',{timeOut: 3000});
         }
       );

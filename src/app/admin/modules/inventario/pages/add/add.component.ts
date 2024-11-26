@@ -6,6 +6,7 @@ import { Categoria } from '../../../../../models/categoria.models';
 import { CategoriaService } from "../../../../../services/categoria.service";
 import { ProductoService } from "../../../../../services/producto.service";
 import {Producto} from "../../../../../models/producto.models";
+import {ToastrService} from "ngx-toastr";
 
 @Component({
   selector: 'app-add',
@@ -41,7 +42,8 @@ export class AddComponent {
 
   constructor(
     private categoriasService: CategoriaService,
-    private productoService: ProductoService
+    private productoService: ProductoService,
+    private toastr: ToastrService
   ) {}
 
   ngOnInit(): void {
@@ -143,16 +145,19 @@ export class AddComponent {
       // Enviar datos al servicio
       this.productoService.addProducto(formData).subscribe({
         next: (response) => {
-          alert('Producto creado exitosamente.');
+          // alert('Producto creado exitosamente.');
+          this.toastr.success('Producto creado exitosamente.', 'Exito',{timeOut: 3000});
           this.resetForm();
         },
         error: (err) => {
           console.error('Error al crear el producto', err);
-          alert('Hubo un error al crear el producto.');
+          // alert('Hubo un error al crear el producto.');
+          this.toastr.error('Hubo un error al crear el producto.', 'Error',{timeOut: 3000});
         }
       });
     } else {
-      alert('Por favor, completa todos los campos obligatorios.');
+      // alert('Por favor, completa todos los campos obligatorios.');
+      this.toastr.warning('Por favor, completa todos los campos.', 'Advertencia',{timeOut: 3000});
     }
   }
 

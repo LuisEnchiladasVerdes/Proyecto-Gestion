@@ -28,20 +28,16 @@ export class GeneralComponent implements OnInit{
   mostrarAgregarCategoriaModal: boolean = false; // Controla la visibilidad del modal
   nuevaCategoria: string = ''; // Almacena el valor de la nueva categoría
 
-
   // ATRIBUTOS DE CATEGORIAS
   categorias: any[] = []; // Array para almacenar las categorías
   categoriaSeleccionada = ''; // Categoría seleccionada
   categoriaId: number = 0;
 
-
   // ATRIBUTO DE PRODUCTOS
   productos: Producto[] = []; // Definir un arreglo para los items
 
-
   // ATRIBUTO PARA IMAGENES
   mediaBaseUrl: string = '';
-
 
   // CONSTRUCTOS
   constructor(private productoService : ProductoService, private categoriaService : CategoriaService, private toastr: ToastrService) { }
@@ -63,11 +59,12 @@ export class GeneralComponent implements OnInit{
     this.categoriaService.getCategorias().subscribe(  //CARGAR CATEGORIAS
       (data: Categoria[]) => {
         this.categorias = data;
-        console.log(this.categorias); // Verificar los datos
+        // console.log(this.categorias); // Verificar los datos
         // alert('Categorias obtenidas')
       },
       (error) => {
-        console.error('Error al cargar las categorías', error);
+        // console.error('Error al cargar las categorías', error);
+        this.toastr.error('Error al cargar las categorias.', 'Error',{timeOut: 3000});
       }
     );
 
@@ -83,7 +80,8 @@ export class GeneralComponent implements OnInit{
         }
       },
       (error: any) => {
-        console.error('Error al cargar los items', error);
+        // console.error('Error al cargar los items', error);
+        this.toastr.error('Error al cargar los items.', 'Error',{timeOut: 3000});
       }
     );
   }
@@ -92,11 +90,10 @@ export class GeneralComponent implements OnInit{
     this.categoriaService.getCategorias().subscribe(
       (data: Categoria[]) => {
         this.categorias = data;
-        console.log(this.categorias); // Verificar los datos
-        // alert('Categorias obtenidas')
       },
       (error) => {
-        console.error('Error al cargar las categorías', error);
+        // console.error('Error al cargar las categorías', error);
+        this.toastr.error('Error al cargar las categorias.', 'Error',{timeOut: 3000});
       }
     );
   }
@@ -121,11 +118,13 @@ export class GeneralComponent implements OnInit{
         (categoria: Categoria) => {
           this.categorias.push(categoria); // Añadir la nueva categoría al arreglo
           this.cerrarAgregarCategoriaModal(); // Cerrar el modal
-          alert('Categoria agregada con exito')
+          // alert('Categoria agregada con exito')
+          this.toastr.success('Categoria agregada correctamente.', 'Exito',{timeOut: 3000});
         },
         (error) => {
           console.error('Error al agregar la categoría', error);
-          alert('Error al agregar la categoria')
+          // alert('Error al agregar la categoria')
+          this.toastr.error('Error al agregar la categoria.', 'Error',{timeOut: 3000});
         }
       );
     }
@@ -145,11 +144,13 @@ export class GeneralComponent implements OnInit{
             this.categorias[index] = categoriaActualizada; // Actualiza la categoría en el arreglo
           }
           this.cerrarEditarCategoriaModal(); // Cerrar el modal de edición
-          alert('Categoria editada con exito')
+          // alert('Categoria editada con exito')
+          this.toastr.success('Categoria editada correctamente.', 'Exito',{timeOut: 3000});
         },
         (error) => {
           console.error('Error al editar la categoría', error);
-          alert('Error al editar la categoria')
+          // alert('Error al editar la categoria')
+          this.toastr.error('Error al editar la categoria.', 'Error',{timeOut: 3000});
         }
       );
     }
@@ -160,10 +161,12 @@ export class GeneralComponent implements OnInit{
       this.categoriaService.deleteCategorias(categoriaId).subscribe(() => {
         // Eliminar categoría exitosa
         this.categorias = this.categorias.filter(c => c.id !== categoriaId);  // Elimina la categoría del array
-        alert('Categoría eliminada con éxito');
+        // alert('Categoría eliminada con éxito');
+        this.toastr.success('Categoria eliminada correctamente.', 'Exito',{timeOut: 3000});
       }, (error) => {
         console.error('Error al eliminar la categoría:', error);
-        alert('Categoria no eliminada')
+        // alert('Categoria no eliminada')
+        this.toastr.error('Error al eliminar la categoria.', 'Error',{timeOut: 3000});
       });
     }
   }
@@ -236,7 +239,8 @@ export class GeneralComponent implements OnInit{
           // Actualización exitosa
           this.isEditing = false;  // Desactiva el modo de edición
         }, (error) => {
-          console.error('Error al guardar la categoría:', error);
+          // console.error('Error al guardar la categoría:', error);
+          this.toastr.error('Error al guardar la categoria.', 'Error',{timeOut: 3000});
         });
       }
     }
@@ -257,8 +261,9 @@ export class GeneralComponent implements OnInit{
           this.obtenerProductos();
         },
         (error) => {
-          console.error('Error al eliminar el producto:', error);
-          alert('Ocurrió un error al eliminar el producto.');
+          // console.error('Error al eliminar el producto:', error);
+          // alert('Ocurrió un error al eliminar el producto.');
+          this.toastr.error('Ocurrio un error al eliminar el producto.', 'Error',{timeOut: 3000});
         }
       );
     }
@@ -272,7 +277,8 @@ export class GeneralComponent implements OnInit{
           this.productos = productos;
         },
         (error) => {
-          console.error('Error al cargar todos los productos', error);
+          // console.error('Error al cargar todos los productos', error);
+          this.toastr.error('Error al cargar todos los productos.', 'Error',{timeOut: 3000});
         }
       );
     } else {
@@ -282,7 +288,8 @@ export class GeneralComponent implements OnInit{
           this.productos = productos;
         },
         (error) => {
-          console.error('Error al filtrar productos por categoría', error);
+          // console.error('Error al filtrar productos por categoría', error);
+          this.toastr.error('Error al filtrar productos por categoria.', 'Error',{timeOut: 3000});
         }
       );
     }

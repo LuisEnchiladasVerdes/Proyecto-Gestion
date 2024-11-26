@@ -6,6 +6,7 @@ import {Producto} from "../../../../../models/producto.models";
 import {ProductoService} from "../../../../../services/producto.service";
 import {Categoria} from "../../../../../models/categoria.models";
 import {CategoriaService} from "../../../../../services/categoria.service";
+import {ToastrService} from "ngx-toastr";
 
 @Component({
   selector: 'app-edit',
@@ -58,7 +59,7 @@ export class EditComponent implements OnInit {
         this.imageUrl.set(imageString); // Actualiza la vista previa
         // console.log(imageString); // Imprime la cadena en la consola
         this.selectedImage = file;
-        console.log(this.imageUrl)
+        // console.log(this.imageUrl)
       };
 
       reader.readAsDataURL(file); // Lee el archivo como Base64
@@ -69,7 +70,8 @@ export class EditComponent implements OnInit {
     private productoService: ProductoService,
     private route: ActivatedRoute,
     private router: Router,
-    private categoriaService : CategoriaService
+    private categoriaService : CategoriaService,
+    private toastr: ToastrService
   ) { }
 
   ngOnInit(): void {
@@ -88,8 +90,9 @@ export class EditComponent implements OnInit {
         this.producto.categoria_id = producto.categoria?.id || undefined;
       },
       (error) => {
-        console.error('Error al cargar el producto:', error);
-        alert('Error al cargar el producto.');
+        // console.error('Error al cargar el producto:', error);
+        // alert('Error al cargar el producto.');
+        this.toastr.error('Error al cargar el producto.', 'Error',{timeOut: 3000});
       }
     );
   }
@@ -101,8 +104,9 @@ export class EditComponent implements OnInit {
         this.categorias = categorias;
       },
       (error) => {
-        console.error('Error al cargar las categorías:', error);
-        alert('Error al cargar las categorías.');
+        // console.error('Error al cargar las categorías:', error);
+        // alert('Error al cargar las categorías.');
+        this.toastr.error('Error al cargar las categorias.', 'Error',{timeOut: 3000});
       }
     );
   }
@@ -133,19 +137,23 @@ export class EditComponent implements OnInit {
       if (this.producto.id) {
         this.productoService.updateItem(formData, this.producto.id).subscribe(
           (response) => {
-            alert('Producto actualizado correctamente.');
+            // alert('Producto actualizado correctamente.');
+            this.toastr.success('Producto actualizado correctamente.', 'Exito',{timeOut: 3000});
             this.router.navigate(['/admin/inventario/general']);
           },
           (error) => {
-            console.error('Error al guardar los cambios:', error);
-            alert('Hubo un error al guardar los cambios.');
+            // console.error('Error al guardar los cambios:', error);
+            // alert('Hubo un error al guardar los cambios.');
+            this.toastr.error('Error al guardar los cambios.', 'Error',{timeOut: 3000});
           }
         );
       } else {
-        alert('ID de producto no válido.');
+        // alert('ID de producto no válido.');
+        this.toastr.error('ID del producto no valido.', 'Error',{timeOut: 3000});
       }
     } else {
-      alert('Por favor, complete todos los campos correctamente.');
+      // alert('Por favor, complete todos los campos correctamente.');
+      this.toastr.error('Por favor, complete todos los compos correctamente.', 'Error',{timeOut: 3000});
     }
   }
 

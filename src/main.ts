@@ -4,14 +4,12 @@ import { AppComponent } from './app/app.component';
 
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { importProvidersFrom } from '@angular/core';
-import {provideToastr} from "ngx-toastr";
 
 bootstrapApplication(AppComponent, {
   ...appConfig,
   providers: [
     ...(appConfig.providers || []),
-    importProvidersFrom(BrowserAnimationsModule),
-    provideToastr()
+    importProvidersFrom(BrowserAnimationsModule)
   ]
 })
   .catch((err) => console.error(err));

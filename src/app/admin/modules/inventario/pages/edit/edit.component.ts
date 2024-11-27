@@ -6,7 +6,7 @@ import { Producto } from "../../../../../models/producto.models";
 import { ProductoService } from "../../../../../services/producto.service";
 import { Categoria } from "../../../../../models/categoria.models";
 import { CategoriaService } from "../../../../../services/categoria.service";
-import { ToastrService } from "ngx-toastr";
+import {AlertService} from "../../../../../services/alert.service";
 
 @Component({
   selector: 'app-edit',
@@ -51,7 +51,7 @@ export class EditComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private categoriaService: CategoriaService,
-    private toastr: ToastrService
+    private alertService: AlertService
   ) {}
 
   ngOnInit(): void {
@@ -71,7 +71,8 @@ export class EditComponent implements OnInit {
         this.producto.categoria_id = producto.categoria?.id || undefined;
       },
       (error) => {
-        this.toastr.error('Error al cargar el producto.', 'Error', { timeOut: 3000 });
+        // this.toastr.error('Error al cargar el producto.', 'Error', { timeOut: 3000 });
+        this.alertService.modalConIconoError('Error al cargar el producto.');
       }
     );
   }
@@ -82,14 +83,16 @@ export class EditComponent implements OnInit {
         this.categorias = categorias;
       },
       (error) => {
-        this.toastr.error('Error al cargar las categorías.', 'Error', { timeOut: 3000 });
+        // this.toastr.error('Error al cargar las categorías.', 'Error', { timeOut: 3000 });
+        this.alertService.modalConIconoError('Error al cargar las categorias.');
       }
     );
   }
 
   guardarCambios(): void {
     if (!this.verificarCambios()) {
-      this.toastr.info('No hay cambios en el formulario.', 'Sin cambios', { timeOut: 3000 });
+      // this.toastr.info('No hay cambios en el formulario.', 'Sin cambios', { timeOut: 3000 });
+      this.alertService.warning('No hay cambios en el formulario.');
       return;
     }
 
@@ -114,18 +117,22 @@ export class EditComponent implements OnInit {
       if (this.producto.id) {
         this.productoService.updateItem(formData, this.producto.id).subscribe(
           (response) => {
-            this.toastr.success('Producto actualizado correctamente.', 'Éxito', { timeOut: 3000 });
+            // this.toastr.success('Producto actualizado correctamente.', 'Éxito', { timeOut: 3000 });
+            this.alertService.success('Producto actualizado exitosamente.');
             this.router.navigate(['/admin/inventario/general']);
           },
           (error) => {
-            this.toastr.error('Error al guardar los cambios.', 'Error', { timeOut: 3000 });
+            // this.toastr.error('Error al guardar los cambios.', 'Error', { timeOut: 3000 });
+            this.alertService.error('Error al guardar los cambios.');
           }
         );
       } else {
-        this.toastr.error('ID del producto no válido.', 'Error', { timeOut: 3000 });
+        // this.toastr.error('ID del producto no válido.', 'Error', { timeOut: 3000 });
+        this.alertService.error('ID del producto no valido.');
       }
     } else {
-      this.toastr.error('Por favor, complete todos los campos correctamente.', 'Error', { timeOut: 3000 });
+      // this.toastr.error('Por favor, complete todos los campos correctamente.', 'Error', { timeOut: 3000 });
+      this.alertService.modalConIconoError('Por favor complete todos los campos correctamente.');
     }
   }
 

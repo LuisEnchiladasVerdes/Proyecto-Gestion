@@ -37,8 +37,14 @@ export class AddComponent {
   precioError = '';
   imageError = '';
 
-  selectedImage: File | null = null;
-  imageUrl = signal<string | null>(null);
+//  selectedImage: File | null = null;
+//  imageUrl = signal<string | null>(null);
+
+// Estas propiedades se agregan:
+  selectedImages: File[] = []; // Array de archivos seleccionados
+  imageUrls: string[] = [];    // Array de URLs para la vista previa
+
+
 
   constructor(
     private categoriasService: CategoriaService,
@@ -59,18 +65,13 @@ export class AddComponent {
 
   onImageSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
-    if (input?.files?.[0]) {
-      const file = input.files[0];
-      const reader = new FileReader();
+    if (input?.files) {
+      const files = Array.from(input.files); // Convierte FileList a array
 
-      reader.onload = () => {
-        this.imageUrl.set(reader.result as string);
-        this.selectedImage = file;
-      };
-
-      reader.readAsDataURL(file);
+      files.forEach((file) => this.handleImage(file)); // Procesa cada archivo
     }
   }
+
 
   validateName(): void {
     this.nameError = this.producto.nombre.trim()
@@ -106,7 +107,7 @@ export class AddComponent {
 
 
   validateImage(): void {
-    this.imageError = this.selectedImage ? '' : 'Se debe seleccionar una imagen';
+    this.imageError = this.selectedImages ? '' : 'Se debe seleccionar una imagen';
   }
 
   onSaveItem(event: Event): void {
@@ -137,10 +138,10 @@ export class AddComponent {
       formData.append('precio', this.producto.precio.toString());
       formData.append('categoria_id', this.producto.categoria_id.toString());
 
-      // Agregar imagen (o imágenes)
-      if (this.selectedImage) {
-        formData.append('media', this.selectedImage);
-      }
+      // Agregar múltiples imágenes
+      this.selectedImages.forEach((image, index) => {
+        formData.append(`media[${index}]`, image); // Usar un nombre único para cada archivo
+      });
 
       // Enviar datos al servicio
       this.productoService.addProducto(formData).subscribe({
@@ -154,13 +155,13 @@ export class AddComponent {
           console.error('Error al crear el producto', err);
           // alert('Hubo un error al crear el producto.');
           // this.toastr.error('Hubo un error al crear el producto.', 'Error',{timeOut: 3000});
-          this.alertService.modalConIconoError('Hubo un error al crear el producto.');
+          this.alertService.error('Error al crear el producto');
         }
       });
     } else {
       // alert('Por favor, completa todos los campos obligatorios.');
       // this.toastr.warning('Por favor, completa todos los campos.', 'Advertencia',{timeOut: 3000});
-      this.alertService.warning('Por favor, completa todos los campos.');
+      this.alertService.warning('Por favor , complete todos los campos.')
     }
   }
 
@@ -172,7 +173,7 @@ export class AddComponent {
     console.log('Stock:', this.producto.stock);
     console.log('Precio:', this.producto.precio);
     console.log('Categoría:', this.selectedCategory);
-    console.log('Imagen seleccionada:', this.selectedImage);
+    console.log('Imagen seleccionada:', this.selectedImages);
 
     let valid = true;
 
@@ -211,7 +212,7 @@ export class AddComponent {
       this.categoryError = '';
     }
 
-    if (!this.selectedImage) {
+    if (!this.selectedImages) {
       this.imageError = 'Se debe seleccionar al menos una imagen.';
       valid = false;
     } else {
@@ -236,11 +237,54 @@ export class AddComponent {
       media_relacionado: []
     };
     this.selectedCategory = null;
-    this.imageUrl.set(null);
+    this.imageUrls = []; // Limpia las URLs
+    this.selectedImages = []; // Limpia los archivos seleccionados
     this.nameError = '';
     this.categoryError = '';
     this.quantityError = '';
     this.descriptionError = '';
     this.imageError = '';
   }
+
+
+  isDragging = false; // Variable para gestionar el estilo del área de arrastre
+
+  onDragOver(event: DragEvent): void {
+    event.preventDefault(); // Previene el comportamiento predeterminado del navegador
+    this.isDragging = true; // Activa el estado de arrastre
+  }
+
+  onDragLeave(event: DragEvent): void {
+    event.preventDefault(); // Opcional, asegura que el evento no tenga efectos colaterales
+    this.isDragging = false; // Desactiva el estado de arrastre
+  }
+
+  onDrop(event: DragEvent): void {
+    event.preventDefault(); // Evita el comportamiento predeterminado
+    this.isDragging = false; // Restablece el estado de arrastre
+
+    // Procesa el archivo arrastrado
+    if (event.dataTransfer && event.dataTransfer.files.length > 0) {
+      const file = event.dataTransfer.files[0];
+      this.handleImage(file);
+    }
+  }
+
+  handleImage(file: File): void {
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      this.imageUrls.push(reader.result as string); // Agrega la URL base64
+      this.selectedImages.push(file); // Guarda el archivo en selectedImages
+    };
+
+    reader.readAsDataURL(file); // Convierte la imagen a Base64
+  }
+
+  removeImage(index: number): void {
+    this.imageUrls.splice(index, 1); // Elimina la URL de la vista previa
+    this.selectedImages.splice(index, 1); // Elimina el archivo del array
+  }
+
+
 }

@@ -48,4 +48,19 @@ export class AlertService {
       text: message
     });
   }
+
+
+
+  showConfirmAlert(text: string, confirmText: string = 'Sí, eliminar', cancelText: string = 'Cancelar') {
+    return Swal.fire({
+      title: '¿Estás seguro?',
+      text: text,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: confirmText,
+      cancelButtonText: cancelText
+    });
+  }
 }

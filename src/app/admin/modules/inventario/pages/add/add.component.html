@@ -102,9 +102,14 @@
           <div>
             <label class="block text-sm font-medium text-gray-700">Imagen del ítem</label>
             <div
-              class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md"
+              class="mt-1 flex flex-col justify-center items-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md"
+              (dragover)="onDragOver($event)"
+              (dragleave)="onDragLeave($event)"
+              (drop)="onDrop($event)"
+              [class.border-indigo-500]="isDragging"
             >
-              <div class="space-y-1 text-center">
+              <!-- Área de subida -->
+              <div *ngIf="imageUrls.length === 0" class="space-y-1 text-center">
                 <svg
                   class="mx-auto h-12 w-12 text-gray-400"
                   stroke="currentColor"
@@ -123,7 +128,7 @@
                     for="file-upload"
                     class="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500"
                   >
-                    <span>Subir un archivo</span>
+                    <span>Subir archivos</span>
                     <input
                       id="file-upload"
                       type="file"
@@ -131,23 +136,35 @@
                       class="sr-only"
                       (change)="onImageSelected($event)"
                       accept="image/*"
+                      multiple
                     />
                   </label>
                   <p class="pl-1">o arrastra y suelta</p>
                 </div>
                 <p class="text-xs text-gray-500">PNG, JPG hasta 10MB</p>
               </div>
-            </div>
-            <!-- Vista previa -->
-            <div *ngIf="imageUrl()" class="mt-4">
-              <label class="block text-sm font-medium text-gray-700">Vista previa</label>
-              <img
-                [src]="imageUrl()"
-                alt="Vista previa"
-                class="mt-2 w-full max-w-md mx-auto rounded-lg shadow-md"
-              />
+
+              <!-- Vista previa de imágenes -->
+              <div *ngIf="imageUrls.length > 0" class="mt-4 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                <div *ngFor="let imageUrl of imageUrls; let i = index" class="relative group">
+                  <img
+                    [src]="imageUrl"
+                    alt="Vista previa"
+                    class="w-full h-32 object-cover rounded-lg shadow-md"
+                  />
+                  <button
+                    type="button"
+                    class="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 text-xs opacity-0 group-hover:opacity-100 transition-opacity"
+                    (click)="removeImage(i)"
+                  >
+                    X
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
+
+
         </div>
 
         <!-- Botones de acción -->

@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, ViewChild } from '@angular/core';
 import { NgFor, NgIf } from "@angular/common";
 import { FormsModule } from "@angular/forms";
 import { RouterLink } from "@angular/router";
@@ -7,15 +7,20 @@ import { CategoriaService } from "../../../../../services/categoria.service";
 import { ProductoService } from "../../../../../services/producto.service";
 import {Producto} from "../../../../../models/producto.models";
 import {AlertService} from "../../../../../services/alert.service";
+import {
+  ImageUploaderComponentComponent
+} from "../../../../components/common/image-uploader-component/image-uploader-component.component";
 
 @Component({
   selector: 'app-add',
   standalone: true,
-  imports: [NgFor, NgIf, FormsModule, RouterLink],
+  imports: [NgFor, NgIf, FormsModule, RouterLink, ImageUploaderComponentComponent],
   templateUrl: './add.component.html',
   styleUrl: './add.component.css'
 })
 export class AddComponent {
+  @ViewChild('uploader') uploader!: ImageUploaderComponentComponent;
+
   producto: Producto = {
     id: 0,
     nombre: '',
@@ -37,20 +42,24 @@ export class AddComponent {
   precioError = '';
   imageError = '';
 
-//  selectedImage: File | null = null;
-//  imageUrl = signal<string | null>(null);
-
-// Estas propiedades se agregan:
   selectedImages: File[] = []; // Array de archivos seleccionados
   imageUrls: string[] = [];    // Array de URLs para la vista previa
-
-
 
   constructor(
     private categoriasService: CategoriaService,
     private productoService: ProductoService,
     private alertService: AlertService
   ) {}
+
+  onImagesChanged(images: File[]): void {
+    this.selectedImages = images;
+  }
+
+  onImageError(message: string): void {
+    console.error(message);
+    this.alertService.warning(message);
+  }
+
 
   ngOnInit(): void {
     this.loadCategorias();
@@ -71,7 +80,6 @@ export class AddComponent {
       files.forEach((file) => this.handleImage(file)); // Procesa cada archivo
     }
   }
-
 
   validateName(): void {
     this.nameError = this.producto.nombre.trim()
@@ -105,7 +113,6 @@ export class AddComponent {
       : 'El precio debe ser mayor que 0.';
   }
 
-
   validateImage(): void {
     this.imageError = this.selectedImages ? '' : 'Se debe seleccionar una imagen';
   }
@@ -119,9 +126,7 @@ export class AddComponent {
     this.validateDescription();
     this.validateImage();
 
-
     this.agregarProducto();
-
   }
 
   agregarProducto(): void {
@@ -146,21 +151,19 @@ export class AddComponent {
       // Enviar datos al servicio
       this.productoService.addProducto(formData).subscribe({
         next: (response) => {
-          // alert('Producto creado exitosamente.');
-          // this.toastr.success('Producto creado exitosamente.', 'Exito',{timeOut: 3000});
           this.alertService.success('Producto creado exitosamente.');
+
+          // Limpia el formulario y el uploader DESPUÉS de guardar exitosamente
           this.resetForm();
+          this.uploader.resetUploader();
         },
         error: (err) => {
+          // Manejo de errores
           console.error('Error al crear el producto', err);
-          // alert('Hubo un error al crear el producto.');
-          // this.toastr.error('Hubo un error al crear el producto.', 'Error',{timeOut: 3000});
           this.alertService.error('Error al crear el producto');
         }
       });
     } else {
-      // alert('Por favor, completa todos los campos obligatorios.');
-      // this.toastr.warning('Por favor, completa todos los campos.', 'Advertencia',{timeOut: 3000});
       this.alertService.warning('Por favor , complete todos los campos.')
     }
   }
@@ -223,8 +226,6 @@ export class AddComponent {
     return valid;
   }
 
-
-
   resetForm(): void {
     this.producto = {
       id: 0,
@@ -237,37 +238,18 @@ export class AddComponent {
       media_relacionado: []
     };
     this.selectedCategory = null;
-    this.imageUrls = []; // Limpia las URLs
-    this.selectedImages = []; // Limpia los archivos seleccionados
+    this.selectedImages = []; // Limpia las imágenes seleccionadas
+    this.imageUrls = [];      // Limpia las URLs de las vistas previas
+
+    // Limpia errores
     this.nameError = '';
     this.categoryError = '';
     this.quantityError = '';
     this.descriptionError = '';
+    this.precioError = '';
     this.imageError = '';
-  }
 
-
-  isDragging = false; // Variable para gestionar el estilo del área de arrastre
-
-  onDragOver(event: DragEvent): void {
-    event.preventDefault(); // Previene el comportamiento predeterminado del navegador
-    this.isDragging = true; // Activa el estado de arrastre
-  }
-
-  onDragLeave(event: DragEvent): void {
-    event.preventDefault(); // Opcional, asegura que el evento no tenga efectos colaterales
-    this.isDragging = false; // Desactiva el estado de arrastre
-  }
-
-  onDrop(event: DragEvent): void {
-    event.preventDefault(); // Evita el comportamiento predeterminado
-    this.isDragging = false; // Restablece el estado de arrastre
-
-    // Procesa el archivo arrastrado
-    if (event.dataTransfer && event.dataTransfer.files.length > 0) {
-      const file = event.dataTransfer.files[0];
-      this.handleImage(file);
-    }
+    console.log('Formulario reseteado');
   }
 
   handleImage(file: File): void {
@@ -280,11 +262,5 @@ export class AddComponent {
 
     reader.readAsDataURL(file); // Convierte la imagen a Base64
   }
-
-  removeImage(index: number): void {
-    this.imageUrls.splice(index, 1); // Elimina la URL de la vista previa
-    this.selectedImages.splice(index, 1); // Elimina el archivo del array
-  }
-
 
 }

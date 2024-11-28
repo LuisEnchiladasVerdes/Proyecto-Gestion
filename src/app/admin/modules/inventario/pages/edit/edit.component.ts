@@ -23,6 +23,7 @@ import {AlertService} from "../../../../../services/alert.service";
 export class EditComponent implements OnInit {
   productoOriginal: Producto | null = null; // Para guardar el estado original del producto
   producto: Producto = {
+    codigo: 0,
     id: 0,
     nombre: '',
     categoria: { id: 0, nombre: '' },
@@ -172,7 +173,8 @@ export class EditComponent implements OnInit {
     this.producto.categoria_id = Number(selectElement.value);
   }
 
-  eliminarImagen(index: number): void {this.alertService.showConfirmAlert(
+  eliminarImagen(index: number): void {
+    this.alertService.showConfirmAlert(
       '¿Estás seguro de que deseas eliminar esta imagen?'
     ).then((result) => {
       if (result.isConfirmed) {

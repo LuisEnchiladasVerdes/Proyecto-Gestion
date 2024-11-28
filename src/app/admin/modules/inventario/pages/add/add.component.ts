@@ -22,6 +22,7 @@ export class AddComponent {
   @ViewChild('uploader') uploader!: ImageUploaderComponentComponent;
 
   producto: Producto = {
+    codigo: 0,
     id: 0,
     nombre: '',
     categoria: { id: 0, nombre: '' },
@@ -228,6 +229,7 @@ export class AddComponent {
 
   resetForm(): void {
     this.producto = {
+      codigo: 0,
       id: 0,
       nombre: '',
       categoria: { id: 0, nombre: '' },

@@ -10,29 +10,26 @@ export class AlertService {
 
   success(message: string, title: string = 'Éxito') {
     Swal.fire({
-      position: "top-end",
       icon: 'success',
       title,
       text: message,
       showConfirmButton: false,
-      timer: 1500
+      timer: 1000
     });
   }
 
   error(message: string, title: string = 'Error') {
     Swal.fire({
-      position: "top-end",
       icon: 'error',
       title,
       text: message,
       showConfirmButton: false,
-      timer: 1500
+      timer: 1000
     });
   }
 
   warning(message: string, title: string = 'Advertencia') {
     Swal.fire({
-      // position: "top-end",
       icon: 'warning',
       title,
       text: message,

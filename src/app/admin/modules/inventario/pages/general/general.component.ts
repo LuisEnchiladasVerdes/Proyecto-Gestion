@@ -262,16 +262,9 @@ export class GeneralComponent implements OnInit{
       return;
     }
 
-    Swal.fire({
-      title: '¿Estás seguro?',
-      text: 'Este producto será eliminado de manera permanente.',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Sí, eliminar',
-      cancelButtonText: 'Cancelar'
-    }).then((result) => {
+    this.alertService.showConfirmAlert(
+      'Este producto sera eliminado de manera permanente'
+    ).then((result) => {
       if (result.isConfirmed) {
         this.productoService.deleteItem(id).subscribe(
           () => {

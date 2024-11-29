@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import { RouterLink } from "@angular/router";
+import { Router, RouterLink } from "@angular/router";
 import { NgFor, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {CategoriaService} from "../../../../../services/categoria.service";
@@ -7,6 +7,7 @@ import { Categoria } from '../../../../../models/categoria.models';
 import {ProductoService} from "../../../../../services/producto.service";
 import {Producto} from "../../../../../models/producto.models";
 import {ToastrService} from "ngx-toastr";
+import { AuthService } from '../../../../../services/auth.service';
 
 @Component({
   selector: 'app-general',
@@ -39,8 +40,14 @@ export class GeneralComponent implements OnInit{
   // ATRIBUTO PARA IMAGENES
   mediaBaseUrl: string = '';
 
+    // CARRUSEL DE IMÁGENES
+    currentImageIndex: { [key: number]: number } = {}; // Índice actual de imagen para cada producto
+
   // CONSTRUCTOS
-  constructor(private productoService : ProductoService, private categoriaService : CategoriaService, private toastr: ToastrService) { }
+  constructor(private productoService : ProductoService, private categoriaService : CategoriaService, private toastr: ToastrService, private router: Router,
+    private authService: AuthService // Inyección del AuthService
+
+  ) { }
 
   // CARGA AL INICIAR LOS PRODUCTOS Y LAS CATEGORIAS
   ngOnInit(): void {
@@ -48,20 +55,26 @@ export class GeneralComponent implements OnInit{
     this.obtenerCategoria();
 
     this.mediaBaseUrl = this.productoService.getMediaBaseUrl(); // Obtiene la base URL del servicio
+      // Inicia el carrusel de imágenes
+      this.startImageCarousel();
   }
 
-  obtenerProductos(){
-    this.productoService.getProductos().subscribe(   //CARGAR PRODUCTOS
-      (productos: Producto[]) => {
-        if (productos && productos.length > 0) {
-          this.productos = productos;
+  obtenerProductos(): void {
+    this.productoService.getProductos().subscribe({
+      next: (productos: Producto[]) => {
+        this.productos = productos;
+      },
+      error: (err) => {
+        if (err.message.includes('401')) {
+          this.toastr.error('No autorizado. Inicia sesión nuevamente.', 'Error');
+          this.router.navigate(['/admin/login']);
+        } else {
+          this.toastr.error('Error al cargar los productos.', 'Error');
         }
       },
-      (error: any) => {
-        this.toastr.error('Error al cargar los items.', 'Error',{timeOut: 3000});
-      }
-    );
+    });
   }
+  
 
   obtenerCategoria(){
     this.categoriaService.getCategorias().subscribe(
@@ -75,14 +88,22 @@ export class GeneralComponent implements OnInit{
     );
   }
 
-  // validarStock(categoria : number, stock : number){
-  //   if(categoria === 1 || categoria === 4){
-  //     if(stock < 10) return 'Bajo Stock'
-  //     else return 'En Stock'
-  //   }else {
-  //     if(stock < 50) return 'Bajo Stock'
-  //     else return 'En Stock'
-  //   }
+  // LÓGICA DEL CARRUSEL
+  startImageCarousel(): void {
+    setInterval(() => {
+      this.productos.forEach((producto) => {
+        // Validar que el producto tenga un ID y que media_relacionado no esté vacío
+        if (producto.id && producto.media_relacionado && producto.media_relacionado.length > 1) {
+          if (!(producto.id in this.currentImageIndex)) {
+            this.currentImageIndex[producto.id] = 0;
+          }
+          this.currentImageIndex[producto.id] =
+            (this.currentImageIndex[producto.id] + 1) % producto.media_relacionado.length;
+        }
+      });
+    }, 3000); // Cambiar cada 3 segundos
+  }
+  
 
   // CRUD CATEDORIAS
   agregarCategoria(): void {

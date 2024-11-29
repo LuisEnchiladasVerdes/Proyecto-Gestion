@@ -12,11 +12,15 @@ import {AuthService} from "../../../../services/auth.service";
   styleUrl: './header-admin.component.css'
 })
 export class HeaderAdminComponent {
-
   constructor(private authService: AuthService, private router: Router) {}
 
   onLogout(): void {
-    this.authService.logout(); // Finaliza la sesión
-    this.router.navigate(['/admin/login']); // Redirige al login
+    this.authService.logout().subscribe({
+      next: () => this.router.navigate(['/admin/login']),
+      error: (err) => {
+        console.error('Error al cerrar sesión:', err);
+        this.router.navigate(['/admin/login']); // Redirige incluso si falla
+      },
+    });
   }
 }

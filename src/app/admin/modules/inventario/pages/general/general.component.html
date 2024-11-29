@@ -248,15 +248,19 @@
               <td class="px-6 py-4 whitespace-nowrap">
                 <div class="flex items-center">
                   <div class="h-10 w-10 flex-shrink-0">
-                    <img class="h-10 w-10 rounded-full"
-                         *ngFor="let img of producto.media_relacionado"
-                         [src]="mediaBaseUrl + img"
-                         alt="{{ producto.nombre }}"
-                    >
+                    <!-- Contenedor de carrusel -->
+                    <div class="h-10 w-10 flex-shrink-0">
+                      <img 
+                        class="h-10 w-10 rounded-full"
+                        *ngIf="producto.id && producto.media_relacionado.length > 0"
+                        [src]="mediaBaseUrl + producto.media_relacionado[currentImageIndex[producto.id] || 0]"
+                        alt="{{ producto.nombre }}"
+                      >
+                    </div>
+                    
                   </div>
                   <div class="ml-4">
                     <div class="text-sm font-medium text-gray-900">{{ producto.nombre }}</div>
-<!--                    <div class="text-sm text-gray-500">{{ validarCategoria(producto.categoria) }}</div>-->
                     <div class="text-sm text-gray-500">{{ producto.categoria.nombre }}</div>
                   </div>
                 </div>
@@ -271,15 +275,16 @@
                 <div class="text-sm text-gray-900">${{ producto.precio_actual }}</div>
               </td>
               <td class="px-6 py-4 whitespace-nowrap">
-                  <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
-<!--                    {{ validarStock(producto.categoria, producto.stock)}}-->
-                  </span>
+                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                  <!-- Estado -->
+                </span>
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                 <button class="text-indigo-600 hover:text-indigo-900 mr-3" [routerLink]="['/admin/inventario/edit', producto.id]">Editar</button>
                 <button class="text-red-600 hover:text-red-900" (click)="eliminarProducto(producto.id)">Eliminar</button>
               </td>
             </tr>
+            
 
           </tbody>
         </table>

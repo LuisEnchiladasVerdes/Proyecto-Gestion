@@ -6,7 +6,13 @@ import {authGuard} from "../guards/auth.guard";
 const routes: Routes = [
   {
     path: '',
+    redirectTo: 'login', // Redirige a 'login' por defecto si no se especifica una sub-ruta
+    pathMatch: 'full',
+  },
+  {
+    path: '',
     component: AdminLayoutComponent,
+    canActivate: [authGuard], // Protege el layout completo con el guard
     children: [
 
       {
@@ -39,13 +45,17 @@ const routes: Routes = [
   {
     path: 'login',
     loadComponent: () => import('./components/aplication/login/login.component')
-      .then(m => m.LoginComponent)
+    .then(m => m.LoginComponent),
   },
+//  {
+//    path: 'forget',
+//    loadChildren: () => import('./modules/recuperar/recuperar.module')
+//      .then(m => m.RecuperarModule)
+//  },
   {
-    path: 'forget',
-    loadChildren: () => import('./modules/recuperar/recuperar.module')
-      .then(m => m.RecuperarModule)
-  }
+    path: '**', // Ruta comodín para manejar rutas no encontradas
+    redirectTo: 'login',
+  },
 ];
 
 @NgModule({

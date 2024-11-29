@@ -1,9 +1,9 @@
 import { Component } from '@angular/core';
-import {Router, RouterLink} from "@angular/router";
-import {FormsModule} from "@angular/forms";
-import {NgIf} from "@angular/common";
-import { HttpClient, HttpClientModule } from '@angular/common/http';
-import {AuthService} from "../../../../services/auth.service";
+import { Router, RouterLink } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+import { NgIf } from '@angular/common';
+import { HttpClientModule } from '@angular/common/http';
+import { AuthService } from '../../../../services/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -15,30 +15,21 @@ import {AuthService} from "../../../../services/auth.service";
     NgIf
   ],
   templateUrl: './login.component.html',
-  styleUrl: './login.component.css'
+  styleUrls: ['./login.component.css'] // Corregí la propiedad a "styleUrls" (plural)
 })
-
 export class LoginComponent {
   username = '';
-  password: string = '';
+  password = '';
+  errorMessage = '';
 
-  errorMessage: string = ''; // Variable para almacenar el mensaje de error
+  constructor(private authService: AuthService, private router: Router) {}
 
-  // CONTRUCTOR
-  constructor(private router: Router, private http : HttpClient, private authService: AuthService) {}
-
-
-
-
-  onLogin() {
-
-    if (this.authService.login(this.username, this.password)) {
-      this.router.navigate(['/admin/home']); // Redirige al dashboard si la autenticación es exitosa
-    } else {
-      this.errorMessage = 'Usuario o contraseña incorrectos'; // Muestra error
-    }
+  onLogin(): void {
+    this.authService.login({ username: this.username, password: this.password }).subscribe({
+      next: () => this.router.navigate(['/admin/home']),
+      error: (err) => {
+        this.errorMessage = err.error?.detail || 'Error al iniciar sesión';
+      },
+    });
   }
-
-
-
 }

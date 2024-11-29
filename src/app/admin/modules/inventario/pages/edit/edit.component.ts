@@ -6,7 +6,7 @@ import { Producto } from "../../../../../models/producto.models";
 import { ProductoService } from "../../../../../services/producto.service";
 import { Categoria } from "../../../../../models/categoria.models";
 import { CategoriaService } from "../../../../../services/categoria.service";
-import { ToastrService } from "ngx-toastr";
+import {AlertService} from "../../../../../services/alert.service";
 
 @Component({
   selector: 'app-edit',
@@ -23,6 +23,7 @@ import { ToastrService } from "ngx-toastr";
 export class EditComponent implements OnInit {
   productoOriginal: Producto | null = null; // Para guardar el estado original del producto
   producto: Producto = {
+    codigo: 0,
     id: 0,
     nombre: '',
     categoria: { id: 0, nombre: '' },
@@ -46,12 +47,14 @@ export class EditComponent implements OnInit {
   imageUrl = signal<string | null>(null);
   mediaBaseUrl: string = '';
 
+  imagenesModificadas = false; // Nueva propiedad para rastrear cambios en imágenes
+
   constructor(
     private productoService: ProductoService,
     private route: ActivatedRoute,
     private router: Router,
     private categoriaService: CategoriaService,
-    private toastr: ToastrService
+    private alertService: AlertService
   ) {}
 
   ngOnInit(): void {
@@ -71,7 +74,7 @@ export class EditComponent implements OnInit {
         this.producto.categoria_id = producto.categoria?.id || undefined;
       },
       (error) => {
-        this.toastr.error('Error al cargar el producto.', 'Error', { timeOut: 3000 });
+        this.alertService.modalConIconoError('Error al cargar el producto.');
       }
     );
   }
@@ -82,14 +85,14 @@ export class EditComponent implements OnInit {
         this.categorias = categorias;
       },
       (error) => {
-        this.toastr.error('Error al cargar las categorías.', 'Error', { timeOut: 3000 });
+        this.alertService.modalConIconoError('Error al cargar las categorias.');
       }
     );
   }
 
   guardarCambios(): void {
     if (!this.verificarCambios()) {
-      this.toastr.info('No hay cambios en el formulario.', 'Sin cambios', { timeOut: 3000 });
+      this.alertService.warning('No hay cambios en el formulario.');
       return;
     }
 
@@ -114,18 +117,20 @@ export class EditComponent implements OnInit {
       if (this.producto.id) {
         this.productoService.updateItem(formData, this.producto.id).subscribe(
           (response) => {
-            this.toastr.success('Producto actualizado correctamente.', 'Éxito', { timeOut: 3000 });
+            // this.toastr.success('Producto actualizado correctamente.', 'Éxito', { timeOut: 3000 });
+            this.alertService.success('Producto actualizado exitosamente.');
             this.router.navigate(['/admin/inventario/general']);
           },
           (error) => {
-            this.toastr.error('Error al guardar los cambios.', 'Error', { timeOut: 3000 });
+            this.alertService.error('Error al guardar los cambios.');
           }
         );
       } else {
-        this.toastr.error('ID del producto no válido.', 'Error', { timeOut: 3000 });
+        this.alertService.error('ID del producto no valido.');
       }
     } else {
-      this.toastr.error('Por favor, complete todos los campos correctamente.', 'Error', { timeOut: 3000 });
+      // this.toastr.error('Por favor, complete todos los campos correctamente.', 'Error', { timeOut: 3000 });
+      this.alertService.modalConIconoError('Por favor complete todos los campos correctamente.');
     }
   }
 
@@ -139,17 +144,29 @@ export class EditComponent implements OnInit {
 
   verificarCambios(): boolean {
     if (!this.productoOriginal) {
+      console.log('No hay producto original. Se asumen cambios.');
       return true; // Si no hay datos originales, asume que hay cambios
     }
 
-    return (
+    const camposCambiados =
       this.producto.nombre !== this.productoOriginal.nombre ||
       this.producto.descripcion !== this.productoOriginal.descripcion ||
       this.producto.stock !== this.productoOriginal.stock ||
       this.producto.precio_actual !== this.productoOriginal.precio_actual ||
-      this.producto.categoria_id !== this.productoOriginal.categoria?.id
-    );
+      this.producto.categoria_id !== this.productoOriginal.categoria?.id;
+
+    const nuevasImagenesAgregadas = !!this.producto.media && this.producto.media.length > 0;
+
+    const resultado = camposCambiados || this.imagenesModificadas || nuevasImagenesAgregadas;
+
+    console.log('Campos cambiados:', camposCambiados);
+    console.log('Nuevas imágenes agregadas:', nuevasImagenesAgregadas);
+    console.log('Imágenes modificadas:', this.imagenesModificadas);
+    console.log('Resultado final de verificarCambios:', resultado);
+
+    return resultado;
   }
+
 
   onCategoriaChange(event: Event): void {
     const selectElement = event.target as HTMLSelectElement;
@@ -157,9 +174,15 @@ export class EditComponent implements OnInit {
   }
 
   eliminarImagen(index: number): void {
-    if (confirm('¿Estás seguro de que deseas eliminar esta imagen?')) {
-      this.producto.media_relacionado.splice(index, 1);
-    }
+    this.alertService.showConfirmAlert(
+      '¿Estás seguro de que deseas eliminar esta imagen?'
+    ).then((result) => {
+      if (result.isConfirmed) {
+        this.producto.media_relacionado.splice(index, 1); // Elimina la imagen del arreglo
+        this.imagenesModificadas = true; // Marca que las imágenes han sido modificadas
+        console.log('Imagen eliminada. Imágenes modificadas:', this.imagenesModificadas);
+      }
+    });
   }
 
   onImageSelected(event: Event): void {

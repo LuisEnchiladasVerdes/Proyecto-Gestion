@@ -6,8 +6,9 @@ import {CategoriaService} from "../../../../../services/categoria.service";
 import { Categoria } from '../../../../../models/categoria.models';
 import {ProductoService} from "../../../../../services/producto.service";
 import {Producto} from "../../../../../models/producto.models";
-import {ToastrService} from "ngx-toastr";
 import { AuthService } from '../../../../../services/auth.service';
+import {AlertService} from "../../../../../services/alert.service";
+import Swal from "sweetalert2";
 
 @Component({
   selector: 'app-general',
@@ -44,9 +45,8 @@ export class GeneralComponent implements OnInit{
     currentImageIndex: { [key: number]: number } = {}; // Índice actual de imagen para cada producto
 
   // CONSTRUCTOS
-  constructor(private productoService : ProductoService, private categoriaService : CategoriaService, private toastr: ToastrService, private router: Router,
-    private authService: AuthService // Inyección del AuthService
-
+  constructor(private productoService : ProductoService, private categoriaService : CategoriaService, private router: Router,
+    private authService: AuthService,   private alertService: AlertService
   ) { }
 
   // CARGA AL INICIAR LOS PRODUCTOS Y LAS CATEGORIAS
@@ -66,10 +66,10 @@ export class GeneralComponent implements OnInit{
       },
       error: (err) => {
         if (err.message.includes('401')) {
-          this.toastr.error('No autorizado. Inicia sesión nuevamente.', 'Error');
+          this.alertService.modalConIconoError('No autorizado. Inicia sesión nuevamente.');
           this.router.navigate(['/admin/login']);
         } else {
-          this.toastr.error('Error al cargar los productos.', 'Error');
+          this.alertService.modalConIconoError('Error al cargar los productos.');
         }
       },
     });
@@ -82,8 +82,8 @@ export class GeneralComponent implements OnInit{
         this.categorias = data;
       },
       (error) => {
-        // console.error('Error al cargar las categorías', error);
-        this.toastr.error('Error al cargar las categorias.', 'Error',{timeOut: 3000});
+        // this.toastr.error('Error al cargar las categorias.', 'Error',{timeOut: 3000});
+        this.alertService.modalConIconoError('Error al cargar las categorias.');
       }
     );
   }
@@ -112,12 +112,14 @@ export class GeneralComponent implements OnInit{
         (categoria: Categoria) => {
           this.categorias.push(categoria); // Añadir la nueva categoría al arreglo
           this.cerrarAgregarCategoriaModal(); // Cerrar el modal
-          this.toastr.success('Categoria agregada correctamente.', 'Exito',{timeOut: 3000});
+          // this.toastr.success('Categoria agregada correctamente.', 'Exito',{timeOut: 3000});
+          this.alertService.success('Categoria agregada correctamente.');
         },
         (error) => {
           console.error('Error al agregar la categoría', error);
           // alert('Error al agregar la categoria')
-          this.toastr.error('Error al agregar la categoria.', 'Error',{timeOut: 3000});
+          // this.toastr.error('Error al agregar la categoria.', 'Error',{timeOut: 3000});
+          this.alertService.modalConIconoError('Error al agregar la categoria.');
         }
       );
     }
@@ -137,11 +139,13 @@ export class GeneralComponent implements OnInit{
             this.categorias[index] = categoriaActualizada; // Actualiza la categoría en el arreglo
           }
           this.cerrarEditarCategoriaModal(); // Cerrar el modal de edición
-          this.toastr.success('Categoria editada correctamente.', 'Exito',{timeOut: 3000});
+          // this.toastr.success('Categoria editada correctamente.', 'Exito',{timeOut: 3000});
+          this.alertService.success('Categoria editada correctamente.');
         },
         (error) => {
           console.error('Error al editar la categoría', error);
-          this.toastr.error('Error al editar la categoria.', 'Error',{timeOut: 3000});
+          // this.toastr.error('Error al editar la categoria.', 'Error',{timeOut: 3000});
+          this.alertService.modalConIconoError('Error al editar la categoria.');
         }
       );
     }
@@ -151,10 +155,12 @@ export class GeneralComponent implements OnInit{
     if (categoriaId > 0) {
       this.categoriaService.deleteCategorias(categoriaId).subscribe(() => {
         this.categorias = this.categorias.filter(c => c.id !== categoriaId);  // Elimina la categoría del array
-        this.toastr.success('Categoria eliminada correctamente.', 'Exito',{timeOut: 3000});
+        // this.toastr.success('Categoria eliminada correctamente.', 'Exito',{timeOut: 3000});
+        this.alertService.success('Categoria eliminada correctamente.');
       }, (error) => {
         console.error('Error al eliminar la categoría:', error);
-        this.toastr.error('Error al eliminar la categoria.', 'Error',{timeOut: 3000});
+        // this.toastr.error('Error al eliminar la categoria.', 'Error',{timeOut: 3000});
+        this.alertService.modalConIconoError('Error al eliminar la categoria.');
       });
     }
   }
@@ -212,7 +218,8 @@ export class GeneralComponent implements OnInit{
 
   guardarEdicion() {
     if (this.categoriaSeleccionada.trim() === this.categoriaOriginal.trim()) {
-      this.toastr.warning('No se han detectado cambios en el nombre de la categoría.', 'Advertencia', { timeOut: 3000 });
+      // this.toastr.warning('No se han detectado cambios en el nombre de la categoría.', 'Advertencia', { timeOut: 3000 });
+      this.alertService.warning('No se han detectado cambios en el nombre de la categoria.');
       return; // Detener el proceso de edición
     }
 
@@ -229,35 +236,67 @@ export class GeneralComponent implements OnInit{
           this.categorias[index] = categoriaActualizada; // Actualiza la categoría en el arreglo
         }
         this.cerrarEditarCategoriaModal(); // Cierra el modal de edición
-        this.toastr.success('Categoría editada correctamente.', 'Éxito', { timeOut: 3000 });
+        // this.toastr.success('Categoría editada correctamente.', 'Éxito', { timeOut: 3000 });
+        this.alertService.success('Categoria editada correctamente.');
       },
       (error) => {
         console.error('Error al editar la categoría', error);
-        this.toastr.error('Error al editar la categoría.', 'Error', { timeOut: 3000 });
+        // this.toastr.error('Error al editar la categoría.', 'Error', { timeOut: 3000 });
+        this.alertService.modalConIconoError('Error al editar la categoria.');
       }
     );
   }
 
 
+  // eliminarProducto(id: number | undefined): void {
+  //   if (!id) {
+  //     alert('El ID del producto no es válido.');
+  //     return;
+  //   }
+  //
+  //   if (confirm('¿Estás seguro de que deseas eliminar este producto?')) {
+  //     this.productoService.deleteItem(id).subscribe(
+  //       () => {
+  //         this.productos = this.productos.filter((producto) => producto.id !== id);
+  //         // this.toastr.success('Producto eliminado correctamente.', 'Exito');
+  //         this.alertService.success('Producto eliminado correctamente.');
+  //         this.obtenerProductos();
+  //       },
+  //       (error) => {
+  //         // this.toastr.error('Ocurrio un error al eliminar el producto.', 'Error',{timeOut: 3000});
+  //         this.alertService.modalConIconoError('Ocurrio un error al eliminar el producto.');
+  //       }
+  //     );
+  //   }
+  // }
+
   eliminarProducto(id: number | undefined): void {
     if (!id) {
-      alert('El ID del producto no es válido.');
+      // this.toastr.error('El ID del producto no es válido.', 'Error');
+      this.alertService.warning('El ID del producto no es valido.');
       return;
     }
 
-    if (confirm('¿Estás seguro de que deseas eliminar este producto?')) {
-      this.productoService.deleteItem(id).subscribe(
-        () => {
-          this.productos = this.productos.filter((producto) => producto.id !== id);
-          this.toastr.success('Producto eliminado correctamente.', 'Exito');
-          this.obtenerProductos();
-        },
-        (error) => {
-          this.toastr.error('Ocurrio un error al eliminar el producto.', 'Error',{timeOut: 3000});
-        }
-      );
-    }
+    this.alertService.showConfirmAlert(
+      'Este producto sera eliminado de manera permanente'
+    ).then((result) => {
+      if (result.isConfirmed) {
+        this.productoService.deleteItem(id).subscribe(
+          () => {
+            this.productos = this.productos.filter((producto) => producto.id !== id);
+            // this.toastr.success('Producto eliminado correctamente.', 'Éxito');
+            this.alertService.success('Producto eliminado correctamente.');
+            this.obtenerProductos();
+          },
+          (error) => {
+            // this.toastr.error('Ocurrió un error al eliminar el producto.', 'Error', { timeOut: 3000 });
+            this.alertService.modalConIconoError('currió un error al eliminar el producto');
+          }
+        );
+      }
+    });
   }
+
 
   filterProductosPorCategoria(): void {
     if (!this.categoriaSeleccionada) {
@@ -267,7 +306,8 @@ export class GeneralComponent implements OnInit{
           this.productos = productos;
         },
         (error) => {
-          this.toastr.error('Error al cargar todos los productos.', 'Error',{timeOut: 3000});
+          // this.toastr.error('Error al cargar todos los productos.', 'Error',{timeOut: 3000});
+          this.alertService.error('Error al cargar todos los productos.');
         }
       );
     } else {
@@ -277,7 +317,8 @@ export class GeneralComponent implements OnInit{
           this.productos = productos;
         },
         (error) => {
-          this.toastr.error('Error al filtrar productos por categoria.', 'Error',{timeOut: 3000});
+          // this.toastr.error('Error al filtrar productos por categoria.', 'Error',{timeOut: 3000});
+          this.alertService.error('Error al filtrar productos por categoria.');
         }
       );
     }

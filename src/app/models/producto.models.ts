@@ -10,6 +10,6 @@ export interface Producto{id?: number; // Opcional para cuando creas un nuevo pr
   precio: number; // Precio opcional para crear/actualizar
   precio_actual: number; // Precio actual mostrado (GET)
   media?: File[]; // Para enviar imágenes al backend
-  media_relacionado: string[]; // URLs de las imágenes asociadas (GET)
-
+  media_relacionado: string[]; // URLs de las imágenes asociadas (GET)
+  codigo: number;
 }

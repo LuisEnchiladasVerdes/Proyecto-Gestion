@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, ViewChild } from '@angular/core';
 import { NgFor, NgIf } from "@angular/common";
 import { FormsModule } from "@angular/forms";
 import { RouterLink } from "@angular/router";
@@ -6,17 +6,23 @@ import { Categoria } from '../../../../../models/categoria.models';
 import { CategoriaService } from "../../../../../services/categoria.service";
 import { ProductoService } from "../../../../../services/producto.service";
 import {Producto} from "../../../../../models/producto.models";
-import {ToastrService} from "ngx-toastr";
+import {AlertService} from "../../../../../services/alert.service";
+import {
+  ImageUploaderComponentComponent
+} from "../../../../components/common/image-uploader-component/image-uploader-component.component";
 
 @Component({
   selector: 'app-add',
   standalone: true,
-  imports: [NgFor, NgIf, FormsModule, RouterLink],
+  imports: [NgFor, NgIf, FormsModule, RouterLink, ImageUploaderComponentComponent],
   templateUrl: './add.component.html',
   styleUrl: './add.component.css'
 })
 export class AddComponent {
+  @ViewChild('uploader') uploader!: ImageUploaderComponentComponent;
+
   producto: Producto = {
+    codigo: 0,
     id: 0,
     nombre: '',
     categoria: { id: 0, nombre: '' },
@@ -49,8 +55,18 @@ imageUrls: string[] = [];    // Array de URLs para la vista previa
   constructor(
     private categoriasService: CategoriaService,
     private productoService: ProductoService,
-    private toastr: ToastrService
+    private alertService: AlertService
   ) {}
+
+  onImagesChanged(images: File[]): void {
+    this.selectedImages = images;
+  }
+
+  onImageError(message: string): void {
+    console.error(message);
+    this.alertService.warning(message);
+  }
+
 
   ngOnInit(): void {
     this.loadCategorias();
@@ -67,7 +83,6 @@ imageUrls: string[] = [];    // Array de URLs para la vista previa
     const input = event.target as HTMLInputElement;
     if (input?.files) {
       const files = Array.from(input.files); // Convierte FileList a array
-  
       files.forEach((file) => this.handleImage(file)); // Procesa cada archivo
     }
   }
@@ -105,7 +120,6 @@ imageUrls: string[] = [];    // Array de URLs para la vista previa
       : 'El precio debe ser mayor que 0.';
   }
 
-
   validateImage(): void {
     this.imageError = this.selectedImages ? '' : 'Se debe seleccionar una imagen';
   }
@@ -119,9 +133,7 @@ imageUrls: string[] = [];    // Array de URLs para la vista previa
     this.validateDescription();
     this.validateImage();
 
-
     this.agregarProducto();
-
   }
 
   agregarProducto(): void {
@@ -146,19 +158,20 @@ imageUrls: string[] = [];    // Array de URLs para la vista previa
       // Enviar datos al servicio
       this.productoService.addProducto(formData).subscribe({
         next: (response) => {
-          // alert('Producto creado exitosamente.');
-          this.toastr.success('Producto creado exitosamente.', 'Exito',{timeOut: 3000});
+          this.alertService.success('Producto creado exitosamente.');
+
+          // Limpia el formulario y el uploader DESPUÉS de guardar exitosamente
           this.resetForm();
+          this.uploader.resetUploader();
         },
         error: (err) => {
+          // Manejo de errores
           console.error('Error al crear el producto', err);
-          // alert('Hubo un error al crear el producto.');
-          this.toastr.error('Hubo un error al crear el producto.', 'Error',{timeOut: 3000});
+          this.alertService.error('Error al crear el producto');
         }
       });
     } else {
-      // alert('Por favor, completa todos los campos obligatorios.');
-      this.toastr.warning('Por favor, completa todos los campos.', 'Advertencia',{timeOut: 3000});
+      this.alertService.warning('Por favor , complete todos los campos.')
     }
   }
 
@@ -220,10 +233,9 @@ imageUrls: string[] = [];    // Array de URLs para la vista previa
     return valid;
   }
 
-
-
   resetForm(): void {
     this.producto = {
+      codigo: 0,
       id: 0,
       nombre: '',
       categoria: { id: 0, nombre: '' },
@@ -240,7 +252,10 @@ imageUrls: string[] = [];    // Array de URLs para la vista previa
     this.categoryError = '';
     this.quantityError = '';
     this.descriptionError = '';
+    this.precioError = '';
     this.imageError = '';
+
+    console.log('Formulario reseteado');
   }
   
 

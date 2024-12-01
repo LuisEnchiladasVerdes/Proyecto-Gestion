@@ -4,12 +4,33 @@ import { AppComponent } from './app/app.component';
 
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { importProvidersFrom } from '@angular/core';
+import {ToastrModule} from "ngx-toastr";
+
+// bootstrapApplication(AppComponent, {
+//   ...appConfig,
+//   providers: [
+//     ...(appConfig.providers || []),
+//     importProvidersFrom(BrowserAnimationsModule)
+//   ]
+// })
+//   .catch((err) => console.error(err));
+
+
+
 
 bootstrapApplication(AppComponent, {
   ...appConfig,
   providers: [
     ...(appConfig.providers || []),
-    importProvidersFrom(BrowserAnimationsModule)
+    importProvidersFrom(
+      BrowserAnimationsModule, // Para animaciones de ngx-toastr
+      ToastrModule.forRoot({
+        timeOut: 2000,
+        positionClass: 'toast-top-right',
+        preventDuplicates: true,
+        progressBar: true,
+        closeButton: true,
+      })
+    )
   ]
-})
-  .catch((err) => console.error(err));
+}).catch((err) => console.error(err));

@@ -4,5 +4,5 @@ export interface Cart{
   id_carrito?: number,
   token?: string,
   // cliente?: Cliente | null,
-  detalles: DetallerCart
+  detalles: DetallerCart []
 }

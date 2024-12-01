@@ -1,3 +1,82 @@
+<!--<div class="relative">-->
+<!--  &lt;!&ndash; Botón del carrito &ndash;&gt;-->
+<!--  <div class="text-white relative cursor-pointer"-->
+<!--       [class.cursor-not-allowed]="products.length === 0"-->
+<!--       [class.cursor-pointer]="products.length > 0"-->
+<!--       (click)="products.length > 0 && toggleDropdown($event)">-->
+<!--    <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2" class="w-6 h-6" viewBox="0 0 24 24">-->
+<!--      <circle cx="9" cy="21" r="1"></circle>-->
+<!--      <circle cx="20" cy="21" r="1"></circle>-->
+<!--      <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>-->
+<!--    </svg>-->
+
+<!--    &lt;!&ndash; Mostrar solo si hay productos &ndash;&gt;-->
+<!--    <span *ngIf="products.length > 0"-->
+<!--          class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full text-xs w-5 h-5 flex items-center justify-center">-->
+<!--      {{ products.length }}-->
+<!--    </span>-->
+<!--  </div>-->
+
+<!--  &lt;!&ndash; Dropdown &ndash;&gt;-->
+<!--  <div *ngIf="isOpen" class="absolute right-0 mt-2 w-96 bg-white rounded-lg shadow-xl z-50">-->
+<!--    <div class="p-4">-->
+<!--      <h3 class="text-lg font-semibold mb-3">Mi Carrito</h3>-->
+
+<!--      &lt;!&ndash; Lista de productos &ndash;&gt;-->
+<!--      <div class="max-h-48 overflow-y-auto">-->
+<!--        <div *ngFor="let product of products" class="flex items-center gap-4 border-b pb-4 pt-4">-->
+<!--          &lt;!&ndash; Botón de eliminar &ndash;&gt;-->
+<!--          <button class="text-red-500 hover:text-red-700 p-1" (click)="removeItem(product.id ?? 0); $event.stopPropagation()">-->
+<!--            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-8">-->
+<!--              <rect x="5" y="7" width="14" height="13" rx="2" ry="2" stroke="currentColor" />-->
+<!--              <path d="M3 7h18M8 7V5a2 2 0 012-2h4a2 2 0 012 2v2" />-->
+<!--              <path d="M10 11v6M14 11v6" />-->
+<!--            </svg>-->
+<!--          </button>-->
+
+<!--          &lt;!&ndash; Imagen del producto &ndash;&gt;-->
+<!--          <img [src]="product.media_relacionado[0]" [alt]="product.nombre" class="w-16 h-16 object-cover rounded-lg">-->
+
+<!--          &lt;!&ndash; Información del producto &ndash;&gt;-->
+<!--          <div class="flex-1">-->
+<!--            <h4 class="text-sm font-medium text-gray-800 truncate mb-1">{{ product.nombre }}</h4>-->
+<!--            <div class="text-sm text-gray-500 mb-2">Cantidad: {{ product.stock }}</div>-->
+<!--            <div class="text-sm font-semibold">Subtotal: ${{ product.precio_actual * product.stock }}</div>-->
+<!--          </div>-->
+
+<!--          &lt;!&ndash; Botones de + y - &ndash;&gt;-->
+<!--          <div class="flex items-center gap-2">-->
+<!--            <button class="text-gray-500 hover:text-gray-700 p-1" (click)="decrementQuantity(product.id ?? 0)">-->
+<!--              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">-->
+<!--                <path stroke-linecap="round" stroke-linejoin="round" d="M18 12H6" />-->
+<!--              </svg>-->
+<!--            </button>-->
+<!--            <button class="text-gray-500 hover:text-gray-700 p-1" (click)="incrementQuantity(product.id ?? 0)">-->
+<!--              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">-->
+<!--                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m6-6H6" />-->
+<!--              </svg>-->
+<!--            </button>-->
+<!--          </div>-->
+<!--        </div>-->
+<!--      </div>-->
+
+<!--      &lt;!&ndash; Total &ndash;&gt;-->
+<!--      <div class="mt-3 text-right font-bold">-->
+<!--        Total: ${{ total }}-->
+<!--      </div>-->
+
+<!--      &lt;!&ndash; Botón para ver carrito &ndash;&gt;-->
+<!--      <div class="mt-3">-->
+<!--        <button (click)="navigateToCart()" routerLink="/carrito/revisar" class="block w-full bg-blue-600 text-white text-center py-2 px-4 rounded-lg hover:bg-blue-700 transition duration-200">-->
+<!--          Ver Carrito-->
+<!--        </button>-->
+<!--      </div>-->
+<!--    </div>-->
+<!--  </div>-->
+<!--</div>-->
+
+
+
 <div class="relative">
   <!-- Botón del carrito -->
   <div class="text-white relative cursor-pointer"
@@ -26,7 +105,7 @@
       <div class="max-h-48 overflow-y-auto">
         <div *ngFor="let product of products" class="flex items-center gap-4 border-b pb-4 pt-4">
           <!-- Botón de eliminar -->
-          <button class="text-red-500 hover:text-red-700 p-1" (click)="removeItem(product.id ?? 0); $event.stopPropagation()">
+          <button class="text-red-500 hover:text-red-700 p-1" (click)="removeItem(product.producto.id ?? 0); $event.stopPropagation()">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-8">
               <rect x="5" y="7" width="14" height="13" rx="2" ry="2" stroke="currentColor" />
               <path d="M3 7h18M8 7V5a2 2 0 012-2h4a2 2 0 012 2v2" />
@@ -35,23 +114,23 @@
           </button>
 
           <!-- Imagen del producto -->
-          <img [src]="product.media_relacionado[0]" [alt]="product.nombre" class="w-16 h-16 object-cover rounded-lg">
+          <img [src]="product.producto.media_relacionado[0]" [alt]="product.producto.nombre" class="w-16 h-16 object-cover rounded-lg">
 
           <!-- Información del producto -->
           <div class="flex-1">
-            <h4 class="text-sm font-medium text-gray-800 truncate mb-1">{{ product.nombre }}</h4>
-            <div class="text-sm text-gray-500 mb-2">Cantidad: {{ product.stock }}</div>
-            <div class="text-sm font-semibold">Subtotal: ${{ product.precio_actual * product.stock }}</div>
+            <h4 class="text-sm font-medium text-gray-800 truncate mb-1">{{ product.producto.nombre }}</h4>
+            <div class="text-sm text-gray-500 mb-2">Cantidad: {{ product.cantidad }}</div>
+            <div class="text-sm font-semibold">Subtotal: ${{ product.total }}</div>
           </div>
 
           <!-- Botones de + y - -->
           <div class="flex items-center gap-2">
-            <button class="text-gray-500 hover:text-gray-700 p-1" (click)="decrementQuantity(product.id ?? 0)">
+            <button class="text-gray-500 hover:text-gray-700 p-1" (click)="decrementQuantity(product.producto.id ?? 0)">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M18 12H6" />
               </svg>
             </button>
-            <button class="text-gray-500 hover:text-gray-700 p-1" (click)="incrementQuantity(product.id ?? 0)">
+            <button class="text-gray-500 hover:text-gray-700 p-1" (click)="incrementQuantity(product.producto.id ?? 0)">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m6-6H6" />
               </svg>

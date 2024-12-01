@@ -5,6 +5,9 @@ import {CategoriaService} from "../../../../../services/categoria.service";
 import {Categoria} from "../../../../../models/categoria.models";
 import {NgForOf} from "@angular/common";
 import {FormsModule} from "@angular/forms";
+import {CartService} from "../../../../../services/cart.service";
+import {AlertService} from "../../../../../services/alert.service";
+import {ToastrService} from "ngx-toastr";
 
 @Component({
   selector: 'app-mobiliario',
@@ -26,7 +29,7 @@ export class MobiliarioComponent implements OnInit{
 
   mediaBaseUrl: string = '';
 
-  constructor(private productoService : ProductoService, private categoriaService : CategoriaService) { }
+  constructor(private productoService : ProductoService, private categoriaService : CategoriaService, private cartService : CartService, private alertService: AlertService, private toastr: ToastrService) { }
 
 
   ngOnInit(): void {
@@ -74,5 +77,22 @@ export class MobiliarioComponent implements OnInit{
       );
     }
   }
+
+  addToCart(producto: Producto): void {
+    const cantidad = 1; // Cantidad inicial (puedes agregar una funcionalidad para que el usuario elija)
+    this.cartService.addToCart(producto.id!, cantidad).subscribe({
+      next: (detalleCarrito) => {
+        // this.alertService.success('Producto agregado');
+        this.toastr.success('Producto agregado!', 'Exito');
+        // console.log(producto);
+      },
+      error: (error) => {
+        console.error('Error al agregar al carrito:', error);
+        // this.alertService.error('Error al cargar el producto al carrito');
+        // this.toastr.error('Error al cargar al carrito', error);
+      },
+    });
+  }
+
 
 }

@@ -38,4 +38,8 @@ export class CategoriaService {
   editarCategoria(categoria: Categoria): Observable<Categoria> {
     return this.http.put<Categoria>(`${this.apiUrl}${categoria.id}/`, categoria, { headers: this.getHeaders() });
   }
+
+  getCategoriasCliente(): Observable<Categoria[]> {
+    return this.http.get<Categoria[]>('http://127.0.0.1:8000/api/clientes/categoriasClientes/');
+  }
 }

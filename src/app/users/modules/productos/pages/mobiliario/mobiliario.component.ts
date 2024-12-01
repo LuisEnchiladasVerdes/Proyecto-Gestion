@@ -30,7 +30,7 @@ export class MobiliarioComponent implements OnInit{
 
 
   ngOnInit(): void {
-    this.productoService.getProductos().subscribe(   //CARGAR PRODUCTOS
+    this.productoService.getProductosCliente().subscribe(   //CARGAR PRODUCTOS
       (productos: Producto[]) => {
         if (productos && productos.length > 0) {
           this.productos = productos; // Asignar todos los items al arreglo
@@ -40,7 +40,7 @@ export class MobiliarioComponent implements OnInit{
         console.error('Error al cargar los items', error);
       }
     );
-    this.categoriaService.getCategorias().subscribe(  //CARGAR CATEGORIAS
+    this.categoriaService.getCategoriasCliente().subscribe(  //CARGAR CATEGORIAS
       (data: Categoria[]) => {
         this.categorias = data;
       },
@@ -54,7 +54,7 @@ export class MobiliarioComponent implements OnInit{
   filterProductosPorCategoria(): void {
     if (!this.categoriaSeleccionada) {
       // Si no hay categoría seleccionada (opción de "todas"), carga todos los productos
-      this.productoService.getProductos().subscribe(
+      this.productoService.getProductosCliente().subscribe(
         (productos: Producto[]) => {
           this.productos = productos;
         },
@@ -64,7 +64,7 @@ export class MobiliarioComponent implements OnInit{
       );
     } else {
       const categoriaId = parseInt(this.categoriaSeleccionada, 10);
-      this.productoService.getProductosPorCategoria(categoriaId).subscribe(
+      this.productoService.getProductosPorCategoriaCliente(categoriaId).subscribe(
         (productos: Producto[]) => {
           this.productos = productos;
         },

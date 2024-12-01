@@ -1,6 +1,7 @@
 import {Categoria} from "./categoria.models";
 
-export interface Producto{id?: number; // Opcional para cuando creas un nuevo producto
+export interface Producto{
+  id?: number; // Opcional para cuando creas un nuevo producto
   nombre: string;
   descripcion: string;
   stock: number;

@@ -10,6 +10,7 @@ import { AuthService } from './auth.service';
 })
 export class ProductoService {
   private apiUrl = 'http://127.0.0.1:8000/api/administrador/productos/';
+  private apiUrlCliente = 'http://127.0.0.1:8000/api/clientes/productosClientes/';
   private mediaBaseUrl = 'http://127.0.0.1:8000';
 
   constructor(private http: HttpClient, private authService: AuthService) {}
@@ -66,5 +67,15 @@ export class ProductoService {
         return throwError(() => new Error('Error al filtrar productos.'));
       })
     );
+  }
+
+  getProductosCliente(): Observable<Producto[]> {
+    // return this.http.get<Producto[]>('http://127.0.0.1:8000/api/clientes/productosClientes/');
+    return this.http.get<Producto[]>(this.apiUrlCliente);
+
+  }
+
+  getProductosPorCategoriaCliente(categoriaId: number): Observable<Producto[]> {
+    return this.http.get<Producto[]>(`${this.apiUrlCliente}?categoria_id=${categoriaId}`);
   }
 }

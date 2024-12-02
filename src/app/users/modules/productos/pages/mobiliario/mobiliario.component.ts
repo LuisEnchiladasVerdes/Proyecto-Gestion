@@ -92,6 +92,8 @@ export class MobiliarioComponent implements OnInit{
         // this.toastr.error('Error al cargar al carrito', error);
       },
     });
+
+    this.cartService.crearCookie();
   }
 
 

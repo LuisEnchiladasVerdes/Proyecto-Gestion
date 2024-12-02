@@ -115,7 +115,7 @@ export class DropdownComponent  implements OnInit {
   constructor(private cartService: CartService) {}
 
   ngOnInit(): void {
-    this.loadCart(); // Carga los productos del carrito al iniciar
+    // this.loadCart(); // Carga los productos del carrito al iniciar
   }
 
   toggleDropdown(event: Event): void {

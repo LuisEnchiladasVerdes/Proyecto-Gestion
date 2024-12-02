@@ -5,6 +5,7 @@ import {DetallerCart} from "../models/detaller-cart.models";
 import {catchError, tap} from "rxjs/operators";
 import {Cart} from "../models/cart.models";
 import {AlertService} from "./alert.service";
+import {CookieService} from "ngx-cookie-service";
 
 @Injectable({
   providedIn: 'root'
@@ -12,7 +13,7 @@ import {AlertService} from "./alert.service";
 export class CartService {
   private apiUrl = 'http://127.0.0.1:8000/api/clientes/carritos/';
 
-  constructor(private http: HttpClient, private alertService: AlertService) {}
+  constructor(private http: HttpClient, private alertService: AlertService, private cookieService: CookieService) {}
 
   // Agregar producto al carrito
   // addToCart(productoId: number, cantidad: number): Observable<DetallerCart> {
@@ -39,17 +40,50 @@ export class CartService {
   //   );
   // }
 
+  // addToCart(productoId: number, cantidad: number): Observable<any> {
+  //   const body = { producto_id: productoId, cantidad };
+  //
+  //   console.log('Cookie cart_token:', this.getCookie('cart_token'));
+  //
+  //   // LOG: Imprime la cookie antes de enviar la solicitud
+  //   console.log('Cookie antes de addToCart:', document.cookie);
+  //
+  //   return this.http.post(`${this.apiUrl}add-to-cart/`, body, { withCredentials: true }).pipe(
+  //     tap((response) => {
+  //       console.log('Respuesta addToCart:', response); // LOG para verificar la respuesta del backend
+  //       console.log('Cookie despues de addToCart:', document.cookie);
+  //     }),
+  //     catchError((error) => {
+  //       console.error('Error al agregar producto al carrito:', error);
+  //       throw new Error('Error al agregar producto al carrito.');
+  //     })
+  //   );
+  // }
+
+  crearCookie(){
+    this.cookieService.set('token','Cookie de ejemplo' );
+    console.log(this.cookieService.get('token'));
+  }
+
   addToCart(productoId: number, cantidad: number): Observable<any> {
     const body = { producto_id: productoId, cantidad };
 
-    console.log('Cookie cart_token:', this.getCookie('cart_token'));
+    // Verificar si la cookie existe antes de agregar
+    const cartToken = this.cookieService.get('cart_token');
 
-    // LOG: Imprime la cookie antes de enviar la solicitud
-    console.log('Cookie antes de addToCart:', document.cookie);
+    const cookieExists: boolean = this.cookieService.check('csrftoken');
+    console.log('Cookie antes de addToCart:', cookieExists);
 
     return this.http.post(`${this.apiUrl}add-to-cart/`, body, { withCredentials: true }).pipe(
-      tap((response) => {
-        console.log('Respuesta addToCart:', response); // LOG para verificar la respuesta del backend
+      tap((response: any) => {
+        console.log('Respuesta addToCart:', response);
+        const cookieExists: boolean = this.cookieService.check('cart_token');
+        console.log('Cookie despues de addToCart:', cookieExists);
+
+        // Si el backend regresa una cookie en la respuesta (Set-Cookie)
+        if (response.token) {
+          // this.cookieService.set('cart_token', response.token, 1, '/', '127.0.0.1', false, 'Lax');
+        }
       }),
       catchError((error) => {
         console.error('Error al agregar producto al carrito:', error);

@@ -22,6 +22,11 @@ export class RevisarComponent implements OnInit {
   mediaBaseUrl: string = '';
   total: number = 0;
 
+  fechaActual = new Date().toISOString().split('T')[0];
+  fecahHoy = new Date();
+  // fechaMaxima = '2025-02-12';
+  fechaMaxima = new Date(this.fecahHoy.getTime() + 2 * 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+
   constructor(private cartService: CartService, private toastr: ToastrService) {
     this.mediaBaseUrl = this.cartService.getMediaBaseUrl();
   }

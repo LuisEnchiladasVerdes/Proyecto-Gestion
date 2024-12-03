@@ -25,14 +25,14 @@
             </svg>
           </button>
           <!-- Imagen del producto -->
-          <img [src]="product.image" class="w-16 h-16 object-cover rounded" [alt]="product.name">
+          <img [src]="mediaBaseUrl + product.producto.media_relacionado[0]" class="w-16 h-16 object-cover rounded" [alt]="product.producto.nombre">
           <!-- Nombre y categoría -->
           <div>
-            <span class="text-base font-medium text-gray-800 block">{{ product.name }}</span>
-            <span class="text-sm text-gray-500">{{ product.category }}</span>
+            <span class="text-base font-medium text-gray-800 block">{{ product.producto.nombre }}</span>
+            <span class="text-sm text-gray-500">{{ product.producto.categoria.nombre }}</span>
           </div>
         </td>
-        <td class="text-center text-base text-gray-600">${{ product.price }}</td>
+        <td class="text-center text-base text-gray-600">${{ product.producto.precio_actual }}</td>
         <td class="text-center">
           <div class="flex items-center justify-center gap-2">
             <!-- Botón de decrementar -->
@@ -42,7 +42,23 @@
               </svg>
             </button>
             <!-- Campo de cantidad -->
-            <input type="number" [(ngModel)]="product.quantity" class="w-12 text-center border border-gray-300 rounded text-sm">
+<!--            <input-->
+<!--              type="number"-->
+<!--              [(ngModel)]="product.cantidad"-->
+<!--              (change)="onQuantityChange(product)"-->
+<!--              class="w-12 text-center border border-gray-300 rounded text-sm"-->
+<!--              min="1"-->
+<!--            />-->
+
+            <input
+              type="number"
+              [(ngModel)]="product.cantidad"
+              (focus)="storePreviousQuantity(product)"
+              (change)="onQuantityChange(product)"
+              class="w-12 text-center border border-gray-300 rounded text-sm"
+              min="1"
+            />
+
             <!-- Botón de incrementar -->
             <button class="text-gray-500 hover:text-gray-700" (click)="increaseQuantity(product)">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
@@ -51,7 +67,7 @@
             </button>
           </div>
         </td>
-        <td class="text-center text-base text-gray-800 font-semibold">${{ product.price * product.quantity }}</td>
+        <td class="text-center text-base text-gray-800 font-semibold">${{ product.total }}</td>
       </tr>
       </tbody>
     </table>
@@ -62,7 +78,8 @@
     <div>
       <div class="bg-white rounded-lg shadow p-6">
         <h5 class="font-bold text-lg mb-4">TOTAL</h5>
-        <h3 class="text-3xl mb-3">${{ calculateTotal() }}</h3>
+<!--        <h3 class="text-3xl mb-3">${{ calculateTotal() }}</h3>-->
+        <h3 class="text-3xl mb-3">${{ total }}</h3>
         <button class="w-full bg-blue-600 text-white font-medium py-3 rounded-lg hover:bg-blue-700 transition duration-200" routerLink="/carrito/confirmar">
           PROCEDER AL PAGO
         </button>

@@ -1,9 +1,7 @@
 import { Injectable } from '@angular/core';
 import {HttpClient} from "@angular/common/http";
-import {BehaviorSubject, Observable, of, throwError} from "rxjs";
-import {DetallerCart} from "../models/detaller-cart.models";
-import {catchError, tap} from "rxjs/operators";
-import {Cart} from "../models/cart.models";
+import {Observable, Subject, throwError} from "rxjs";
+import {catchError, tap,} from "rxjs/operators";
 import {AlertService} from "./alert.service";
 import {CookieService} from "ngx-cookie-service";
 
@@ -12,129 +10,83 @@ import {CookieService} from "ngx-cookie-service";
 })
 export class CartService {
   private apiUrl = 'http://127.0.0.1:8000/api/clientes/carritos/';
+  private mediaBaseUrl = 'http://127.0.0.1:8000';
+
+  private cartUpdated = new Subject<void>();
+  cartUpdated$ = this.cartUpdated.asObservable();
 
   constructor(private http: HttpClient, private alertService: AlertService, private cookieService: CookieService) {}
 
-  // Agregar producto al carrito
-  // addToCart(productoId: number, cantidad: number): Observable<DetallerCart> {
-  //   const body = { producto_id: productoId, cantidad };
-  //   return this.http
-  //     .post<DetallerCart>(`${this.apiUrl}add-to-cart/`, body)
-  //     .pipe(
-  //       catchError((error) => {
-  //         this.alertService.error('Error al agregar al carrito');
-  //         return throwError(() => new Error('Error al agregar al carrito.'));
-  //       })
-  //     );
-  // }
-
-
-
-  // addToCart(productoId: number, cantidad: number): Observable<any> {
-  //   const body = { producto_id: productoId, cantidad };
-  //   return this.http.post(`${this.apiUrl}add-to-cart/`, body, { withCredentials: true }).pipe(
-  //     catchError((error) => {
-  //       console.error('Error al agregar producto al carrito:', error);
-  //       throw new Error('Error al agregar producto al carrito.');
-  //     })
-  //   );
-  // }
-
-  // addToCart(productoId: number, cantidad: number): Observable<any> {
-  //   const body = { producto_id: productoId, cantidad };
-  //
-  //   console.log('Cookie cart_token:', this.getCookie('cart_token'));
-  //
-  //   // LOG: Imprime la cookie antes de enviar la solicitud
-  //   console.log('Cookie antes de addToCart:', document.cookie);
-  //
-  //   return this.http.post(`${this.apiUrl}add-to-cart/`, body, { withCredentials: true }).pipe(
-  //     tap((response) => {
-  //       console.log('Respuesta addToCart:', response); // LOG para verificar la respuesta del backend
-  //       console.log('Cookie despues de addToCart:', document.cookie);
-  //     }),
-  //     catchError((error) => {
-  //       console.error('Error al agregar producto al carrito:', error);
-  //       throw new Error('Error al agregar producto al carrito.');
-  //     })
-  //   );
-  // }
-
-  crearCookie(){
-    this.cookieService.set('token','Cookie de ejemplo' );
-    console.log(this.cookieService.get('token'));
+  notifyCartUpdated(): void {
+    this.cartUpdated.next();
   }
 
   addToCart(productoId: number, cantidad: number): Observable<any> {
-    const body = { producto_id: productoId, cantidad };
+    const body = {
+      producto_id: productoId,
+      cantidad: cantidad,
+    };
+    console.log('Enviando solicitud para agregar al carrito con el body:', body);
 
-    // Verificar si la cookie existe antes de agregar
-    const cartToken = this.cookieService.get('cart_token');
+    // Verificar si el cart_token está presente en las cookies
+    const cartToken = this.getCartTokenFromCookies();
+    console.log('Token del carrito en las cookies:', cartToken);
 
-    const cookieExists: boolean = this.cookieService.check('csrftoken');
-    console.log('Cookie antes de addToCart:', cookieExists);
-
-    return this.http.post(`${this.apiUrl}add-to-cart/`, body, { withCredentials: true }).pipe(
-      tap((response: any) => {
-        console.log('Respuesta addToCart:', response);
-        const cookieExists: boolean = this.cookieService.check('cart_token');
-        console.log('Cookie despues de addToCart:', cookieExists);
-
-        // Si el backend regresa una cookie en la respuesta (Set-Cookie)
-        if (response.token) {
-          // this.cookieService.set('cart_token', response.token, 1, '/', '127.0.0.1', false, 'Lax');
-        }
-      }),
+    return this.http.post<any>(`${this.apiUrl}add-to-cart/`, body, { withCredentials: true }).pipe(
       catchError((error) => {
-        console.error('Error al agregar producto al carrito:', error);
-        throw new Error('Error al agregar producto al carrito.');
+        console.error('Error al agregar al carrito:', error);
+        return throwError(() => new Error('Error al agregar al carrito.'));
       })
     );
   }
 
-  // Obtener el carrito actual (resumen)
-  getCarritoActual(): Observable<Cart> {
-    return this.http.get<Cart>(`${this.apiUrl}current/`, { withCredentials: true }).pipe(
+  decrementItemInCart(productId: number, cantidad: number): Observable<any> {
+    const body = {
+      producto_id: productId,
+      cantidad: cantidad,
+    };
+    return this.http.post<any>(`${this.apiUrl}decrement-item/`, body, { withCredentials: true }).pipe(
       catchError((error) => {
-        if (error.status === 404) {
-          console.warn('Carrito no encontrado, devolviendo carrito vacío.');
-          return of({
-            id_carrito: undefined,
-            token: undefined,
-            detalles: [],
-          } as Cart); // Devolvemos un carrito vacío
-        }
-        console.error('Error al obtener el carrito actual:', error);
-        throw new Error('Error al obtener el carrito actual.');
+        console.error('Error al decrementar el producto:', error);
+        return throwError(() => new Error('Error al decrementar el producto.'));
       })
     );
   }
 
-  // Eliminar un producto del carrito
+  private getCartTokenFromCookies(): string | null {
+    const cookies = document.cookie.split(';');
+    let cartToken = null;
+    cookies.forEach(cookie => {
+      const [name, value] = cookie.trim().split('=');
+      if (name === 'cart_token') {
+        cartToken = value;
+      }
+    });
+    return cartToken;
+  }
+
+  getCurrentCart(): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}current/`, { withCredentials: true }).pipe(
+      catchError((error) => {
+        console.error('Error al obtener el carrito :(:', error);
+        return throwError(() => new Error('Error al obtener el carrito.'));
+      })
+    );
+  }
+
+  getMediaBaseUrl(): string {
+    return this.mediaBaseUrl;
+  }
+
   removeItemFromCart(productoId: number): Observable<{ message: string }> {
     const body = { producto_id: productoId };
-    return this.http.request<{ message: string }>('delete', `${this.apiUrl}remove-item/`, { body });
-  }
-
-  // Limpiar el carrito
-  clearCart(): Observable<{ message: string }> {
-    return this.http.delete<{ message: string }>(`${this.apiUrl}clear-cart/`);
-  }
-
-  // Confirmar el carrito (validar stock y cliente)
-  confirmCart(): Observable<{ message: string }> {
-    return this.http.post<{ message: string }>(`${this.apiUrl}confirm-cart/`, {});
-  }
-
-
-
-  getCookie(name: string): string | null {
-    const value = `; ${document.cookie}`;
-    const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) {
-      return parts.pop()?.split(';').shift() || null;
-    }
-    return null;
+    return this.http.request<{ message: string }>('delete', `${this.apiUrl}remove-item/`, { body, withCredentials: true }).pipe(
+      tap(() => console.log(`Producto con ID ${productoId} eliminado del carrito.`)),
+      catchError((error) => {
+        console.error('Error al eliminar el producto del carrito:', error);
+        throw new Error('Error al eliminar el producto del carrito.');
+      })
+    );
   }
 
 }

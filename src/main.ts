@@ -25,7 +25,7 @@ bootstrapApplication(AppComponent, {
     importProvidersFrom(
       BrowserAnimationsModule, // Para animaciones de ngx-toastr
       ToastrModule.forRoot({
-        timeOut: 2000,
+        timeOut: 1000,
         positionClass: 'toast-top-right',
         preventDuplicates: true,
         progressBar: true,

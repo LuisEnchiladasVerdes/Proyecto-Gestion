@@ -7,4 +7,5 @@ export interface Direccion{
   agencia: string,
   estado: string,
   codigo_postal: number,
+  referencia: string,
 }

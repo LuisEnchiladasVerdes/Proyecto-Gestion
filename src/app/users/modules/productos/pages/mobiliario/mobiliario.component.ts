@@ -8,6 +8,7 @@ import {FormsModule} from "@angular/forms";
 import {CartService} from "../../../../../services/cart.service";
 import {AlertService} from "../../../../../services/alert.service";
 import {ToastrService} from "ngx-toastr";
+import {DropdownComponent} from "../../../../components/aplication/dropdown/dropdown.component";
 
 @Component({
   selector: 'app-mobiliario',
@@ -82,9 +83,8 @@ export class MobiliarioComponent implements OnInit{
     const cantidad = 1; // Cantidad inicial (puedes agregar una funcionalidad para que el usuario elija)
     this.cartService.addToCart(producto.id!, cantidad).subscribe({
       next: (detalleCarrito) => {
-        // this.alertService.success('Producto agregado');
         this.toastr.success('Producto agregado!', 'Exito');
-        // console.log(producto);
+        this.cartService.notifyCartUpdated();
       },
       error: (error) => {
         console.error('Error al agregar al carrito:', error);
@@ -92,8 +92,6 @@ export class MobiliarioComponent implements OnInit{
         // this.toastr.error('Error al cargar al carrito', error);
       },
     });
-
-    this.cartService.crearCookie();
   }
 
 

@@ -1,7 +1,10 @@
-import { Component } from '@angular/core';
-import {RouterLink} from "@angular/router";
-import {FormsModule} from "@angular/forms";
-import {NgForOf} from "@angular/common";
+import { Component, OnInit } from '@angular/core';
+import { RouterLink } from "@angular/router";
+import { FormsModule } from "@angular/forms";
+import { NgForOf } from "@angular/common";
+import { CartService } from "../../../../../services/cart.service";
+import { DetallerCart } from "../../../../../models/detaller-cart.models";
+import {ToastrService} from "ngx-toastr";
 
 @Component({
   selector: 'app-revisar',
@@ -14,48 +17,157 @@ import {NgForOf} from "@angular/common";
   templateUrl: './revisar.component.html',
   styleUrl: './revisar.component.css'
 })
-export class RevisarComponent {
-  cartProducts = [
-    {
-      id: 1,
-      name: 'Mesa de madera',
-      category: 'Mesas',
-      price: 50.0,
-      quantity: 5,
-      image: 'assets/img/PROD/1.jpg',
-    },
-    {
-      id: 2,
-      name: 'Silla de oficina',
-      category: 'Sillas',
-      price: 75.0,
-      quantity: 3,
-      image: 'assets/img/PROD/10.jpg',
-    },
-  ];
+export class RevisarComponent implements OnInit {
+  cartProducts: DetallerCart[] = []; // Reemplaza los datos estáticos por un arreglo vacío
+  mediaBaseUrl: string = '';
+  total: number = 0;
 
-  // Incrementar cantidad
-  increaseQuantity(product: any): void {
-    product.quantity++;
+  constructor(private cartService: CartService, private toastr: ToastrService) {
+    this.mediaBaseUrl = this.cartService.getMediaBaseUrl();
+  }
+
+  ngOnInit(): void {
+    this.loadCart(); // Carga los productos del carrito al iniciar
+  }
+
+  loadCart(): void {
+    this.cartService.getCurrentCart().subscribe({
+      next: (cart) => {
+        this.cartProducts = cart.detalles; // Carga los detalles reales del carrito
+        this.calculateTotal();
+      },
+      error: (error) => {
+        console.error('Error al cargar el carrito:', error);
+      }
+    });
   }
 
   // Decrementar cantidad
-  decreaseQuantity(product: any): void {
-    if (product.quantity > 1) {
-      product.quantity--;
+  decreaseQuantity(product: DetallerCart): void {
+    if (product.cantidad > 1) {
+      this.cartService.decrementItemInCart(product.producto.id!, 1).subscribe({
+        next: (updatedDetalle) => {
+          product.cantidad -= 1; // Decrementa la cantidad
+          product.total = product.cantidad * product.producto.precio_actual; // Actualiza el subtotal
+          this.calculateTotal(); // Recalcula el total del carrito
+        },
+        error: (error) => {
+          console.error("Error al decrementar la cantidad:", error);
+          this.toastr.error("No se pudo decrementar la cantidad", "Error");
+        }
+      });
+    } else {
+      // Si es 1, elimina el producto del carrito
+      this.removeProduct(product);
     }
   }
 
-  // Eliminar producto
-  removeProduct(product: any): void {
-    this.cartProducts = this.cartProducts.filter((p) => p.id !== product.id);
+  decreaseQuantityPersonalizada(product: DetallerCart): void {
+    if (product.cantidad > 1) {
+      this.cartService.decrementItemInCart(product.producto.id!, 1).subscribe({
+        next: (updatedDetalle) => {
+          product.cantidad -= 1; // Decrementa la cantidad
+          product.total = product.cantidad * product.producto.precio_actual; // Actualiza el subtotal
+          this.calculateTotal(); // Recalcula el total del carrito
+        },
+        error: (error) => {
+          console.error("Error al decrementar la cantidad:", error);
+          this.toastr.error("No se pudo decrementar la cantidad", "Error");
+        }
+      });
+    } else {
+      // Si es 1, elimina el producto del carrito
+      this.removeProduct(product);
+    }
   }
 
-  // Calcular el total
-  calculateTotal(): number {
-    return this.cartProducts.reduce(
-      (total, product) => total + product.price * product.quantity,
-      0
-    );
+  increaseQuantity(product: any): void {
+    this.cartService.addToCart(product.producto.id, 1).subscribe({
+      next: (updatedItem) => {
+        product.cantidad = updatedItem.cantidad;
+        product.total = updatedItem.total;
+      },
+      error: (error) => console.error('Error al incrementar la cantidad:', error),
+      complete: () => {
+        this.calculateTotal();
+      }
+    });
   }
+
+  removeProduct(product: any): void {
+    this.cartService.removeItemFromCart(product.producto.id).subscribe({
+      next: () => {
+        this.cartProducts = this.cartProducts.filter((p) => p.producto.id !== product.producto.id);
+      },
+      error: (error) => console.error('Error al eliminar el producto:', error),
+      complete: () => {
+        this.calculateTotal();
+      }
+    });
+  }
+
+  // Almacena la cantidad previa
+  storePreviousQuantity(product: DetallerCart): void {
+    (product as any).previousCantidad = product.cantidad; // Guardamos el valor anterior
+  }
+
+// Detecta y maneja cambios en el input de cantidad
+  onQuantityChange(product: DetallerCart): void {
+    const nuevaCantidad = Math.max(1, product.cantidad); // Asegurar que sea al menos 1
+    const cantidadAnterior = (product as any).previousCantidad || 0; // Valor almacenado
+
+    console.log('Cantidad anterior:', cantidadAnterior);
+    console.log('Nueva cantidad:', nuevaCantidad);
+
+    if (nuevaCantidad === cantidadAnterior) {
+      console.log('La cantidad no cambió. Saliendo...');
+      return;
+    }
+
+    if (nuevaCantidad > cantidadAnterior) {
+      // Incremento
+      const cantidadIncrementada = nuevaCantidad - cantidadAnterior;
+      console.log('Incrementando cantidad en:', cantidadIncrementada);
+
+      this.cartService.addToCart(product.producto.id!, cantidadIncrementada).subscribe({
+        next: (detalleActualizado) => {
+          product.cantidad = detalleActualizado.cantidad;
+          product.total = detalleActualizado.total;
+          this.calculateTotal(); // Actualizamos el total
+        },
+        error: (error) => {
+          console.error('Error al incrementar la cantidad:', error);
+          this.toastr.error('Error al incrementar la cantidad.');
+        },
+      });
+    } else {
+      // Decremento
+      const cantidadDecrementada = cantidadAnterior - nuevaCantidad;
+      console.log('Decrementando cantidad en:', cantidadDecrementada);
+
+      this.cartService.decrementItemInCart(product.producto.id!, cantidadDecrementada).subscribe({
+        next: (detalleActualizado) => {
+          product.cantidad = detalleActualizado.cantidad;
+          product.total = detalleActualizado.total;
+          this.calculateTotal(); // Actualizamos el total
+        },
+        error: (error) => {
+          console.error('Error al decrementar la cantidad:', error);
+          this.toastr.error('Error al decrementar la cantidad.');
+        },
+      });
+    }
+  }
+
+
+
+  // calculateTotal(): number {
+  //   return this.cartProducts.reduce((sum, product) => sum + product.cantidad * product.producto.precio_actual, 0);
+  // }
+
+  calculateTotal(): void {
+    this.total = this.cartProducts.reduce((sum, item) => sum + item.total, 0);
+  }
+
+
 }

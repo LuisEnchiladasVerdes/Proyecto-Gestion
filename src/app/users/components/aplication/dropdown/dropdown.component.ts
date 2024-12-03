@@ -2,9 +2,9 @@ import {Component, HostListener, OnInit} from '@angular/core';
 import {RouterLink} from "@angular/router";
 import {NgForOf, NgIf} from "@angular/common";
 import {animate, style, transition, trigger} from "@angular/animations";
-import {Producto} from "../../../../models/producto.models";
 import {DetallerCart} from "../../../../models/detaller-cart.models";
 import {CartService} from "../../../../services/cart.service";
+import {ToastrService} from "ngx-toastr";
 
 @Component({
   selector: 'app-dropdown',
@@ -29,93 +29,22 @@ import {CartService} from "../../../../services/cart.service";
   ]
 })
 export class DropdownComponent  implements OnInit {
-  // isOpen = false;
-  // products: Producto[] = [
-  //   {
-  //     id: 1,
-  //     nombre: 'Producto A',
-  //     descripcion: 'Descripción del Producto A',
-  //     stock: 10,
-  //     categoria: { id: 1, nombre: 'Categoría 1' },
-  //     categoria_id: 1,
-  //     precio: 100,
-  //     precio_actual: 100,
-  //     media_relacionado: ['assets/img/PROD/14.jpg'],
-  //     codigo: 123456
-  //   },
-  //   {
-  //     id: 2,
-  //     nombre: 'Producto B',
-  //     descripcion: 'Descripción del Producto B',
-  //     stock: 5,
-  //     categoria: { id: 2, nombre: 'Categoría 2' },
-  //     categoria_id: 2,
-  //     precio: 200,
-  //     precio_actual: 200,
-  //     media_relacionado: ['assets/img/PROD/15.jpg'],
-  //     codigo: 654321
-  //   },
-  // ];
-  // total: number = 0;
-  //
-  // ngOnInit(): void {
-  //   this.calculateTotal(); // Calcula el total al cargar
-  // }
-  //
-  // toggleDropdown(event: Event): void {
-  //   event.preventDefault();
-  //   this.isOpen = !this.isOpen;
-  // }
-  //
-  // incrementQuantity(productId: number): void {
-  //   const product = this.products.find(product => product.id === productId);
-  //   if (product) {
-  //     product.stock++;
-  //     this.calculateTotal(); // Recalcula el total
-  //   }
-  // }
-  //
-  // decrementQuantity(productId: number): void {
-  //   const product = this.products.find(product => product.id === productId);
-  //   if (product && product.stock > 1) {
-  //     product.stock--;
-  //     this.calculateTotal(); // Recalcula el total
-  //   }
-  // }
-  //
-  // removeItem(productId: number): void {
-  //   this.products = this.products.filter(product => product.id !== productId);
-  //   this.calculateTotal(); // Recalcula el total
-  // }
-  //
-  // calculateTotal(): void {
-  //   this.total = this.products.reduce((sum, product) => sum + product.precio_actual * product.stock, 0);
-  // }
-  //
-  // @HostListener('document:click', ['$event'])
-  // onDocumentClick(event: MouseEvent): void {
-  //   const element = event.target as HTMLElement;
-  //   const isClickedInside = element.closest('app-dropdown');
-  //   if (!isClickedInside) {
-  //     this.isOpen = false;
-  //   }
-  // }
-  //
-  // navigateToCart(): void {
-  //     this.isOpen = false; // Cerrar el dropdown
-  //   }
-
-
-
-
   isOpen = false;
   products: DetallerCart[] = []; // Ahora usamos DetallerCart
   total: number = 0;
 
-  constructor(private cartService: CartService) {}
+  mediaBaseUrl: string = '';
+
+  constructor(private cartService: CartService, private toastr: ToastrService,) {
+    this.mediaBaseUrl = this.cartService.getMediaBaseUrl();
+  }
 
   ngOnInit(): void {
-    // this.loadCart(); // Carga los productos del carrito al iniciar
+    this.loadCart(); // Carga los productos del carrito al iniciar
+
+    this.cartService.cartUpdated$.subscribe(() => {
+      this.loadCart(); // Recarga el contenido del carrito
+    });
   }
 
   toggleDropdown(event: Event): void {
@@ -124,7 +53,7 @@ export class DropdownComponent  implements OnInit {
   }
 
   loadCart(): void {
-    this.cartService.getCarritoActual().subscribe({
+    this.cartService.getCurrentCart().subscribe({
       next: (cart) => {
         this.products = cart.detalles; // Carga los detalles del carrito
         this.calculateTotal(); // Calcula el total
@@ -138,44 +67,65 @@ export class DropdownComponent  implements OnInit {
   incrementQuantity(productId: number): void {
     const detalle = this.products.find(item => item.producto.id === productId);
     if (detalle) {
-      this.cartService.addToCart(productId, detalle.cantidad + 1).subscribe({
+      this.cartService.addToCart(productId,  1).subscribe({
         next: (updatedDetalle) => {
           detalle.cantidad = updatedDetalle.cantidad;
           detalle.total = updatedDetalle.total;
           this.calculateTotal(); // Actualiza el total
         },
-        error: (error) => console.error("Error al incrementar la cantidad:", error)
+        error: (error) => {
+          console.error('Error al incrementar la cantidad:', error);
+          this.toastr.error('No se puede agregar más productos. Falta de stock.', 'Error');
+        },
       });
     }
   }
 
   decrementQuantity(productId: number): void {
-    const detalle = this.products.find(item => item.producto.id === productId);
+    const detalle = this.products.find(item => item.producto.id === productId); // Encuentra el detalle del producto en el carrito
     if (detalle && detalle.cantidad > 1) {
-      this.cartService.addToCart(productId, detalle.cantidad - 1).subscribe({
+      // Llama al backend para decrementar la cantidad
+      this.cartService.decrementItemInCart(productId, 1).subscribe({
         next: (updatedDetalle) => {
-          detalle.cantidad = updatedDetalle.cantidad;
-          detalle.total = updatedDetalle.total;
-          this.calculateTotal(); // Actualiza el total
+          // Actualiza la cantidad y el total solo para este producto
+          detalle.cantidad -= 1; // Resta una unidad
+          detalle.total = detalle.cantidad * detalle.producto.precio_actual; // Recalcula el subtotal localmente
+          this.calculateTotal(); // Recalcula el total del carrito
         },
-        error: (error) => console.error("Error al decrementar la cantidad:", error)
+        error: (error) => {
+          console.error('Error al decrementar la cantidad:', error);
+          this.toastr.error('No se pudo decrementar la cantidad', 'Error');
+        }
       });
+    } else if (detalle && detalle.cantidad === 1) {
+      // Si la cantidad llega a 1, elimina el producto
+      this.removeItem(productId);
     }
   }
 
+
+
+
   removeItem(productId: number): void {
     this.cartService.removeItemFromCart(productId).subscribe({
-      next: () => {
-        this.products = this.products.filter(item => item.producto.id !== productId);
-        this.calculateTotal(); // Recalcula el total
+      next: (response) => {
+        console.log(response.message); // Confirmación del backend
+        this.products = this.products.filter(item => item.producto.id !== productId); // Filtrar el producto eliminado
+        this.calculateTotal(); // Recalcular el total
       },
-      error: (error) => console.error("Error al eliminar el producto:", error)
+      error: (error) => {
+        console.error('Error al eliminar el producto:', error);
+      }
     });
   }
 
   calculateTotal(): void {
-    this.total = this.products.reduce((sum, item) => sum + item.total, 0);
+    this.total = this.products.reduce((sum, item) => {
+      const subtotal = item.total || 0; // Usa 0 si el subtotal es inválido
+      return sum + subtotal;
+    }, 0);
   }
+
 
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent): void {

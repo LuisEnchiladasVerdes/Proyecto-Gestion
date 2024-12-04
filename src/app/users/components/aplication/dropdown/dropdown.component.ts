@@ -1,16 +1,16 @@
 import {Component, HostListener, OnInit} from '@angular/core';
-import {RouterLink} from "@angular/router";
+import {Router, RouterLink} from "@angular/router";
 import {NgForOf, NgIf} from "@angular/common";
 import {animate, style, transition, trigger} from "@angular/animations";
 import {DetallerCart} from "../../../../models/detaller-cart.models";
 import {CartService} from "../../../../services/cart.service";
 import {ToastrService} from "ngx-toastr";
+import {NavigationStateService} from "../../../../services/navigation-state.service";
 
 @Component({
   selector: 'app-dropdown',
   standalone: true,
   imports: [
-    RouterLink,
     NgIf,
     NgForOf
   ],
@@ -35,7 +35,7 @@ export class DropdownComponent  implements OnInit {
 
   mediaBaseUrl: string = '';
 
-  constructor(private cartService: CartService, private toastr: ToastrService,) {
+  constructor(private cartService: CartService, private toastr: ToastrService, private router: Router, private navigationStateService: NavigationStateService) {
     this.mediaBaseUrl = this.cartService.getMediaBaseUrl();
   }
 
@@ -103,9 +103,6 @@ export class DropdownComponent  implements OnInit {
     }
   }
 
-
-
-
   removeItem(productId: number): void {
     this.cartService.removeItemFromCart(productId).subscribe({
       next: (response) => {
@@ -126,7 +123,6 @@ export class DropdownComponent  implements OnInit {
     }, 0);
   }
 
-
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent): void {
     const element = event.target as HTMLElement;
@@ -138,6 +134,8 @@ export class DropdownComponent  implements OnInit {
 
   navigateToCart(): void {
     this.isOpen = false; // Cierra el dropdown al navegar al carrito
+    this.navigationStateService.setAccessRevisar(true); // Habilitar acceso a "Revisar"
+    this.router.navigate(['/carrito/revisar']);
   }
 
 }

@@ -1,16 +1,16 @@
 import { Component, OnInit } from '@angular/core';
-import { RouterLink } from "@angular/router";
+import {Router, RouterLink} from "@angular/router";
 import { FormsModule } from "@angular/forms";
 import { NgForOf } from "@angular/common";
 import { CartService } from "../../../../../services/cart.service";
 import { DetallerCart } from "../../../../../models/detaller-cart.models";
 import {ToastrService} from "ngx-toastr";
+import {NavigationStateService} from "../../../../../services/navigation-state.service";
 
 @Component({
   selector: 'app-revisar',
   standalone: true,
   imports: [
-    RouterLink,
     FormsModule,
     NgForOf
   ],
@@ -27,7 +27,7 @@ export class RevisarComponent implements OnInit {
   // fechaMaxima = '2025-02-12';
   fechaMaxima = new Date(this.fecahHoy.getTime() + 2 * 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
 
-  constructor(private cartService: CartService, private toastr: ToastrService) {
+  constructor(private cartService: CartService, private toastr: ToastrService, private router: Router, private navigationStateService: NavigationStateService) {
     this.mediaBaseUrl = this.cartService.getMediaBaseUrl();
   }
 
@@ -174,5 +174,9 @@ export class RevisarComponent implements OnInit {
     this.total = this.cartProducts.reduce((sum, item) => sum + item.total, 0);
   }
 
+  navigateToRevisar(): void {
+    this.navigationStateService.setAccessConfirmacion(true); // Habilitar acceso a "Revisar"
+    this.router.navigate(['/carrito/confirmar']);
+  }
 
 }

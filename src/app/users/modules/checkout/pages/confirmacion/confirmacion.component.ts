@@ -7,6 +7,7 @@ import {CartService} from "../../../../../services/cart.service";
 import {DetallerCart} from "../../../../../models/detaller-cart.models";
 import {VerifyService} from "../../../../../services/verify.service";
 import {ToastrService} from "ngx-toastr";
+import {NavigationStateService} from "../../../../../services/navigation-state.service";
 
 @Component({
   selector: 'app-confirmacion',
@@ -31,11 +32,12 @@ export class ConfirmacionComponent implements OnInit {
   numero_telefono: number = 0;
 
 
-  constructor(private fb: FormBuilder, private router: Router, private alertService: AlertService, private cartService: CartService, private verify: VerifyService, private toastr: ToastrService) {
+  constructor(private fb: FormBuilder, private router: Router, private alertService: AlertService, private cartService: CartService, private verify: VerifyService, private toastr: ToastrService, private navigationStateService: NavigationStateService) {
     this.formulario = this.fb.group({
       numero: ['', [Validators.required, Validators.pattern(/^\d{10}$/)]],
-      nombre: ['', [Validators.required, Validators.pattern(/^[a-zA-Z\s]+$/)]],
-      apellido: ['', [Validators.required, Validators.pattern(/^[a-zA-Z\s]+$/)]],
+      // nombre: ['', [Validators.required, Validators.pattern(/^[a-zA-Z\s]+$/)]],
+      nombre: ['', [Validators.required, Validators.pattern(/^[a-zA-ZáéíóúñÁÉÍÓÚÑ\s]+$/)]],
+      // apellido: ['', [Validators.required, Validators.pattern(/^[a-zA-Z\s]+$/)]],
       correo: ['', [Validators.required, Validators.email]],
       calle: ['', [Validators.required]],
       colonia: ['', [Validators.required]],
@@ -126,7 +128,7 @@ export class ConfirmacionComponent implements OnInit {
           if (cliente) {
             this.formulario.patchValue({
               nombre: cliente.nombre,
-              apellido: cliente.apellido || '', // Ajusta según la estructura del backend
+              // apellido: cliente.apellido || '', // Ajusta según la estructura del backend
               correo: cliente.correo,
               calle: cliente.direcciones?.[0]?.calle || '',
               colonia: cliente.direcciones?.[0]?.colonia || '',
@@ -144,6 +146,8 @@ export class ConfirmacionComponent implements OnInit {
         this.botonDeshabilitado = false;
         this.formulario.get('numero')?.disable();
         this.intentosRestantes = 3; // Reinicia los intentos si el código es correcto
+        this.formulario.get('nombre')?.disable();
+        this.formulario.get('correo')?.disable();
       },
       error: () => {
         this.intentosRestantes -= 1; // Reducir un intento en caso de error
@@ -163,18 +167,17 @@ export class ConfirmacionComponent implements OnInit {
   }
 
 
-
-
   submitForm() {
     if (this.formulario.valid) {
       console.log('Formulario válido:', this.formulario.value);
-      this.realizarOrden();
+      this.finalizeOrder();
     } else {
       this.alertService.error('Por favor, completa todos los campos obligatorios.');
     }
   }
 
-  realizarOrden() {
+  finalizeOrder(): void {
+    this.navigationStateService.setAccessRealizado(true); // Habilitar acceso a "Realizado"
     this.router.navigate(['/carrito/realizado']);
   }
 }

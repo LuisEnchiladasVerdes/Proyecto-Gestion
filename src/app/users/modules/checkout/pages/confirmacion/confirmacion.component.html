@@ -44,37 +44,20 @@
           <!-- Nombres -->
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-4 pt-3">
             <div>
-              <label for="nombre" class="block text-sm font-medium text-gray-700">Nombre(s) *</label>
+              <label for="nombre" class="block text-sm font-medium text-gray-700">Nombre(s) y Apellido(s) *</label>
               <input
                 type="text"
                 id="nombre"
                 formControlName="nombre"
                 maxlength="50"
                 class="mt-1 p-2 border border-gray-300 rounded w-full focus:ring-indigo-500 focus:border-indigo-500"
-                placeholder="Ej. Juan"
+                placeholder="Ej. Juan Perez"
               />
               <span
                 *ngIf="formulario.get('nombre')?.hasError('pattern') && formulario.get('nombre')?.touched"
                 class="text-red-500 text-xs"
               >
                 El nombre no puede contener números.
-              </span>
-            </div>
-            <div>
-              <label for="apellido" class="block text-sm font-medium text-gray-700">Apellido(s) *</label>
-              <input
-                type="text"
-                id="apellido"
-                formControlName="apellido"
-                maxlength="50"
-                class="mt-1 p-2 border border-gray-300 rounded w-full focus:ring-indigo-500 focus:border-indigo-500"
-                placeholder="Ej. Lopez"
-              />
-              <span
-                *ngIf="formulario.get('apellido')?.hasError('pattern') && formulario.get('apellido')?.touched"
-                class="text-red-500 text-xs"
-              >
-                El apellido no puede contener números.
               </span>
             </div>
           </div>

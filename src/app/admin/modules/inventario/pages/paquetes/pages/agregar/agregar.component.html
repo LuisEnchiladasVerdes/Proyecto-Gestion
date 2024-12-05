@@ -10,7 +10,6 @@
     <!-- Formulario -->
     <div class="bg-white rounded-lg shadow-sm p-6">
 
-<!--      (ngSubmit)="onSaveItem($event)"-->
       <form (ngSubmit)="onSaveItem($event)" class="space-y-6">
         <!-- Información básica -->
         <div class="space-y-4">
@@ -154,32 +153,45 @@
                     <input
                       type="number"
                       min="0"
+                      name="cantidad"
                       class="mt-1 block w-16 px-2 py-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                       [(ngModel)]="row.cantidad"
                       placeholder="0"
                     >
                   </td>
+
+                  <!-- Categoría -->
                   <td class="w-3/12 px-3 py-1 whitespace-nowrap">
                     <select
                       class="mt-1 block w-full px-2 py-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                       [(ngModel)]="row.categoria"
+                      (change)="filterItemsByCategory(i)"
                     >
-                      <option value="Mesas">Mesas</option>
-                      <option value="Sillas">Sillas</option>
+                    <option value="" disabled selected hidden>Selecciona una categoría</option>
+                    <option value="todos">Todos los productos</option> <!-- Opción "Todos los productos" -->
+                    <option *ngFor="let categoria of categorias" [value]="categoria.id">
+                      {{ categoria.nombre }}
+                    </option>
                     </select>
                   </td>
+
+                  <!-- Ítem -->
                   <td class="w-3/12 px-3 py-1 whitespace-nowrap">
                     <select
                       class="mt-1 block w-full px-2 py-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                       [(ngModel)]="row.item"
                     >
-                      <option value="Mesa de plástico">Mesa de plástico</option>
-                      <option value="Silla de metal">Silla de metal</option>
+                      <option value="" disabled selected hidden>Selecciona un ítem</option>
+                      <option *ngFor="let item of row.item" [value]="item">
+                        {{ item }}
+                      </option>
                     </select>
                   </td>
+
                   <td class="w-4/12 px-3 py-1 whitespace-nowrap">
                     <textarea
                       rows="1"
+                      name="desc"
                       class="mt-1 block w-full px-2 py-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                       [(ngModel)]="row.nota"
                       placeholder="Descripción ..."

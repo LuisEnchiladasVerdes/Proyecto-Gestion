@@ -47,11 +47,11 @@ const routes: Routes = [
     loadComponent: () => import('./components/aplication/login/login.component')
     .then(m => m.LoginComponent),
   },
-//  {
-//    path: 'forget',
-//    loadChildren: () => import('./modules/recuperar/recuperar.module')
-//      .then(m => m.RecuperarModule)
-//  },
+  {
+    path: 'forget',
+    loadChildren: () => import('./modules/recuperar/recuperar.module')
+      .then(m => m.RecuperarModule)
+  },
   {
     path: '**', // Ruta comodín para manejar rutas no encontradas
     redirectTo: 'login',

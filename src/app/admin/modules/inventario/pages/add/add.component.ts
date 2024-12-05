@@ -43,13 +43,8 @@ export class AddComponent {
   precioError = '';
   imageError = '';
 
-//  selectedImage: File | null = null;
-//  imageUrl = signal<string | null>(null);
-
-// Estas propiedades se agregan:
-selectedImages: File[] = []; // Array de archivos seleccionados
-imageUrls: string[] = [];    // Array de URLs para la vista previa
-
+  selectedImages: File[] = []; // Array de archivos seleccionados
+  imageUrls: string[] = [];    // Array de URLs para la vista previa
 
 
   constructor(
@@ -66,7 +61,6 @@ imageUrls: string[] = [];    // Array de URLs para la vista previa
     console.error(message);
     this.alertService.warning(message);
   }
-
 
   ngOnInit(): void {
     this.loadCategorias();
@@ -86,7 +80,6 @@ imageUrls: string[] = [];    // Array de URLs para la vista previa
       files.forEach((file) => this.handleImage(file)); // Procesa cada archivo
     }
   }
-  
 
   validateName(): void {
     this.nameError = this.producto.nombre.trim()
@@ -257,7 +250,7 @@ imageUrls: string[] = [];    // Array de URLs para la vista previa
 
     console.log('Formulario reseteado');
   }
-  
+
 
 isDragging = false; // Variable para gestionar el estilo del área de arrastre
 

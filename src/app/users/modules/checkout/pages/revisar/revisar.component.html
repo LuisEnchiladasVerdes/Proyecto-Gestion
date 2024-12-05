@@ -100,10 +100,17 @@
         <h5 class="font-bold text-lg mb-4">TOTAL</h5>
 <!--        <h3 class="text-3xl mb-3">${{ calculateTotal() }}</h3>-->
         <h3 class="text-3xl mb-3">${{ total }}</h3>
-<!--        routerLink="/carrito/confirmar"-->
-        <button class="w-full bg-blue-600 text-white font-medium py-3 rounded-lg hover:bg-blue-700 transition duration-200" (click)="navigateToRevisar()">
+<!--        <button class="w-full bg-blue-600 text-white font-medium py-3 rounded-lg hover:bg-blue-700 transition duration-200" (click)="navigateToRevisar()">-->
+<!--          PROCEDER AL PAGO-->
+<!--        </button>-->
+        <button
+          class="w-full bg-blue-600 text-white font-medium py-3 rounded-lg hover:bg-blue-700 transition duration-200"
+          [disabled]="isProcessing"
+          (click)="navigateToRevisar()"
+        >
           PROCEDER AL PAGO
         </button>
+
       </div>
     </div>
   </div>

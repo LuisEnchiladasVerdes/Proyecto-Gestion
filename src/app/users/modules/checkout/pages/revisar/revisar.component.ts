@@ -22,9 +22,10 @@ export class RevisarComponent implements OnInit {
   mediaBaseUrl: string = '';
   total: number = 0;
 
+  isProcessing = false;
+
   fechaActual = new Date().toISOString().split('T')[0];
   fecahHoy = new Date();
-  // fechaMaxima = '2025-02-12';
   fechaMaxima = new Date(this.fecahHoy.getTime() + 2 * 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
 
   constructor(private cartService: CartService, private toastr: ToastrService, private router: Router, private navigationStateService: NavigationStateService) {
@@ -164,8 +165,6 @@ export class RevisarComponent implements OnInit {
     }
   }
 
-
-
   // calculateTotal(): number {
   //   return this.cartProducts.reduce((sum, product) => sum + product.cantidad * product.producto.precio_actual, 0);
   // }
@@ -175,8 +174,22 @@ export class RevisarComponent implements OnInit {
   }
 
   navigateToRevisar(): void {
-    this.navigationStateService.setAccessConfirmacion(true); // Habilitar acceso a "Revisar"
-    this.router.navigate(['/carrito/confirmar']);
+    this.isProcessing = true;
+    this.cartService.confirmCart().subscribe({
+      next: (response) => {
+        console.log('Carrito confirmado exitosamente:', response);
+        // this.alertService.success('¡Carrito confirmado exitosamente!');
+        this.navigationStateService.setAccessConfirmacion(true);
+        this.router.navigate(['/carrito/confirmar']);
+      },
+      error: (error) => {
+        console.error('Error al confirmar el carrito:', error);
+        // this.alertService.error('Hubo un problema al confirmar el carrito.');
+      },
+      complete: () => {
+        this.isProcessing = false;
+      }
+    });
   }
 
 }

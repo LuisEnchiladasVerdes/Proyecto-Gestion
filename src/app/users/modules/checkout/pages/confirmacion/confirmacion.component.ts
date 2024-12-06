@@ -8,6 +8,7 @@ import {DetallerCart} from "../../../../../models/detaller-cart.models";
 import {VerifyService} from "../../../../../services/verify.service";
 import {ToastrService} from "ngx-toastr";
 import {NavigationStateService} from "../../../../../services/navigation-state.service";
+import {Reserva} from "../../../../../models/Reserva.models";
 
 @Component({
   selector: 'app-confirmacion',
@@ -31,6 +32,10 @@ export class ConfirmacionComponent implements OnInit {
 
   numero_telefono: number = 0;
 
+  fechaActual = new Date().toISOString().split('T')[0];
+  fecahHoy = new Date();
+  fechaMaxima = new Date(this.fecahHoy.getTime() + 2 * 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+  intentosRestantes = 3; // Número máximo de intentos permitidos
 
   constructor(private fb: FormBuilder, private router: Router, private alertService: AlertService, private cartService: CartService, private verify: VerifyService, private toastr: ToastrService, private navigationStateService: NavigationStateService) {
     this.formulario = this.fb.group({
@@ -98,8 +103,6 @@ export class ConfirmacionComponent implements OnInit {
     this.codigo = ''; // Limpia el código al cerrar
   }
 
-  intentosRestantes = 3; // Número máximo de intentos permitidos
-
   validarCodigo(): void {
     // Verifica que el código tenga exactamente 6 dígitos
     if (!/^\d{6}$/.test(this.codigo)) {
@@ -166,11 +169,11 @@ export class ConfirmacionComponent implements OnInit {
     });
   }
 
-
   submitForm() {
     if (this.formulario.valid) {
       console.log('Formulario válido:', this.formulario.value);
-      this.finalizeOrder();
+      // this.finalizeOrder();
+      this.crearReserva();
     } else {
       this.alertService.error('Por favor, completa todos los campos obligatorios.');
     }
@@ -179,5 +182,44 @@ export class ConfirmacionComponent implements OnInit {
   finalizeOrder(): void {
     this.navigationStateService.setAccessRealizado(true); // Habilitar acceso a "Realizado"
     this.router.navigate(['/carrito/realizado']);
+  }
+
+  crearReserva(): void{
+    const reserva: Reserva = {
+      cliente: {
+        telefono: this.formulario.get('numero')?.value,
+        // nombre: this.formulario.get('nombre')?.value,
+        // correo: this.formulario.get('correo')?.value
+        nombre: 'Luis Rodriguez',
+        correo: 'correodeluis41@gmial.com'
+      },
+      direccion: {
+        nombre_direccion: this.formulario.get('referencia')?.value || null, // Permitir null si no se proporciona
+        calle: this.formulario.get('calle')?.value,
+        numero_casa: this.formulario.get('numero_exterior')?.value,
+        colonia: this.formulario.get('colonia')?.value,
+        agencia: 'null', // Puedes ajustar esto según tus necesidades
+        estado: 'Ciudad de México', // Valor predeterminado
+        codigo_postal: this.formulario.get('codigo_postal')?.value
+      },
+      // metodo_pago: this.formulario.get('metodo_pago')?.value,
+      metodo_pago: 1,
+      fecha_entrega: this.fechaActual, // Puedes cambiar esto a un valor seleccionado si lo necesitas
+      hora_entrega: this.formulario.get('hora')?.value,
+      verification_token: this.codigo // El token ya validado previamente
+    };
+
+    this.cartService.crearReserva(reserva).subscribe({
+      next: (response) => {
+        console.log('Reserva creada exitosamente:', response);
+        this.alertService.success('¡Reserva creada exitosamente!');
+        this.navigationStateService.setAccessRealizado(true); // Habilitar acceso a "Realizado"
+        this.router.navigate(['/carrito/realizado']); // Redirige al componente "Realizado"
+      },
+      error: (error) => {
+        console.error('Error al crear la reserva:', error);
+        this.alertService.error('No se pudo crear la reserva. Intenta nuevamente.');
+      }
+    });
   }
 }

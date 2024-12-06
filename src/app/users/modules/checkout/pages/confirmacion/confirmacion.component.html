@@ -253,6 +253,35 @@
         </div>
       </div>
     </div>
+
+    <div class="bg-white rounded-lg shadow p-6">
+      <div class="mb-4">
+        <label class="block text-gray-700 font-bold mb-2">Seleccionar Fecha</label>
+        <input
+          type="date"
+          class="w-full border border-gray-300 rounded-lg p-2"
+          min="{{ fechaActual }}"
+          max="{{ fechaMaxima }}"
+        >
+      </div>
+      <div>
+        <label class="block text-gray-700 font-bold mb-2">Seleccionar Hora</label>
+        <select class="w-full border border-gray-300 rounded-lg p-2">
+          <option value="" hidden="">Seleccionar hora</option>
+          <option value="08:00">08:00</option>
+          <option value="09:00">09:00</option>
+          <option value="10:00">10:00</option>
+          <option value="11:00">11:00</option>
+          <option value="12:00">12:00</option>
+          <option value="13:00">13:00</option>
+          <option value="14:00">14:00</option>
+          <option value="15:00">15:00</option>
+          <option value="16:00">16:00</option>
+          <option value="17:00">17:00</option>
+        </select>
+      </div>
+    </div>
+
   </form>
 
   <!-- Modal -->

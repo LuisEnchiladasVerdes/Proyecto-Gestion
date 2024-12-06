@@ -4,7 +4,7 @@ export interface Direccion{
   calle: string,
   numero_casa: number,
   colonia: string,
-  agencia: string,
+  agencia?: string,
   estado: string,
   codigo_postal: number,
   referencia?: string,

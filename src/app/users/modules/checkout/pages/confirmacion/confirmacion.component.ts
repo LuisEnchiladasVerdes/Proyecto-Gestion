@@ -27,6 +27,8 @@ export class ConfirmacionComponent implements OnInit {
   mostrarModal = false; // Controla la visibilidad del modal
   codigo: string = ''; // Almacena el código ingresado
 
+  verificationToken: string | null = null; // Almacenará el token de verificación
+
   cartProducts: DetallerCart[] = []; // Reemplaza los datos estáticos por un arreglo vacío
   total: number = 0;
 
@@ -103,7 +105,7 @@ export class ConfirmacionComponent implements OnInit {
     this.codigo = ''; // Limpia el código al cerrar
   }
 
-  validarCodigo(): void {
+  validarCodigo1(): void {
     // Verifica que el código tenga exactamente 6 dígitos
     if (!/^\d{6}$/.test(this.codigo)) {
       this.alertService.error('El código debe tener exactamente 6 dígitos.');
@@ -139,6 +141,8 @@ export class ConfirmacionComponent implements OnInit {
               numero_exterior: cliente.direcciones?.[0]?.numero_casa || '',
               referencia: cliente.direcciones?.[0]?.nombre_direccion || '',
             });
+            this.formulario.get('nombre')?.disable();
+            this.formulario.get('correo')?.disable();
           }
         } else if (response.message === 'Código de verificación correcto. Cliente no registrado.') {
           this.alertService.success('¡Código verificado exitosamente! Cliente no registrado.');
@@ -149,8 +153,8 @@ export class ConfirmacionComponent implements OnInit {
         this.botonDeshabilitado = false;
         this.formulario.get('numero')?.disable();
         this.intentosRestantes = 3; // Reinicia los intentos si el código es correcto
-        this.formulario.get('nombre')?.disable();
-        this.formulario.get('correo')?.disable();
+        // this.formulario.get('nombre')?.disable();
+        // this.formulario.get('correo')?.disable();
       },
       error: () => {
         this.intentosRestantes -= 1; // Reducir un intento en caso de error
@@ -169,9 +173,73 @@ export class ConfirmacionComponent implements OnInit {
     });
   }
 
+  validarCodigo(): void {
+    // Verifica que el código tenga exactamente 6 dígitos
+    if (!/^\d{6}$/.test(this.codigo)) {
+      this.alertService.error('El código debe tener exactamente 6 dígitos.');
+      return;
+    }
+
+    const phoneNumber = this.formulario.get('numero')?.value; // Obtiene el número de teléfono del formulario
+    if (!phoneNumber) {
+      this.alertService.error('No se encontró el número de teléfono. Valídalo primero.');
+      return;
+    }
+
+    this.verify.verifyCode(phoneNumber, this.codigo).subscribe({
+      next: (response) => {
+        if (response.message === 'Código de verificación correcto. Cliente verificado o creado.') {
+          this.alertService.success('¡Código verificado exitosamente!');
+
+          // Almacena el `verification_token` para usarlo más tarde
+          this.verificationToken = response.verification_token;
+          // console.log('Token', this.verificationToken);
+
+          // Rellenar formulario con datos del cliente, si existen
+          const cliente = response.cliente;
+          if (cliente) {
+            this.formulario.patchValue({
+              nombre: cliente.nombre,
+              // apellido: cliente.apellido || '', // Ajusta según la estructura del backend
+              correo: cliente.correo,
+              calle: cliente.direcciones?.[0]?.calle || '',
+              colonia: cliente.direcciones?.[0]?.colonia || '',
+              codigo_postal: cliente.direcciones?.[0]?.codigo_postal || '',
+              numero_exterior: cliente.direcciones?.[0]?.numero_casa || '',
+              referencia: cliente.direcciones?.[0]?.nombre_direccion || '',
+            });
+            this.formulario.get('nombre')?.disable();
+            this.formulario.get('correo')?.disable();
+          }
+        } else if (response.message === 'Código de verificación correcto. Cliente no registrado.') {
+          this.alertService.success('¡Código verificado exitosamente! Cliente no registrado.');
+          this.formulario.get('nombre')?.enable();
+          this.formulario.get('correo')?.enable();
+        }
+
+        // En ambos casos de éxito (cliente verificado o no registrado), cerramos el modal
+        this.cerrarModal();
+        this.botonDeshabilitado = false;
+        this.formulario.get('numero')?.disable();
+        this.intentosRestantes = 3; // Reinicia los intentos si el código es correcto
+      },
+      error: () => {
+        this.intentosRestantes -= 1;
+        if (this.intentosRestantes > 0) {
+          this.alertService.error(`Código incorrecto. Intentos restantes: ${this.intentosRestantes}`);
+        } else {
+          this.alertService.error('Has agotado todos los intentos. Envia de nuevo el código.');
+          this.cerrarModal();
+          this.intentosRestantes = 3; // Reinicia los intentos
+        }
+      },
+    });
+  }
+
+
   submitForm() {
     if (this.formulario.valid) {
-      console.log('Formulario válido:', this.formulario.value);
+      // console.log('Formulario válido:', this.formulario.value);
       // this.finalizeOrder();
       this.crearReserva();
     } else {
@@ -184,37 +252,46 @@ export class ConfirmacionComponent implements OnInit {
     this.router.navigate(['/carrito/realizado']);
   }
 
-  crearReserva(): void{
+
+
+  crearReserva(): void {
+    // Verificar que el token exista
+    if (!this.verificationToken) {
+      this.alertService.error('No se encontró el token de verificación. Por favor, valida tu número nuevamente.');
+      return;
+    }
+
+    // Construir el objeto de reserva desde el formulario
     const reserva: Reserva = {
       cliente: {
-        telefono: this.formulario.get('numero')?.value,
-        // nombre: this.formulario.get('nombre')?.value,
-        // correo: this.formulario.get('correo')?.value
-        nombre: 'Luis Rodriguez',
-        correo: 'correodeluis41@gmial.com'
+        telefono: `+52${this.formulario.get('numero')?.value}`,
+        nombre: this.formulario.get('nombre')?.value,
+        correo: this.formulario.get('correo')?.value
       },
       direccion: {
-        nombre_direccion: this.formulario.get('referencia')?.value || null, // Permitir null si no se proporciona
+        nombre_direccion: this.formulario.get('referencia')?.value || null,
         calle: this.formulario.get('calle')?.value,
         numero_casa: this.formulario.get('numero_exterior')?.value,
         colonia: this.formulario.get('colonia')?.value,
-        agencia: 'null', // Puedes ajustar esto según tus necesidades
-        estado: 'Ciudad de México', // Valor predeterminado
+        agencia: 'Donaji',
+        estado: 'Ciudad de México',
         codigo_postal: this.formulario.get('codigo_postal')?.value
       },
-      // metodo_pago: this.formulario.get('metodo_pago')?.value,
       metodo_pago: 1,
-      fecha_entrega: this.fechaActual, // Puedes cambiar esto a un valor seleccionado si lo necesitas
-      hora_entrega: this.formulario.get('hora')?.value,
-      verification_token: this.codigo // El token ya validado previamente
+      fecha_entrega: this.fechaActual,
+      hora_entrega: '10:00:00',
+      verification_token: this.verificationToken!
     };
 
+    // console.log('Datos a enviar en la reserva:', reserva);
+    // console.log('Fecha actual', this.fechaActual)
+
+    // Llamar al servicio
     this.cartService.crearReserva(reserva).subscribe({
       next: (response) => {
         console.log('Reserva creada exitosamente:', response);
         this.alertService.success('¡Reserva creada exitosamente!');
-        this.navigationStateService.setAccessRealizado(true); // Habilitar acceso a "Realizado"
-        this.router.navigate(['/carrito/realizado']); // Redirige al componente "Realizado"
+        this.finalizeOrder();
       },
       error: (error) => {
         console.error('Error al crear la reserva:', error);
@@ -222,4 +299,5 @@ export class ConfirmacionComponent implements OnInit {
       }
     });
   }
+
 }

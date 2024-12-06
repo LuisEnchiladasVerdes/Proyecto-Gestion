@@ -1,7 +1,7 @@
 export interface Cliente{
   id_cliente?: number,
   nombre: string,
-  telefono: number,
+  telefono: string,
   correo: string,
   es_identificado?: boolean,
 }

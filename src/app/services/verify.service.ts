@@ -14,9 +14,9 @@ export class VerifyService {
 
   sendVerificationCode(phoneNumber: string): Observable<any> {
     const body = { phone_number: `${this.lada}${phoneNumber}` };
-    console.log(`${this.lada}${phoneNumber}`);
+    // console.log(`${this.lada}${phoneNumber}`);
 
-    return this.http.post(`${this.apiUrl}send-verification-code/`, body).pipe(
+    return this.http.post(`${this.apiUrl}send-verification-code/`, body, { withCredentials: true }).pipe(
       catchError((error) => {
         console.error('Error al enviar el codigo:', error);
         return throwError(() => new Error('Error al enviar el codigo.'));
@@ -30,7 +30,7 @@ export class VerifyService {
       code: code,
     };
 
-    return this.http.post<any>(`${this.apiUrl}verify-code/`, body).pipe(
+    return this.http.post<any>(`${this.apiUrl}verify-code/`, body, { withCredentials: true }).pipe(
       catchError((error) => {
         console.error('Error al verificar el codigo:', error);
         return throwError(() => new Error('Error al verificar el codigo.'));

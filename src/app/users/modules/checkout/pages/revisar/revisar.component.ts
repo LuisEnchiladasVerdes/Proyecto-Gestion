@@ -177,7 +177,7 @@ export class RevisarComponent implements OnInit {
     this.isProcessing = true;
     this.cartService.confirmCart().subscribe({
       next: (response) => {
-        console.log('Carrito confirmado exitosamente:', response);
+        // console.log('Carrito confirmado exitosamente:', response);
         // this.alertService.success('¡Carrito confirmado exitosamente!');
         this.navigationStateService.setAccessConfirmacion(true);
         this.router.navigate(['/carrito/confirmar']);

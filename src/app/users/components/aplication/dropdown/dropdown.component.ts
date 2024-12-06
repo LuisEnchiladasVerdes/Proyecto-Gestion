@@ -58,9 +58,9 @@ export class DropdownComponent  implements OnInit {
         this.products = cart.detalles; // Carga los detalles del carrito
         this.calculateTotal(); // Calcula el total
       },
-      error: (error) => {
-        console.error("Error al cargar el carrito:", error);
-      }
+      // error: (error) => {
+      //   console.error("Error al cargar el carrito:", error);
+      // }
     });
   }
 

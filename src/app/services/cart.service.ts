@@ -34,10 +34,10 @@ export class CartService {
   // OBTENER CARRITO ACTUAL
   getCurrentCart(): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}current/`, { withCredentials: true }).pipe(
-      catchError((error) => {
-        console.error('Error al obtener el carrito :(:', error);
-        return throwError(() => new Error('Error al obtener el carrito.'));
-      })
+      // catchError((error) => {
+      //   console.error('Error al obtener el carrito :(:', error);
+      //   return throwError(() => new Error('Error al obtener el carrito.'));
+      // })
     );
   }
 
@@ -55,11 +55,11 @@ export class CartService {
       producto_id: productoId,
       cantidad: cantidad,
     };
-    console.log('Enviando solicitud para agregar al carrito con el body:', body);
+    // console.log('Enviando solicitud para agregar al carrito con el body:', body);
 
     // Verificar si el cart_token está presente en las cookies
     const cartToken = this.getCartTokenFromCookies();
-    console.log('Token del carrito en las cookies:', cartToken);
+    // console.log('Token del carrito en las cookies:', cartToken);
 
     return this.http.post<any>(`${this.apiUrl}add-to-cart/`, body, { withCredentials: true }).pipe(
       catchError((error) => {
@@ -95,7 +95,7 @@ export class CartService {
 
   confirmCart(): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}confirm-cart/`, {}, {withCredentials: true}).pipe(
-      tap(() => console.log(`Se confirmo el carrito`)),
+      // tap(() => console.log(`Se confirmo el carrito`)),
       catchError((error) => {
         console.error('Error al confirmar el carrito', error);
         throw new Error('Error al confirmar el carrito.');
@@ -106,10 +106,10 @@ export class CartService {
   crearReserva(body: Reserva): Observable<any> {
     const url = 'http://127.0.0.1:8000/api/clientes/cliente-reserva/';
     return this.http.post<any>(url, body, { withCredentials: true }).pipe(
-      catchError((error) => {
-        console.error('Error al crear la reserva:', error);
-        return throwError(() => new Error('Error al crear la reserva.'));
-      })
+      // catchError((error) => {
+      //   console.error('Error al crear la reserva:', error);
+      //   return throwError(() => new Error('Error al crear la reserva.'));
+      // })
     );
   }
 

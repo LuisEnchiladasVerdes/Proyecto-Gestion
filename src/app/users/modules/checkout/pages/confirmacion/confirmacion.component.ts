@@ -105,74 +105,6 @@ export class ConfirmacionComponent implements OnInit {
     this.codigo = ''; // Limpia el código al cerrar
   }
 
-  validarCodigo1(): void {
-    // Verifica que el código tenga exactamente 6 dígitos
-    if (!/^\d{6}$/.test(this.codigo)) {
-      this.alertService.error('El código debe tener exactamente 6 dígitos.');
-      return;
-    }
-
-    const phoneNumber = this.formulario.get('numero')?.value; // Obtiene el número de teléfono del formulario
-    if (!phoneNumber) {
-      this.alertService.error('No se encontró el número de teléfono. Valídalo primero.');
-      return;
-    }
-
-    const payload = {
-      phone_number: `+52${phoneNumber}`, // Agregamos la lada +52
-      code: this.codigo, // Código ingresado en el modal
-    };
-
-    this.verify.verifyCode((this.numero_telefono).toString(), this.codigo).subscribe({
-      next: (response) => {
-        if (response.message === 'Código de verificación correcto. Cliente verificado.') {
-          this.alertService.success('¡Código verificado exitosamente! Cliente verificado.');
-
-          // Llenamos el formulario con los datos del cliente
-          const cliente = response.cliente;
-          if (cliente) {
-            this.formulario.patchValue({
-              nombre: cliente.nombre,
-              // apellido: cliente.apellido || '', // Ajusta según la estructura del backend
-              correo: cliente.correo,
-              calle: cliente.direcciones?.[0]?.calle || '',
-              colonia: cliente.direcciones?.[0]?.colonia || '',
-              codigo_postal: cliente.direcciones?.[0]?.codigo_postal || '',
-              numero_exterior: cliente.direcciones?.[0]?.numero_casa || '',
-              referencia: cliente.direcciones?.[0]?.nombre_direccion || '',
-            });
-            this.formulario.get('nombre')?.disable();
-            this.formulario.get('correo')?.disable();
-          }
-        } else if (response.message === 'Código de verificación correcto. Cliente no registrado.') {
-          this.alertService.success('¡Código verificado exitosamente! Cliente no registrado.');
-        }
-
-        // En ambos casos de éxito (cliente verificado o no registrado), cerramos el modal
-        this.cerrarModal();
-        this.botonDeshabilitado = false;
-        this.formulario.get('numero')?.disable();
-        this.intentosRestantes = 3; // Reinicia los intentos si el código es correcto
-        // this.formulario.get('nombre')?.disable();
-        // this.formulario.get('correo')?.disable();
-      },
-      error: () => {
-        this.intentosRestantes -= 1; // Reducir un intento en caso de error
-        if (this.intentosRestantes > 0) {
-          this.alertService.error(
-            `Código incorrecto. Intentos restantes: ${this.intentosRestantes}`
-          );
-        } else {
-          this.alertService.error(
-            'Has agotado todos los intentos. Envia de nuevo el codigo.'
-          );
-          this.cerrarModal(); // Cierra el modal si se agotaron los intentos
-          this.intentosRestantes = 3; // Reinicia los intentos para el siguiente uso
-        }
-      },
-    });
-  }
-
   validarCodigo(): void {
     // Verifica que el código tenga exactamente 6 dígitos
     if (!/^\d{6}$/.test(this.codigo)) {
@@ -236,7 +168,6 @@ export class ConfirmacionComponent implements OnInit {
     });
   }
 
-
   submitForm() {
     if (this.formulario.valid) {
       // console.log('Formulario válido:', this.formulario.value);
@@ -251,8 +182,6 @@ export class ConfirmacionComponent implements OnInit {
     this.navigationStateService.setAccessRealizado(true); // Habilitar acceso a "Realizado"
     this.router.navigate(['/carrito/realizado']);
   }
-
-
 
   crearReserva(): void {
     // Verificar que el token exista
@@ -283,10 +212,8 @@ export class ConfirmacionComponent implements OnInit {
       verification_token: this.verificationToken!
     };
 
-    // console.log('Datos a enviar en la reserva:', reserva);
-    // console.log('Fecha actual', this.fechaActual)
+    this.alertService.loading('Procesando pago ...')
 
-    // Llamar al servicio
     this.cartService.crearReserva(reserva).subscribe({
       next: (response) => {
         console.log('Reserva creada exitosamente:', response);

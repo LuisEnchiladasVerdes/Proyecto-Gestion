@@ -60,4 +60,15 @@ export class AlertService {
       cancelButtonText: cancelText
     });
   }
+
+  loading(text: string) {
+    return Swal.fire({
+      title: text,
+      text: 'Por favor, espera un momento.',
+      allowOutsideClick: false,
+      didOpen: () => {
+        Swal.showLoading(); // Muestra el círculo de carga
+      },
+    })
+  }
 }

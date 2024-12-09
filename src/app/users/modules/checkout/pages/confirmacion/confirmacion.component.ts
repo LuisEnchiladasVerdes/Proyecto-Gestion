@@ -9,6 +9,7 @@ import {VerifyService} from "../../../../../services/verify.service";
 import {ToastrService} from "ngx-toastr";
 import {NavigationStateService} from "../../../../../services/navigation-state.service";
 import {Reserva} from "../../../../../models/Reserva.models";
+import {SharedDataService} from "../../../../../services/shared-data.service";
 
 @Component({
   selector: 'app-confirmacion',
@@ -35,11 +36,12 @@ export class ConfirmacionComponent implements OnInit {
   numero_telefono: number = 0;
 
   fechaActual = new Date().toISOString().split('T')[0];
-  fecahHoy = new Date();
-  fechaMaxima = new Date(this.fecahHoy.getTime() + 2 * 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
   intentosRestantes = 3; // Número máximo de intentos permitidos
 
-  constructor(private fb: FormBuilder, private router: Router, private alertService: AlertService, private cartService: CartService, private verify: VerifyService, private toastr: ToastrService, private navigationStateService: NavigationStateService) {
+  fechaSeleccionada: string = ''; // Fecha recibida
+  horaSeleccionada: string = ''; // Hora recibida
+
+  constructor(private fb: FormBuilder, private router: Router, private alertService: AlertService, private cartService: CartService, private verify: VerifyService, private toastr: ToastrService, private navigationStateService: NavigationStateService, private sharedDataService: SharedDataService) {
     this.formulario = this.fb.group({
       numero: ['', [Validators.required, Validators.pattern(/^\d{10}$/)]],
       // nombre: ['', [Validators.required, Validators.pattern(/^[a-zA-Z\s]+$/)]],
@@ -58,6 +60,15 @@ export class ConfirmacionComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadCart(); // Carga los productos del carrito al iniciar
+
+    const fecha = this.sharedDataService.getFechaSeleccionada();
+    const hora = this.sharedDataService.getHoraSeleccionada();
+
+    console.log('Fecha seleccionada:', fecha);
+    console.log('Hora seleccionada:', hora);
+
+    this.fechaSeleccionada = this.sharedDataService.getFechaSeleccionada() ?? '';
+    this.horaSeleccionada = this.sharedDataService.getHoraSeleccionada()  ?? '';
   }
 
   loadCart(): void {
@@ -123,16 +134,13 @@ export class ConfirmacionComponent implements OnInit {
         if (response.message === 'Código de verificación correcto. Cliente verificado o creado.') {
           this.alertService.success('¡Código verificado exitosamente!');
 
-          // Almacena el `verification_token` para usarlo más tarde
           this.verificationToken = response.verification_token;
-          // console.log('Token', this.verificationToken);
 
-          // Rellenar formulario con datos del cliente, si existen
-          const cliente = response.cliente;
-          if (cliente) {
+          const cliente: any = response.cliente;
+
+          if (cliente && cliente.nombre && cliente.correo) {
             this.formulario.patchValue({
               nombre: cliente.nombre,
-              // apellido: cliente.apellido || '', // Ajusta según la estructura del backend
               correo: cliente.correo,
               calle: cliente.direcciones?.[0]?.calle || '',
               colonia: cliente.direcciones?.[0]?.colonia || '',
@@ -140,16 +148,18 @@ export class ConfirmacionComponent implements OnInit {
               numero_exterior: cliente.direcciones?.[0]?.numero_casa || '',
               referencia: cliente.direcciones?.[0]?.nombre_direccion || '',
             });
+
+            // Bloquear nombre y correo para clientes registrados
             this.formulario.get('nombre')?.disable();
             this.formulario.get('correo')?.disable();
+          } else {
+            // Si el cliente no tiene nombre o correo, habilita los campos
+            this.alertService.success('¡Código verificado exitosamente! Cliente no registrado.');
+            this.formulario.get('nombre')?.enable();
+            this.formulario.get('correo')?.enable();
           }
-        } else if (response.message === 'Código de verificación correcto. Cliente no registrado.') {
-          this.alertService.success('¡Código verificado exitosamente! Cliente no registrado.');
-          this.formulario.get('nombre')?.enable();
-          this.formulario.get('correo')?.enable();
         }
 
-        // En ambos casos de éxito (cliente verificado o no registrado), cerramos el modal
         this.cerrarModal();
         this.botonDeshabilitado = false;
         this.formulario.get('numero')?.disable();
@@ -207,10 +217,11 @@ export class ConfirmacionComponent implements OnInit {
         codigo_postal: this.formulario.get('codigo_postal')?.value
       },
       metodo_pago: 1,
-      fecha_entrega: this.fechaActual,
-      hora_entrega: '10:00:00',
+      fecha_entrega: this.fechaSeleccionada,
+      hora_entrega: this.horaSeleccionada,
       verification_token: this.verificationToken!
     };
+    console.log(reserva);
 
     this.alertService.loading('Procesando pago ...')
 

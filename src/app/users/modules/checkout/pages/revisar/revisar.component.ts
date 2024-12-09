@@ -1,18 +1,20 @@
 import { Component, OnInit } from '@angular/core';
 import {Router, RouterLink} from "@angular/router";
 import { FormsModule } from "@angular/forms";
-import { NgForOf } from "@angular/common";
+import {NgForOf, NgIf} from "@angular/common";
 import { CartService } from "../../../../../services/cart.service";
 import { DetallerCart } from "../../../../../models/detaller-cart.models";
 import {ToastrService} from "ngx-toastr";
 import {NavigationStateService} from "../../../../../services/navigation-state.service";
+import {SharedDataService} from "../../../../../services/shared-data.service";
 
 @Component({
   selector: 'app-revisar',
   standalone: true,
   imports: [
     FormsModule,
-    NgForOf
+    NgForOf,
+    NgIf
   ],
   templateUrl: './revisar.component.html',
   styleUrl: './revisar.component.css'
@@ -28,7 +30,11 @@ export class RevisarComponent implements OnInit {
   fecahHoy = new Date();
   fechaMaxima = new Date(this.fecahHoy.getTime() + 2 * 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
 
-  constructor(private cartService: CartService, private toastr: ToastrService, private router: Router, private navigationStateService: NavigationStateService) {
+  horasDisponibles: string[] = []; // Almacena las horas disponibles para la fecha seleccionada
+  fechaSeleccionada: string = ''; // Almacena la fecha seleccionada
+  horaSeleccionadas: string = '';
+
+  constructor(private cartService: CartService, private toastr: ToastrService, private router: Router, private navigationStateService: NavigationStateService, private sharedDataService: SharedDataService) {
     this.mediaBaseUrl = this.cartService.getMediaBaseUrl();
   }
 
@@ -165,31 +171,86 @@ export class RevisarComponent implements OnInit {
     }
   }
 
-  // calculateTotal(): number {
-  //   return this.cartProducts.reduce((sum, product) => sum + product.cantidad * product.producto.precio_actual, 0);
-  // }
-
   calculateTotal(): void {
     this.total = this.cartProducts.reduce((sum, item) => sum + item.total, 0);
   }
 
+  onFechaChange(event: any): void {
+    const fecha = event.target.value; // Fecha seleccionada en formato YYYY-MM-DD
+    this.fechaSeleccionada = fecha; // Almacena la fecha seleccionada localmente
+
+    // Extraer mes y año de la fecha seleccionada
+    const [anio, mes] = fecha.split('-').map(Number);
+
+    // Llamar al servicio para consultar la disponibilidad
+    this.cartService.consultarDisponibilidad(mes, anio).subscribe({
+      next: (response) => {
+        // Filtrar las horas ocupadas para la fecha seleccionada
+        const horasOcupadas = response.ocupadas.find(
+          (ocupada: any) => ocupada.fecha_entrega === fecha
+        )?.horas_ocupadas || [];
+
+        // Actualizar las horas disponibles eliminando las ocupadas
+        this.horasDisponibles = this.getHorasDisponibles(horasOcupadas);
+      },
+      error: (error) => {
+        console.error('Error al consultar la disponibilidad:', error);
+        this.horasDisponibles = []; // Reiniciar si hay un error
+      },
+    });
+  }
+
+  onHoraChange(event: any): void {
+    const hora = event.target.value; // Hora seleccionada
+    this.horaSeleccionadas = hora; // Guardar la hora seleccionada
+  }
+
   navigateToRevisar(): void {
+    // Validar que se hayan seleccionado una fecha y una hora
+    if (!this.fechaSeleccionada) {
+      this.toastr.error('Por favor, selecciona una fecha.', 'Error');
+      return;
+    }
+    if (!this.horaSeleccionadas) {
+      this.toastr.error('Por favor, selecciona una hora.', 'Error');
+      return;
+    }
+
+    this.sharedDataService.setFechaSeleccionada(this.fechaSeleccionada);
+    this.sharedDataService.setHoraSeleccionada(this.horaSeleccionadas);
+
     this.isProcessing = true;
     this.cartService.confirmCart().subscribe({
       next: (response) => {
-        // console.log('Carrito confirmado exitosamente:', response);
-        // this.alertService.success('¡Carrito confirmado exitosamente!');
+        // Acciones después de confirmar
         this.navigationStateService.setAccessConfirmacion(true);
         this.router.navigate(['/carrito/confirmar']);
       },
       error: (error) => {
         console.error('Error al confirmar el carrito:', error);
-        // this.alertService.error('Hubo un problema al confirmar el carrito.');
       },
       complete: () => {
         this.isProcessing = false;
-      }
+      },
     });
   }
+
+  getHorasDisponibles(horasOcupadas: string[]): string[] {
+    const todasLasHoras = [
+      '08:00',
+      '09:00',
+      '10:00',
+      '11:00',
+      '12:00',
+      '13:00',
+      '14:00',
+      '15:00',
+      '16:00',
+      '17:00',
+    ];
+    const horasOcupadasFormateadas = horasOcupadas.map((hora) => hora.slice(0, 5));
+    return todasLasHoras.filter((hora) => !horasOcupadasFormateadas.includes(hora));
+  }
+
 
 }

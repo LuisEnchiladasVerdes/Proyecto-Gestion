@@ -106,10 +106,24 @@ export class CartService {
   crearReserva(body: Reserva): Observable<any> {
     const url = 'http://127.0.0.1:8000/api/clientes/cliente-reserva/';
     return this.http.post<any>(url, body, { withCredentials: true }).pipe(
-      // catchError((error) => {
-      //   console.error('Error al crear la reserva:', error);
-      //   return throwError(() => new Error('Error al crear la reserva.'));
-      // })
+      catchError((error) => {
+        console.error('Error al crear la reserva:', error);
+        return throwError(() => new Error('Error al crear la reserva.'));
+      })
+    );
+  }
+
+  consultarDisponibilidad(mes: number, anio: number): Observable<any> {
+    const body = {
+      mes: mes,
+      año: anio,
+    }
+    const url = 'http://127.0.0.1:8000/api/clientes/reservas/fechas_horas_ocupadas_mes/';
+    return this.http.post<any>(url, body, { withCredentials: true }).pipe(
+      catchError((error) => {
+        console.error('Error al consultar la disponibilidad:', error);
+        return throwError(() => new Error('Error al consultar la disponibilidad.'));
+      })
     );
   }
 

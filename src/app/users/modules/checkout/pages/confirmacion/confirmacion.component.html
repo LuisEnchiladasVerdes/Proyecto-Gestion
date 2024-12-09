@@ -57,7 +57,7 @@
                 *ngIf="formulario.get('nombre')?.hasError('pattern') && formulario.get('nombre')?.touched"
                 class="text-red-500 text-xs"
               >
-                El nombre no puede contener números.
+                El nombre no puede contener números o simbolos.
               </span>
             </div>
           </div>
@@ -102,7 +102,7 @@
                 *ngIf="formulario.get('calle')?.hasError('pattern') && formulario.get('calle')?.touched"
                 class="text-red-500 text-xs"
               >
-                La calle no puede contener numeros.
+                La calle no puede contener numeros o simbolos.
               </span>
             </div>
             <div>
@@ -119,7 +119,7 @@
                 *ngIf="formulario.get('colonia')?.hasError('pattern') && formulario.get('colonia')?.touched"
                 class="text-red-500 text-xs"
               >
-                La colonia no puede contener numeros.
+                La colonia no puede contener numeros o simbolos.
               </span>
             </div>
           </div>
@@ -155,7 +155,7 @@
                 *ngIf="formulario.get('numero_exterior')?.hasError('pattern') && formulario.get('numero_exterior')?.touched"
                 class="text-red-500 text-xs"
               >
-                El número no puede contener letras.
+                El número no puede contener letras o simbolos.
               </span>
             </div>
             <div>
@@ -172,7 +172,7 @@
                 *ngIf="formulario.get('numero_exterior')?.hasError('pattern') && formulario.get('numero_exterior')?.touched"
                 class="text-red-500 text-xs"
               >
-                El número no puede contener letras.
+                El número no puede contener letras o simbolos.
               </span>
             </div>
           </div>
@@ -189,6 +189,52 @@
           </div>
           <div class="text-sm text-gray-500">* Campos Obligatorios</div>
         </div>
+
+<!--        <div class="bg-white rounded-lg shadow p-6 mt-4">-->
+<!--          <div class="mb-4">-->
+<!--            <label class="block text-gray-700 font-bold mb-2">Seleccionar Fecha</label>-->
+<!--            <input-->
+<!--              type="date"-->
+<!--              class="w-full border border-gray-300 rounded-lg p-2"-->
+<!--              min="{{ fechaActual }}"-->
+<!--              max="{{ fechaMaxima }}"-->
+<!--            >-->
+<!--          </div>-->
+<!--          <div>-->
+<!--            <label class="block text-gray-700 font-bold mb-2">Seleccionar Hora</label>-->
+<!--            <select class="w-full border border-gray-300 rounded-lg p-2">-->
+<!--              <option value="" hidden="">Seleccionar hora</option>-->
+<!--              <option value="08:00">08:00</option>-->
+<!--              <option value="09:00">09:00</option>-->
+<!--              <option value="10:00">10:00</option>-->
+<!--              <option value="11:00">11:00</option>-->
+<!--              <option value="12:00">12:00</option>-->
+<!--              <option value="13:00">13:00</option>-->
+<!--              <option value="14:00">14:00</option>-->
+<!--              <option value="15:00">15:00</option>-->
+<!--              <option value="16:00">16:00</option>-->
+<!--              <option value="17:00">17:00</option>-->
+<!--            </select>-->
+<!--          </div>-->
+<!--        </div>-->
+
+
+        <div class="bg-white rounded-lg shadow p-6 mt-4">
+          <div class="mb-4">
+            <label class="block text-gray-700 font-bold mb-2">Fecha Seleccionada</label>
+            <div class="w-full border border-gray-300 rounded-lg p-2 bg-gray-100 text-gray-700">
+              {{ fechaSeleccionada || 'No seleccionada' }}
+            </div>
+          </div>
+          <div>
+            <label class="block text-gray-700 font-bold mb-2">Hora Seleccionada</label>
+            <div class="w-full border border-gray-300 rounded-lg p-2 bg-gray-100 text-gray-700">
+              {{ horaSeleccionada || 'No seleccionada' }}
+            </div>
+          </div>
+        </div>
+
+
       </div>
 
       <!-- Columna derecha -->
@@ -243,13 +289,6 @@
         <div class="bg-white rounded-lg shadow p-5">
           <h5 class="font-bold text-lg mb-2">TOTAL</h5>
           <p class="text-2xl font-bold text-gray-800 mb-6">${{ calculateTotal() }}</p>
-<!--          <button-->
-<!--            [disabled]="botonDeshabilitado"-->
-<!--            (click)="submitForm()"-->
-<!--            class="bg-indigo-600 text-white py-3 px-4 rounded-lg w-full block text-center hover:bg-indigo-500 transition duration-200 disabled:bg-gray-300 disabled:cursor-not-allowed"-->
-<!--          >-->
-<!--            REALIZA TU ORDEN-->
-<!--          </button>-->
           <button
             [disabled]="botonDeshabilitado"
             type="submit"
@@ -261,35 +300,6 @@
         </div>
       </div>
     </div>
-
-    <div class="bg-white rounded-lg shadow p-6">
-      <div class="mb-4">
-        <label class="block text-gray-700 font-bold mb-2">Seleccionar Fecha</label>
-        <input
-          type="date"
-          class="w-full border border-gray-300 rounded-lg p-2"
-          min="{{ fechaActual }}"
-          max="{{ fechaMaxima }}"
-        >
-      </div>
-      <div>
-        <label class="block text-gray-700 font-bold mb-2">Seleccionar Hora</label>
-        <select class="w-full border border-gray-300 rounded-lg p-2">
-          <option value="" hidden="">Seleccionar hora</option>
-          <option value="08:00">08:00</option>
-          <option value="09:00">09:00</option>
-          <option value="10:00">10:00</option>
-          <option value="11:00">11:00</option>
-          <option value="12:00">12:00</option>
-          <option value="13:00">13:00</option>
-          <option value="14:00">14:00</option>
-          <option value="15:00">15:00</option>
-          <option value="16:00">16:00</option>
-          <option value="17:00">17:00</option>
-        </select>
-      </div>
-    </div>
-
   </form>
 
   <!-- Modal -->

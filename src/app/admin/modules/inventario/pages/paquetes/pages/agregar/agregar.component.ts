@@ -1,171 +1,109 @@
-import {Component, OnInit} from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+import { CategoriaService } from "../../../../../../../services/categoria.service";
+import { ProductoService } from "../../../../../../../services/producto.service";
+import { PaquetesService } from "../../../../../../../services/paquetes.service";
+import { AlertService } from "../../../../../../../services/alert.service";
+import { Categoria } from "../../../../../../../models/categoria.models";
+import { Producto } from "../../../../../../../models/producto.models";
 import {FormsModule} from "@angular/forms";
-import {NgFor, NgIf} from "@angular/common";
-import {Router, RouterLink} from "@angular/router";
-import {CategoriaService} from "../../../../../../../services/categoria.service";
-import {ProductoService} from "../../../../../../../services/producto.service";
-import {AlertService} from "../../../../../../../services/alert.service";
-import {Categoria} from "../../../../../../../models/categoria.models";
-import {Producto} from "../../../../../../../models/producto.models";
+import {NgForOf} from "@angular/common";
 
 @Component({
   selector: 'app-agregar',
   standalone: true,
+  templateUrl: './agregar.component.html',
   imports: [
     FormsModule,
-    NgFor,
-    NgIf,
-    RouterLink
+    NgForOf
   ],
-  templateUrl: './agregar.component.html',
   styleUrl: './agregar.component.css'
 })
 export class AgregarComponent implements OnInit {
-  nameError = '';
-  quantityError = '';
-  descriptionError = '';
-  imageError = '';
-
-  categoriaSeleccionada = '';
+  nombrePaquete = '';
+  descripcionPaquete = '';
   categorias: Categoria[] = [];
   productos: Producto[] = [];
+  rows: Array<{ cantidad: number; categoria: string; producto: number | null; descuento?: number; items: Producto[] }> = [
+    { cantidad: 1, categoria: '', producto: null, descuento: 0, items: [] }
+  ];
 
   constructor(
-    private categoriasService: CategoriaService,
+    private categoriaService: CategoriaService,
     private productoService: ProductoService,
+    private paqueteService: PaquetesService,
     private alertService: AlertService,
     private router: Router
   ) {}
 
   ngOnInit(): void {
     this.loadCategorias();
-    this.obtenerProductos();
-    this.rows.forEach(row => {
-      row.categoria = 'todos'; // Esto asegura que todos los productos se carguen por defecto
-    });
-
-    // También puedes llamar a filterItemsByCategory para cargar los productos de inmediato
-    this.filterItemsByCategory(0); // Llama al filtro para la primera fila
   }
 
   loadCategorias(): void {
-    this.categoriasService.getCategorias().subscribe({
-      next: (data: Categoria[]) => (this.categorias = data),
-      error: (err) => console.error('Error al cargar categorías', err),
+    this.categoriaService.getCategorias().subscribe({
+      next: (categorias) => (this.categorias = categorias),
+      error: () => this.alertService.error('Error al cargar las categorías.')
     });
-  }
-
-  obtenerProductos(): void {
-    this.productoService.getProductos().subscribe({
-      next: (productos: Producto[]) => {
-        this.productos = productos;
-      },
-      error: (err) => {
-        if (err.message.includes('401')) {
-          this.alertService.modalConIconoError('No autorizado. Inicia sesión nuevamente.');
-          this.router.navigate(['/admin/login']);
-        } else {
-          this.alertService.modalConIconoError('Error al cargar los productos.');
-        }
-      },
-    });
-  }
-
-  validateName() {
-    const nameInput = (document.getElementById('name') as HTMLInputElement).value;
-    this.nameError = /^[^0-9]+$/.test(nameInput) ? '' : 'El nombre no debe contener números';
-  }
-
-  validateDescription() {
-    const descriptionInput = (document.getElementById('description') as HTMLTextAreaElement).value;
-    this.descriptionError = descriptionInput ? '' : 'La descripción no debe estar vacía';
-  }
-
-  validateImage() {
-    const imageInput = (document.getElementById('file-upload') as HTMLInputElement).files;
-    this.imageError = imageInput && imageInput.length > 0 ? '' : 'Se debe seleccionar una imagen';
-  }
-
-  limpiarCampos() {
-    // (document.getElementById('name') as HTMLInputElement).value = '';
-    // (document.getElementById('quantity') as HTMLInputElement).value = '';
-    // (document.getElementById('description') as HTMLTextAreaElement).value = '';
-    // (document.getElementById('file-upload') as HTMLInputElement).value = '';
-    //
-    // this.nameError = '';
-    // this.descriptionError = '';
-    // this.imageError = '';
-  }
-
-  onSaveItem(event: Event) {
-    event.preventDefault(); // Evita la recarga de la página
-
-    this.validateName();
-    this.validateDescription();
-    this.validateImage();
-
-    // Si no hay errores, muestra el mensaje de éxito                         && !this.imageError
-    if (!this.nameError && !this.descriptionError) {
-      alert('Item agregado');
-      this.limpiarCampos();
-    }
-  }
-
-  // rows: Array<{
-  //   cantidad: number;
-  //   categoria: string;
-  //   item: string;
-  //   nota: string;
-  // }> = [
-  //   { cantidad: 0, categoria: '', item: '', nota: '' },
-  // ];
-
-  rows: Array<{ cantidad: number; categoria: string; item: string[]; nota: string }> = [
-    { cantidad: 0, categoria: '', item: [], nota: '' },
-  ];
-
-
-  // Agregar una nueva fila
-  agregarFila() {
-    this.rows.push({cantidad: 0, categoria: '', item: [], nota: ''});
-  }
-
-  // Eliminar una fila por índice
-  eliminarFila(index: number) {
-    this.rows.splice(index, 1);
   }
 
   filterItemsByCategory(index: number): void {
-    const categoriaSeleccionada = this.rows[index].categoria;
+    const categoriaId = parseInt(this.rows[index].categoria, 10);
 
-    if (!categoriaSeleccionada || categoriaSeleccionada === 'todos') {
-      // Si no hay categoría seleccionada o seleccionamos "todos", cargar todos los productos
-      this.productoService.getProductos().subscribe({
-        next: (productos: Producto[]) => {
-          // Asumimos que todos los productos se deben mostrar
-          this.rows[index].item = productos.map((producto) => producto.nombre);
-        },
-        error: () => {
-          this.alertService.error('Error al cargar todos los productos.');
-          this.rows[index].item = []; // Vaciar ítems en caso de error
-        },
-      });
-    } else {
-      const categoriaId = parseInt(categoriaSeleccionada, 10);
-
-      // Llamada al servicio para obtener ítems filtrados por categoría
-      this.productoService.getProductosPorCategoria(categoriaId).subscribe({
-        next: (productos: Producto[]) => {
-          // Actualizar los ítems en la fila correspondiente
-          this.rows[index].item = productos.map((producto) => producto.nombre);
-        },
-        error: () => {
-          this.alertService.error('Error al filtrar ítems por categoría.');
-          this.rows[index].item = []; // Vaciar ítems en caso de error
-        },
-      });
+    if (isNaN(categoriaId)) {
+      this.rows[index].items = [];
+      return;
     }
+
+    this.productoService.getProductosPorCategoria(categoriaId).subscribe({
+      next: (productos) => (this.rows[index].items = productos),
+      error: () => this.alertService.error('Error al cargar los productos.')
+    });
   }
 
+  agregarFila(): void {
+    this.rows.push({ cantidad: 1, categoria: '', producto: null, descuento: 0, items: [] });
+  }
 
+  eliminarFila(index: number): void {
+    this.rows.splice(index, 1);
+  }
+
+  onSaveItem(event: Event): void {
+    event.preventDefault(); // Evita la recarga de la página
+    if (!this.nombrePaquete || !this.descripcionPaquete) {
+      this.alertService.error('Por favor, completa todos los campos obligatorios.');
+      return;
+    }
+
+    if (!this.nombrePaquete || !this.descripcionPaquete) {
+      this.alertService.error('Por favor, completa todos los campos obligatorios.');
+      return;
+    }
+
+    const detalles = this.rows.map((row) => {
+      const detalle: any = {
+        producto: row.producto,
+        cantidad: row.cantidad,
+      };
+      if (row.descuento) {
+        detalle.precio_con_descuento = row.descuento;
+      }
+      return detalle;
+    });
+
+    const paquete = {
+      nombre: this.nombrePaquete,
+      descripcion: this.descripcionPaquete,
+      detalles
+    };
+
+    this.paqueteService.addPaquete(paquete).subscribe({
+      next: () => {
+        this.alertService.success('Paquete agregado exitosamente.');
+        this.router.navigate(['/admin/inventario/paquetes/general']);
+      },
+      error: () => this.alertService.error('Error al guardar el paquete.')
+    });
+  }
 }

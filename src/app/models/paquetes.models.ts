@@ -7,7 +7,10 @@ export interface Paquetes {
 }
 
 export interface paqueteDetails {
-  idProducto: number;
+  // idProducto: number;
+  // cantidad: number;
+  // precioDescuento?: number;
+  producto: number;
   cantidad: number;
-  precioDescuente?: number;
+  precio_con_descuento?: number;
 }

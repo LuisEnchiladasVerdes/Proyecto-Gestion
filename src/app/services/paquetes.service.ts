@@ -12,7 +12,7 @@ import {Paquetes} from "../models/paquetes.models";
 export class PaquetesService {
   private apiUrl = 'http://127.0.0.1:8000/api/administrador/paquetes/';
 
-  private apiUrlCliente = 'http://127.0.0.1:8000/api/clientes/productosClientes/';
+  // private apiUrlCliente = 'http://127.0.0.1:8000/api/clientes/productosClientes/';
   private mediaBaseUrl = 'http://127.0.0.1:8000';
 
   constructor(private http: HttpClient, private authService: AuthService) { }
@@ -37,17 +37,31 @@ export class PaquetesService {
     );
   }
 
-  addPaquete(formData: FormData): Observable<Paquetes> {
-    return this.http.post<Paquetes>(this.apiUrl, formData, { headers: this.getHeaders() }).pipe(
+  // addPaquete(formData: FormData): Observable<Paquetes> {
+  //   return this.http.post<Paquetes>(this.apiUrl, formData, { headers: this.getHeaders() }).pipe(
+  //     catchError((error) => {
+  //       console.error('Error al agregar producto:', error);
+  //       return throwError(() => new Error('Error al agregar producto.'));
+  //     })
+  //   );
+  // }
+
+  addPaquete(paquete: Paquetes): Observable<Paquetes> {
+    return this.http.post<Paquetes>(this.apiUrl, paquete, { headers: this.getHeaders() }).pipe(
       catchError((error) => {
-        console.error('Error al agregar producto:', error);
-        return throwError(() => new Error('Error al agregar producto.'));
+        console.error('Error al agregar paquete:', error);
+        return throwError(() => new Error('Error al agregar paquete.'));
       })
     );
   }
 
-  getPaqueteById(id: string): Observable<Paquetes> {
-    return this.http.get<Paquetes>(`${this.apiUrl}${id}/`, { headers: this.getHeaders() });
+  getPaqueteById(id: number): Observable<Paquetes> {
+    return this.http.get<Paquetes>(`${this.apiUrl}${id}/`, { headers: this.getHeaders() }).pipe(
+      catchError((error) => {
+        console.error(`Error al obtener el paquete con ID ${id}:`, error);
+        return throwError(() => new Error(`Error al obtener el paquete con ID ${id}.`));
+      })
+    );
   }
 
   updatePaquete(formData: FormData, id: number): Observable<any> {
@@ -62,10 +76,10 @@ export class PaquetesService {
     return this.mediaBaseUrl;
   }
 
-  getProductosCliente(): Observable<Paquetes[]> {
-    // return this.http.get<Producto[]>('http://127.0.0.1:8000/api/clientes/productosClientes/');
-    return this.http.get<Paquetes[]>(this.apiUrlCliente);
-
-  }
+  // getProductosCliente(): Observable<Paquetes[]> {
+  //   // return this.http.get<Producto[]>('http://127.0.0.1:8000/api/clientes/productosClientes/');
+  //   return this.http.get<Paquetes[]>(this.apiUrlCliente);
+  //
+  // }
 
 }

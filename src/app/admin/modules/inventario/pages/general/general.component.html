@@ -291,8 +291,23 @@
           </tbody>
         </table>
       </div>
-
-
     </div>
+
+  </div>
+  <div class="pt-10">
+    <button class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            (click)="imprimirPDF()">
+<!--      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">-->
+<!--        <path d="M13 2L21 10L9 22L2 22L2 15L13 2Z" />-->
+<!--      </svg>-->
+      Descargar productos PDF
+    </button>
+    <button class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            (click)="exportarExcel()">
+      <!--      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">-->
+      <!--        <path d="M13 2L21 10L9 22L2 22L2 15L13 2Z" />-->
+      <!--      </svg>-->
+      Descargar productos EXCEL
+    </button>
   </div>
 </div>

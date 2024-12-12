@@ -16,6 +16,7 @@
                 id="numero"
                 formControlName="numero"
                 maxlength="10"
+                (keypress)="permitirSoloNumeros($event)"
                 class="mt-1 p-2 border border-gray-300 rounded w-full focus:ring-indigo-500 focus:border-indigo-500"
                 placeholder="Ej: 951-XXX-XX-XX"
               />
@@ -131,6 +132,7 @@
                 id="codigo_postal"
                 formControlName="codigo_postal"
                 maxlength="5"
+                (keypress)="permitirSoloNumeros($event)"
                 class="mt-1 p-2 border border-gray-300 rounded w-full focus:ring-indigo-500 focus:border-indigo-500"
                 placeholder="Ej: 68000"
               />
@@ -148,6 +150,7 @@
                 id="numero_exterior"
                 formControlName="numero_exterior"
                 maxlength="5"
+                (keypress)="permitirSoloNumeros($event)"
                 class="mt-1 p-2 border border-gray-300 rounded w-full focus:ring-indigo-500 focus:border-indigo-500"
                 placeholder="Ej: 123"
               />
@@ -165,6 +168,7 @@
                 id="numero_interior"
                 formControlName="numero_interior"
                 maxlength="5"
+                (keypress)="permitirSoloNumeros($event)"
                 class="mt-1 p-2 border border-gray-300 rounded w-full focus:ring-indigo-500 focus:border-indigo-500"
                 placeholder="Opcional"
               />

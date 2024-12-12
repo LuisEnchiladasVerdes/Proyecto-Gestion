@@ -43,16 +43,18 @@ export class ConfirmacionComponent implements OnInit {
 
   constructor(private fb: FormBuilder, private router: Router, private alertService: AlertService, private cartService: CartService, private verify: VerifyService, private toastr: ToastrService, private navigationStateService: NavigationStateService, private sharedDataService: SharedDataService) {
     this.formulario = this.fb.group({
-      numero: ['', [Validators.required, Validators.pattern(/^\d{10}$/)]],
-      // nombre: ['', [Validators.required, Validators.pattern(/^[a-zA-Z\s]+$/)]],
+      // numero: ['', [Validators.required, Validators.pattern(/^\d{10}$/)]],
+      numero: ['', [Validators.required, Validators.pattern(/^\d{10}$/), Validators.maxLength(10)]], // Teléfono: 10 dígitos
       nombre: ['', [Validators.required, Validators.pattern(/^[a-zA-ZáéíóúñÁÉÍÓÚÑ\s]+$/)]],
-      // apellido: ['', [Validators.required, Validators.pattern(/^[a-zA-Z\s]+$/)]],
       correo: ['', [Validators.required, Validators.email]],
       calle: ['', [Validators.required]],
       colonia: ['', [Validators.required]],
-      codigo_postal: ['', [Validators.required, Validators.pattern(/^\d{5}$/)]],
-      numero_exterior: ['', [Validators.required, Validators.pattern(/^\d+$/)]],
-      numero_interior: [''],
+      // codigo_postal: ['', [Validators.required, Validators.pattern(/^\d{5}$/)]],
+      // numero_exterior: ['', [Validators.required, Validators.pattern(/^\d+$/)]],
+      // numero_interior: [''],
+      codigo_postal: ['', [Validators.required, Validators.pattern(/^\d{5}$/), Validators.maxLength(5)]], // Código postal: 5 dígitos
+      numero_exterior: ['', [Validators.required, Validators.pattern(/^\d+$/), Validators.maxLength(5)]], // Número exterior: solo números (máx. 5)
+      numero_interior: ['', [Validators.pattern(/^\d*$/), Validators.maxLength(5)]], // Número interior: opcional, solo números (máx. 5)
       referencia: ['', [Validators.required]],
       metodo_pago: [null, [Validators.required]],
     });
@@ -238,4 +240,12 @@ export class ConfirmacionComponent implements OnInit {
     });
   }
 
+  permitirSoloNumeros(event: KeyboardEvent): void {
+    const charCode = event.which ? event.which : event.keyCode;
+
+    // Permitir solo números (códigos de 0 a 9) y teclas especiales como backspace
+    if (charCode < 48 || charCode > 57) {
+      event.preventDefault();
+    }
+  }
 }

@@ -9,6 +9,8 @@ import {Producto} from "../../../../../models/producto.models";
 import { AuthService } from '../../../../../services/auth.service';
 import {AlertService} from "../../../../../services/alert.service";
 import Swal from "sweetalert2";
+import {PdfService} from "../../../../../services/pdf.service";
+import {ExcelService} from "../../../../../services/excel.service";
 
 @Component({
   selector: 'app-general',
@@ -37,22 +39,25 @@ export class GeneralComponent implements OnInit{
 
   // ATRIBUTO DE PRODUCTOS
   productos: Producto[] = []; // Definir un arreglo para los items
+  productosParaImprimir: Producto[] = [];
 
   // ATRIBUTO PARA IMAGENES
   mediaBaseUrl: string = '';
 
-    // CARRUSEL DE IMÁGENES
-    currentImageIndex: { [key: number]: number } = {}; // Índice actual de imagen para cada producto
+  // CARRUSEL DE IMÁGENES
+  currentImageIndex: { [key: number]: number } = {}; // Índice actual de imagen para cada producto
 
   // CONSTRUCTOS
   constructor(private productoService : ProductoService, private categoriaService : CategoriaService, private router: Router,
-    private authService: AuthService,   private alertService: AlertService
+    private authService: AuthService,   private alertService: AlertService, private pdfService: PdfService, private excelService: ExcelService
   ) { }
 
   // CARGA AL INICIAR LOS PRODUCTOS Y LAS CATEGORIAS
   ngOnInit(): void {
     this.obtenerProductos();
     this.obtenerCategoria();
+
+    // this.imprimirProd();
 
     this.mediaBaseUrl = this.productoService.getMediaBaseUrl(); // Obtiene la base URL del servicio
       // Inicia el carrusel de imágenes
@@ -63,6 +68,13 @@ export class GeneralComponent implements OnInit{
     this.productoService.getProductos().subscribe({
       next: (productos: Producto[]) => {
         this.productos = productos;
+
+        this.productosParaImprimir = productos;
+        console.log(this.productos);
+
+        console.log('213', this.productos);
+
+        this.imprimirProd();
       },
       error: (err) => {
         if (err.message.includes('401')) {
@@ -74,7 +86,7 @@ export class GeneralComponent implements OnInit{
       },
     });
   }
-  
+
 
   obtenerCategoria(){
     this.categoriaService.getCategorias().subscribe(
@@ -103,7 +115,7 @@ export class GeneralComponent implements OnInit{
       });
     }, 3000); // Cambiar cada 3 segundos
   }
-  
+
 
   // CRUD CATEDORIAS
   agregarCategoria(): void {
@@ -247,29 +259,6 @@ export class GeneralComponent implements OnInit{
     );
   }
 
-
-  // eliminarProducto(id: number | undefined): void {
-  //   if (!id) {
-  //     alert('El ID del producto no es válido.');
-  //     return;
-  //   }
-  //
-  //   if (confirm('¿Estás seguro de que deseas eliminar este producto?')) {
-  //     this.productoService.deleteItem(id).subscribe(
-  //       () => {
-  //         this.productos = this.productos.filter((producto) => producto.id !== id);
-  //         // this.toastr.success('Producto eliminado correctamente.', 'Exito');
-  //         this.alertService.success('Producto eliminado correctamente.');
-  //         this.obtenerProductos();
-  //       },
-  //       (error) => {
-  //         // this.toastr.error('Ocurrio un error al eliminar el producto.', 'Error',{timeOut: 3000});
-  //         this.alertService.modalConIconoError('Ocurrio un error al eliminar el producto.');
-  //       }
-  //     );
-  //   }
-  // }
-
   eliminarProducto(id: number | undefined): void {
     if (!id) {
       // this.toastr.error('El ID del producto no es válido.', 'Error');
@@ -324,5 +313,22 @@ export class GeneralComponent implements OnInit{
     }
   }
 
+  imprimirPDF(): void {
+    const columnas = ['nombre', 'categoria', 'codigo', 'stock', 'precio_actual'];
+    const blob = this.pdfService.generarPDF(this.productosParaImprimir, columnas);
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'productos.pdf';
+    link.click();
+  }
+
+  exportarExcel(): void {
+    const columnas = ['nombre', 'categoria', 'codigo', 'stock', 'precio_actual'];
+    this.excelService.exportToExcel(this.productosParaImprimir, columnas);
+  }
+
+  imprimirProd(){
+    console.log('imprimir productos', this.productosParaImprimir)
+  }
 
 }

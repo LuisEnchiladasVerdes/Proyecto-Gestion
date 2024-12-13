@@ -64,8 +64,8 @@ export class PaquetesService {
     );
   }
 
-  updatePaquete(formData: FormData, id: number): Observable<any> {
-    return this.http.put(`${this.apiUrl}${id}/`, formData, { headers: this.getHeaders() });
+  updatePaquete(paquete: Paquetes, id: number): Observable<any> {
+    return this.http.put(`${this.apiUrl}${id}/`, paquete, { headers: this.getHeaders() });
   }
 
   deletePaquete(id: number): Observable<any> {

@@ -7,12 +7,21 @@
     </div>
 
     <!-- Formulario -->
+<!--    <app-form-paquete-->
+<!--      [nombrePaquete]="nombrePaquete"-->
+<!--      [descripcionPaquete]="descripcionPaquete"-->
+<!--      [rows]="rows"-->
+<!--      [editMode]="editMode"-->
+<!--      (formSubmit)="onSaveItem($event)"-->
+<!--    ></app-form-paquete>-->
+
     <app-form-paquete
-      [nombrePaquete]="nombrePaquete"
-      [descripcionPaquete]="descripcionPaquete"
+      [isEditMode]="false"
+      [formData]="formData"
       [rows]="rows"
-      [editMode]="editMode"
-      (formSubmit)="onSaveItem($event)"
+      [categorias]="categorias"
+      (savePaquete)="onSavePaquete()"
+      (cancelPaquete)="onCancel()"
     ></app-form-paquete>
 
   </div>

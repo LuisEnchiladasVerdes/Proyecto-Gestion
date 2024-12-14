@@ -13,7 +13,7 @@ const routes: Routes = [
       .then(m => m.AgregarComponent)
   },
   {
-    path: 'edit:/id',
+    path: 'edit/:id',
     loadComponent: () => import('./pages/editar/editar.component')
       .then(m => m.EditarComponent)
   }

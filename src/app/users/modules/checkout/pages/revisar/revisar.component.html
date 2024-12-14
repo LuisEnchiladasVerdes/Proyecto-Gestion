@@ -1,114 +1,118 @@
-<div class="carrito bg-gray-100 p-10 pb-52">
-  <h2 class="text-center text-xl font-bold mb-4 pt-10">CARRITO DE COMPRA</h2>
+<div class="carrito bg-gray-100 p-4 sm:p-6 md:p-10 pb-20">
+  <h1 class="text-center text-3xl font-bold mb-6 pt-16">CARRITO DE COMPRA</h1>
 
-  <!-- Productos -->
-  <div class="card mb-4 bg-white rounded-lg shadow">
-    <div class="card-body mt-4 p-4">
-
-<!--      <div class="eventos px-12 grid grid-cols-1 sm:grid-cols-1 md:grid-cols-4 lg:grid-cols-5 gap-4 pb-5">-->
-
-<!--        <div class="imgEventos flex flex-col items-center cursor-pointer pb-3">-->
-<!--          <img src="assets/img/PROD/1.jpg" alt="imgXV" class="h-30vh object-cover mb-2">-->
-<!--          <div class="text-lg font-medium text-gray-900">Nombre</div>-->
-<!--          <div class="text-sm font-medium text-gray-900">$12,123.00</div>-->
-<!--        </div>-->
-<!--        <div class="imgEventos flex flex-col items-center cursor-pointer pb-3">-->
-<!--          <img src="assets/img/PROD/2.jpg" alt="imgBaut" class="h-30vh object-cover mb-2">-->
-<!--        </div>-->
-<!--        <div class="imgEventos flex flex-col items-center cursor-pointer pb-3">-->
-<!--          <img src="assets/img/PROD/3.jpg" alt="imgBoda" class="h-30vh object-cover mb-2">-->
-<!--        </div>-->
-<!--        <div class="imgEventos flex flex-col items-center cursor-pointer pb-3">-->
-<!--          <img src="assets/img/PROD/4.jpg" alt="imgCumpleanios" class="h-30vh object-cover mb-2">-->
-<!--        </div>-->
-<!--        <div class="imgEventos flex flex-col items-center cursor-pointer pb-3">-->
-<!--          <img src="assets/img/PROD/5.jpg" alt="imgDespedida" class="h-30vh object-cover mb-2">-->
-<!--        </div>-->
-<!--        <div class="imgEventos flex flex-col items-center cursor-pointer pb-3">-->
-<!--          <img src="assets/img/PROD/6.jpg" alt="imgGraduacion" class="h-30vh object-cover mb-2">-->
-<!--        </div>-->
-<!--        <div class="imgEventos flex flex-col items-center cursor-pointer pb-3">-->
-<!--          <img src="assets/img/PROD/7.jpg" alt="imgGraduacion" class="h-30vh object-cover mb-2">-->
-<!--        </div>-->
-<!--      </div>-->
-
-
-      <div class="p-5 ">
-        <!-- Producto 1 -->
-        <div class="flex items-center gap-4 mb-4">
-          <div class="w-40">
-            <img src="assets/img/PROD/1.jpg" class="w-full h-auto rounded" alt="Mesa de madera">
+  <!-- Tabla de productos -->
+  <div class="overflow-x-auto bg-white rounded-lg shadow p-4">
+    <table class="min-w-full table-auto">
+      <thead>
+      <tr class="bg-gray-200">
+        <th class="text-left text-sm font-semibold text-gray-700 p-2">Producto</th>
+        <th class="text-center text-sm font-semibold text-gray-700 p-2">Precio Unitario</th>
+        <th class="text-center text-sm font-semibold text-gray-700 p-2">Cantidad</th>
+        <th class="text-center text-sm font-semibold text-gray-700 p-2">Subtotal</th>
+      </tr>
+      </thead>
+      <tbody>
+      <!-- Producto -->
+      <tr class="border-b" *ngFor="let product of cartProducts">
+        <td class="p-4 flex items-center gap-4">
+          <!-- Ícono de eliminar -->
+          <button class="text-red-500 hover:text-red-700" (click)="removeProduct(product)">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
+              <rect x="5" y="7" width="14" height="13" rx="2" ry="2" />
+              <path d="M3 7h18M8 7V5a2 2 0 012-2h4a2 2 0 012 2v2" />
+              <path d="M10 11v6M14 11v6" />
+            </svg>
+          </button>
+          <!-- Imagen del producto -->
+          <img [src]="mediaBaseUrl + product.producto.media_relacionado[0]" class="w-16 h-16 object-cover rounded" [alt]="product.producto.nombre">
+          <!-- Nombre y categoría -->
+          <div>
+            <span class="text-base font-medium text-gray-800 block">{{ product.producto.nombre }}</span>
+            <span class="text-sm text-gray-500">{{ product.producto.categoria.nombre }}</span>
           </div>
-          <div class="flex-1">
-            <h5 class="font-semibold">Mesa de madera ...</h5>
-            <p class="text-gray-600">$50.00 C/U</p>
-          </div>
-          <div class="flex-1">
-            <h5 class="font-semibold">Cantidad</h5>
-            <p class="text-gray-600">5 pza</p>
-          </div>
-          <div class="flex-1">
-            <h5 class="font-semibold">Eliminar</h5>
-          </div>
-        </div>
+        </td>
+        <td class="text-center text-base text-gray-600">${{ product.producto.precio_actual }}</td>
+        <td class="text-center">
+          <div class="flex items-center justify-center gap-2">
+            <!-- Botón de decrementar -->
+            <button class="text-gray-500 hover:text-gray-700" (click)="decreaseQuantity(product)">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M18 12H6" />
+              </svg>
+            </button>
 
-        <!-- Producto 2 -->
-        <div class="flex items-center gap-4">
-          <div class="w-40">
-            <img src="assets/img/PROD/10.jpg" class="w-full h-auto rounded" alt="Mesa de madera">
-          </div>
-          <div class="flex-1">
-            <h5 class="font-semibold">Mesa de madera ...</h5>
-            <p class="text-gray-600">$50.00 C/U</p>
-          </div>
-        </div>
+            <input
+              type="number"
+              name="cantidad"
+              [(ngModel)]="product.cantidad"
+              (focus)="storePreviousQuantity(product)"
+              (change)="onQuantityChange(product)"
+              class="w-12 text-center border border-gray-300 rounded text-sm"
+              min="1"
+            />
 
+            <!-- Botón de incrementar -->
+            <button class="text-gray-500 hover:text-gray-700" (click)="increaseQuantity(product)">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m6-6H6" />
+              </svg>
+            </button>
+          </div>
+        </td>
+        <td class="text-center text-base text-gray-800 font-semibold">${{ product.total }}</td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Total y botón de pago -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+    <div class="bg-white rounded-lg shadow p-6">
+      <!-- Input de fecha -->
+      <div class="mb-4">
+        <label class="block text-gray-700 font-bold mb-2">Seleccionar Fecha</label>
+        <input
+          type="date"
+          class="w-full border border-gray-300 rounded-lg p-2"
+          min="{{ fechaActual }}"
+          max="{{ fechaMaxima }}"
+          (change)="onFechaChange($event)"
+        />
+      </div>
+      <div>
+        <label class="block text-gray-700 font-bold mb-2">Seleccionar Hora</label>
+        <select class="w-full border border-gray-300 rounded-lg p-2" [disabled]="!fechaSeleccionada" (change)="onHoraChange($event)">
+          <option value="" hidden="">Seleccionar hora</option>
+          <!-- Mostrar solo las horas disponibles -->
+          <option *ngFor="let hora of horasDisponibles" [value]="hora">
+            {{ hora }}
+          </option>
+          <!-- Si no hay horas disponibles -->
+          <option *ngIf="horasDisponibles.length === 0" disabled>
+            No hay horas disponibles para esta fecha
+          </option>
+        </select>
       </div>
 
     </div>
-  </div>
-
-  <!-- Formulario de datos -->
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-<!--    <div>-->
-<!--      <div class="card bg-white rounded-lg shadow mb-4">-->
-<!--        <div class="card-body p-4">-->
-<!--          <h5 class="font-bold text-lg mb-4">DATOS</h5>-->
-<!--          <form>-->
-<!--            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-3">-->
-<!--              <div>-->
-<!--                <label for="nombre" class="block font-medium">NOMBRE</label>-->
-<!--                <input type="text" class="mt-1 p-2 border border-gray-300 rounded w-full" id="nombre">-->
-<!--              </div>-->
-<!--              <div>-->
-<!--                <label for="apellido" class="block font-medium">APELLIDO</label>-->
-<!--                <input type="text" class="mt-1 p-2 border border-gray-300 rounded w-full" id="apellido">-->
-<!--              </div>-->
-<!--            </div>-->
-<!--            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">-->
-<!--              <div>-->
-<!--                <label for="numero" class="block font-medium">NUMERO</label>-->
-<!--                <input type="text" class="mt-1 p-2 border border-gray-300 rounded w-full" id="numero">-->
-<!--              </div>-->
-<!--              <div>-->
-<!--                <label for="correo" class="block font-medium">CORREO</label>-->
-<!--                <input type="email" class="mt-1 p-2 border border-gray-300 rounded w-full" id="correo">-->
-<!--              </div>-->
-<!--            </div>-->
-<!--          </form>-->
-<!--        </div>-->
-<!--      </div>-->
-<!--    </div>-->
-
-    <!-- Total y botón de pago -->
     <div>
-      <div class="card bg-white rounded-lg shadow mb-4">
-        <div class="card-body p-4">
-          <h5 class="font-bold text-lg mb-4">TOTAL</h5>
-          <h3 class="text-3xl mb-3">$845.25</h3>
-          <button class="btn btn-primary w-full bg-blue-600 text-white font-medium py-2 rounded hover:bg-blue-700" routerLink="/carrito/confirmar">PROCEDER AL PAGO</button>
-        </div>
+      <div class="bg-white rounded-lg shadow p-6">
+        <h5 class="font-bold text-lg mb-4">TOTAL</h5>
+<!--        <h3 class="text-3xl mb-3">${{ calculateTotal() }}</h3>-->
+        <h3 class="text-3xl mb-3">${{ total }}</h3>
+        <button
+          class="w-full bg-blue-600 text-white font-medium py-3 rounded-lg hover:bg-blue-700 transition duration-200"
+          [disabled]="isProcessing"
+          (click)="navigateToRevisar()"
+        >
+          PROCEDER AL PAGO
+        </button>
+
       </div>
     </div>
   </div>
 </div>
+
+
+

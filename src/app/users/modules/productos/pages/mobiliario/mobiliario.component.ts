@@ -5,6 +5,10 @@ import {CategoriaService} from "../../../../../services/categoria.service";
 import {Categoria} from "../../../../../models/categoria.models";
 import {NgForOf} from "@angular/common";
 import {FormsModule} from "@angular/forms";
+import {CartService} from "../../../../../services/cart.service";
+import {AlertService} from "../../../../../services/alert.service";
+import {ToastrService} from "ngx-toastr";
+import {DropdownComponent} from "../../../../components/aplication/dropdown/dropdown.component";
 
 @Component({
   selector: 'app-mobiliario',
@@ -22,18 +26,15 @@ export class MobiliarioComponent implements OnInit{
   categoriaSeleccionada = ''; // Categoría seleccionada
   categoriaId: number = 0;
 
-  // ATRIBUTO DE PRODUCTOS
   productos: Producto[] = []; // Definir un arreglo para los items
 
-  // ATRIBUTO PARA IMAGENES
   mediaBaseUrl: string = '';
 
-  // CONSTRUCTOS
-  constructor(private productoService : ProductoService, private categoriaService : CategoriaService) { }
+  constructor(private productoService : ProductoService, private categoriaService : CategoriaService, private cartService : CartService, private alertService: AlertService, private toastr: ToastrService) { }
 
-  // CARGA AL INICIAR LOS PRODUCTOS Y LAS CATEGORIAS
+
   ngOnInit(): void {
-    this.productoService.getProductos().subscribe(   //CARGAR PRODUCTOS
+    this.productoService.getProductosCliente().subscribe(   //CARGAR PRODUCTOS
       (productos: Producto[]) => {
         if (productos && productos.length > 0) {
           this.productos = productos; // Asignar todos los items al arreglo
@@ -43,7 +44,7 @@ export class MobiliarioComponent implements OnInit{
         console.error('Error al cargar los items', error);
       }
     );
-    this.categoriaService.getCategorias().subscribe(  //CARGAR CATEGORIAS
+    this.categoriaService.getCategoriasCliente().subscribe(  //CARGAR CATEGORIAS
       (data: Categoria[]) => {
         this.categorias = data;
       },
@@ -53,4 +54,45 @@ export class MobiliarioComponent implements OnInit{
     );
     this.mediaBaseUrl = this.productoService.getMediaBaseUrl(); // Obtiene la base URL del servicio
   }
+
+  filterProductosPorCategoria(): void {
+    if (!this.categoriaSeleccionada) {
+      // Si no hay categoría seleccionada (opción de "todas"), carga todos los productos
+      this.productoService.getProductosCliente().subscribe(
+        (productos: Producto[]) => {
+          this.productos = productos;
+        },
+        (error) => {
+          console.error('Error al cargar todos los productos', error);
+        }
+      );
+    } else {
+      const categoriaId = parseInt(this.categoriaSeleccionada, 10);
+      this.productoService.getProductosPorCategoriaCliente(categoriaId).subscribe(
+        (productos: Producto[]) => {
+          this.productos = productos;
+        },
+        (error) => {
+          console.error('Error al filtrar productos por categoría', error);
+        }
+      );
+    }
+  }
+
+  addToCart(producto: Producto): void {
+    const cantidad = 1; // Cantidad inicial (puedes agregar una funcionalidad para que el usuario elija)
+    this.cartService.addToCart(producto.id!, cantidad).subscribe({
+      next: (detalleCarrito) => {
+        this.toastr.success('Producto agregado!', 'Exito');
+        this.cartService.notifyCartUpdated();
+      },
+      error: (error) => {
+        console.error('Error al agregar al carrito:', error);
+        // this.alertService.error('Error al cargar el producto al carrito');
+        // this.toastr.error('Error al cargar al carrito', error);
+      },
+    });
+  }
+
+
 }

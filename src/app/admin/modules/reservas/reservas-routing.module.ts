@@ -11,6 +11,11 @@ const routes: Routes = [
     path: 'preview',
     loadComponent: () => import('./pages/preview/preview.component')
       .then(m => m.PreviewComponent)
+  },
+  {
+    path: 'reportes',
+    loadComponent: () => import('./pages/reporte/reporte.component')
+      .then(m => m.ReporteComponent)
   }
 ];
 

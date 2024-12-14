@@ -1,22 +1,33 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, throwError } from 'rxjs';
-import {Producto} from "../models/producto.models";
+import { Producto } from '../models/producto.models';
 import { catchError } from 'rxjs/operators';
-
+import { AuthService } from './auth.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ProductoService {
+  private apiUrl = 'http://127.0.0.1:8000/api/administrador/productos/';
+  private apiUrlCliente = 'http://127.0.0.1:8000/api/clientes/productosClientes/';
+  private mediaBaseUrl = 'http://127.0.0.1:8000';
 
-  private apiUrl = 'http://127.0.0.1:8000/api/administrador/productos/'; // URL de tu API de categorías
-  private mediaBaseUrl = 'http://127.0.0.1:8000'; // Base URL del servidor
+  constructor(private http: HttpClient, private authService: AuthService) {}
 
-  constructor(private http: HttpClient) { }
+  private getHeaders(): HttpHeaders {
+    const token = this.authService.getAccessToken();
+    return new HttpHeaders({
+      Authorization: `Bearer ${token}`,
+    });
+  }
 
   getProductos(): Observable<Producto[]> {
-    return this.http.get<Producto[]>(this.apiUrl).pipe(
+    if (!this.authService.isAdminUser()) {
+      return throwError(() => new Error('Acceso denegado: No tienes permisos administrativos.'));
+    }
+
+    return this.http.get<Producto[]>(this.apiUrl, { headers: this.getHeaders() }).pipe(
       catchError((error) => {
         console.error('Error al obtener productos:', error);
         return throwError(() => new Error('Error al obtener productos.'));
@@ -25,7 +36,7 @@ export class ProductoService {
   }
 
   addProducto(formData: FormData): Observable<Producto> {
-    return this.http.post<Producto>(this.apiUrl, formData).pipe(
+    return this.http.post<Producto>(this.apiUrl, formData, { headers: this.getHeaders() }).pipe(
       catchError((error) => {
         console.error('Error al agregar producto:', error);
         return throwError(() => new Error('Error al agregar producto.'));
@@ -33,21 +44,38 @@ export class ProductoService {
     );
   }
 
-  getItemById(id: string) : Observable<Producto> {
-    return this.http.get<Producto>(`${this.apiUrl}${id}/`);
+  getItemById(id: string): Observable<Producto> {
+    return this.http.get<Producto>(`${this.apiUrl}${id}/`, { headers: this.getHeaders() });
   }
 
   updateItem(formData: FormData, id: number): Observable<any> {
-    const url = (`${this.apiUrl}${id}/`);  // URL con el ID del producto
-    return this.http.put(url, formData);
+    return this.http.put(`${this.apiUrl}${id}/`, formData, { headers: this.getHeaders() });
   }
 
-  deleteItem(id: number | undefined): Observable<any> {
-    return this.http.delete(`${this.apiUrl}${id}/`);
+  deleteItem(id: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}${id}/`, { headers: this.getHeaders() });
   }
 
   getMediaBaseUrl(): string {
     return this.mediaBaseUrl;
   }
 
+  getProductosPorCategoria(categoriaId: number): Observable<Producto[]> {
+    return this.http.get<Producto[]>(`${this.apiUrl}?categoria_id=${categoriaId}`, { headers: this.getHeaders() }).pipe(
+      catchError((error) => {
+        console.error('Error al filtrar productos:', error);
+        return throwError(() => new Error('Error al filtrar productos.'));
+      })
+    );
+  }
+
+  getProductosCliente(): Observable<Producto[]> {
+    // return this.http.get<Producto[]>('http://127.0.0.1:8000/api/clientes/productosClientes/');
+    return this.http.get<Producto[]>(this.apiUrlCliente);
+
+  }
+
+  getProductosPorCategoriaCliente(categoriaId: number): Observable<Producto[]> {
+    return this.http.get<Producto[]>(`${this.apiUrlCliente}?categoria_id=${categoriaId}`);
+  }
 }

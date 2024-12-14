@@ -1,87 +1,80 @@
-import { Component } from '@angular/core';
-import {FormsModule} from "@angular/forms";
-import {NgFor, NgIf} from "@angular/common";
-import {RouterLink} from "@angular/router";
+import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+import { CategoriaService } from '../../../../../../../services/categoria.service';
+import { PaquetesService } from '../../../../../../../services/paquetes.service';
+import { AlertService } from '../../../../../../../services/alert.service';
+import { Categoria } from '../../../../../../../models/categoria.models';
+import { Producto } from '../../../../../../../models/producto.models';
+import {FormPaqueteComponent} from "../../../../../../components/common/form-paquete/form-paquete.component";
 
 @Component({
   selector: 'app-agregar',
+  templateUrl: './agregar.component.html',
   standalone: true,
   imports: [
-    FormsModule,
-    NgFor,
-    NgIf,
-    RouterLink
+    FormPaqueteComponent
   ],
-  templateUrl: './agregar.component.html',
-  styleUrl: './agregar.component.css'
+  styleUrls: ['./agregar.component.css']
 })
-export class AgregarComponent {
-  nameError = '';
-  quantityError = '';
-  descriptionError = '';
-  imageError = '';
+export class AgregarComponent implements OnInit {
+  formData = {
+    nombrePaquete: '',
+    descripcionPaquete: ''
+  };
+  rows: Array<{ cantidad: number; categoria: string; producto: number | null; descuento?: number; items: Producto[] }> = [];
+  categorias: Categoria[] = [];
 
-  // constructor(private mueblesService : MueblesService) {}
-  // constructor(private itemService : ItemService) {}
+  constructor(
+    private categoriaService: CategoriaService,
+    private paqueteService: PaquetesService,
+    private alertService: AlertService,
+    private router: Router
+  ) {}
 
-  validateName() {
-    const nameInput = (document.getElementById('name') as HTMLInputElement).value;
-    this.nameError = /^[^0-9]+$/.test(nameInput) ? '' : 'El nombre no debe contener números';
+  ngOnInit(): void {
+    this.loadCategorias();
   }
 
-  validateDescription() {
-    const descriptionInput = (document.getElementById('description') as HTMLTextAreaElement).value;
-    this.descriptionError = descriptionInput ? '' : 'La descripción no debe estar vacía';
+  loadCategorias(): void {
+    this.categoriaService.getCategorias().subscribe({
+      next: (categorias) => (this.categorias = categorias),
+      error: () => this.alertService.error('Error al cargar las categorías.')
+    });
   }
 
-  validateImage() {
-    const imageInput = (document.getElementById('file-upload') as HTMLInputElement).files;
-    this.imageError = imageInput && imageInput.length > 0 ? '' : 'Se debe seleccionar una imagen';
-  }
-
-  limpiarCampos() {
-    // (document.getElementById('name') as HTMLInputElement).value = '';
-    // (document.getElementById('quantity') as HTMLInputElement).value = '';
-    // (document.getElementById('description') as HTMLTextAreaElement).value = '';
-    // (document.getElementById('file-upload') as HTMLInputElement).value = '';
-    //
-    // this.nameError = '';
-    // this.descriptionError = '';
-    // this.imageError = '';
-  }
-
-  onSaveItem(event: Event) {
-    event.preventDefault(); // Evita la recarga de la página
-
-    // Ejecuta todas las validaciones
-    this.validateName();
-    this.validateDescription();
-    this.validateImage();
-
-    // Si no hay errores, muestra el mensaje de éxito                         && !this.imageError
-    if (!this.nameError && !this.descriptionError) {
-
-      alert('Item agregado');
-
-
-      this.limpiarCampos();
+  onSavePaquete(): void {
+    if (!this.formData.nombrePaquete || !this.formData.descripcionPaquete) {
+      this.alertService.error('Por favor, completa todos los campos obligatorios.');
+      return;
     }
+
+    const detalles = this.rows.map((row) => {
+      const detalle: any = {
+        producto: row.producto,
+        cantidad: row.cantidad
+      };
+      if (row.descuento) {
+        detalle.precio_con_descuento = row.descuento;
+      }
+      return detalle;
+    });
+
+    const paquete = {
+      nombre: this.formData.nombrePaquete,
+      descripcion: this.formData.descripcionPaquete,
+      detalles
+    };
+
+    this.paqueteService.addPaquete(paquete).subscribe({
+      next: () => {
+        this.alertService.success('Paquete agregado exitosamente.');
+        this.router.navigate(['/admin/inventario/paquetes/general']);
+      },
+      error: () => this.alertService.error('Error al guardar el paquete.')
+    });
   }
 
-
-  rows: Array<{ cantidad: number; categoria: string; item: string; nota: string }> = [
-    { cantidad: 0, categoria: '', item: '', nota: '' },
-  ];
-
-  // Agregar una nueva fila
-  agregarFila() {
-    this.rows.push({ cantidad: 0, categoria: '', item: '', nota: '' });
+  onCancel(): void {
+    this.router.navigate(['/admin/inventario/paquetes/general']);
   }
-
-  // Eliminar una fila por índice
-  eliminarFila(index: number) {
-    this.rows.splice(index, 1);
-  }
-
-
 }

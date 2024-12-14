@@ -1,35 +1,45 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Categoria } from '../models/categoria.models';
+import { AuthService } from './auth.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CategoriaService {
-
   private apiUrl = 'http://127.0.0.1:8000/api/administrador/categorias/';
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private authService: AuthService) {}
 
-  addCategoria(categoria : Categoria): Observable<Categoria> {
-    return this.http.post<Categoria>(`${this.apiUrl}`, categoria);
+  private getHeaders(): HttpHeaders {
+    const token = this.authService.getAccessToken();
+    return new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
   }
 
-  // Método para obtener las categorías
+  addCategoria(categoria: Categoria): Observable<Categoria> {
+    return this.http.post<Categoria>(`${this.apiUrl}`, categoria, { headers: this.getHeaders() });
+  }
+
   getCategorias(): Observable<Categoria[]> {
-    return this.http.get<Categoria[]>(this.apiUrl);
+    return this.http.get<Categoria[]>(this.apiUrl, { headers: this.getHeaders() });
   }
 
-  getCategoriasById(id: string) {
-    return this.http.get<Categoria>(`${this.apiUrl}/${id}`);
+  getCategoriasById(id: string): Observable<Categoria> {
+    return this.http.get<Categoria>(`${this.apiUrl}/${id}`, { headers: this.getHeaders() });
   }
 
   deleteCategorias(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}${id}/`);
+    return this.http.delete<void>(`${this.apiUrl}${id}/`, { headers: this.getHeaders() });
   }
 
   editarCategoria(categoria: Categoria): Observable<Categoria> {
-    return this.http.put<Categoria>(`${this.apiUrl}${categoria.id}/`, categoria);
+    return this.http.put<Categoria>(`${this.apiUrl}${categoria.id}/`, categoria, { headers: this.getHeaders() });
+  }
+
+  getCategoriasCliente(): Observable<Categoria[]> {
+    return this.http.get<Categoria[]>('http://127.0.0.1:8000/api/clientes/categoriasClientes/');
   }
 }

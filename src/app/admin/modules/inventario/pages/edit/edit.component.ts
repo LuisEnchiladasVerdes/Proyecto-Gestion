@@ -1,11 +1,12 @@
-import {Component, OnInit, signal} from '@angular/core';
-import {NgForOf, NgIf} from '@angular/common';
+import { Component, OnInit, signal } from '@angular/core';
+import { NgForOf, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import {Producto} from "../../../../../models/producto.models";
-import {ProductoService} from "../../../../../services/producto.service";
-import {Categoria} from "../../../../../models/categoria.models";
-import {CategoriaService} from "../../../../../services/categoria.service";
+import { Producto } from "../../../../../models/producto.models";
+import { ProductoService } from "../../../../../services/producto.service";
+import { Categoria } from "../../../../../models/categoria.models";
+import { CategoriaService } from "../../../../../services/categoria.service";
+import {AlertService} from "../../../../../services/alert.service";
 
 @Component({
   selector: 'app-edit',
@@ -20,19 +21,20 @@ import {CategoriaService} from "../../../../../services/categoria.service";
   styleUrl: './edit.component.css'
 })
 export class EditComponent implements OnInit {
+  productoOriginal: Producto | null = null; // Para guardar el estado original del producto
   producto: Producto = {
+    codigo: 0,
     id: 0,
     nombre: '',
-    categoria: { id: 0, nombre: '' }, // Inicialización de categoria como un objeto vacío
+    categoria: { id: 0, nombre: '' },
     descripcion: '',
     stock: 0,
-    precio_actual : 0,
+    precio_actual: 0,
     precio: 0,
     media_relacionado: []
   };
 
-  categorias: Categoria[] = []; // Lista de categorías disponibles
-
+  categorias: Categoria[] = [];
   formValid = {
     nombre: true,
     categoria: true,
@@ -43,57 +45,39 @@ export class EditComponent implements OnInit {
 
   selectedImage: File | null = null; // Para almacenar el archivo seleccionado
   imageUrl = signal<string | null>(null);
-
-  // ATRIBUTO PARA IMAGENES
   mediaBaseUrl: string = '';
 
-  onImageSelected(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    if (input?.files && input.files.length === 1) {
-      const file = input.files[0];
-      const reader = new FileReader();
-
-      reader.onload = () => {
-        const imageString = reader.result as string;
-        this.imageUrl.set(imageString); // Actualiza la vista previa
-        // console.log(imageString); // Imprime la cadena en la consola
-        this.selectedImage = file;
-        console.log(this.imageUrl)
-      };
-
-      reader.readAsDataURL(file); // Lee el archivo como Base64
-    }
-  }
+  imagenesModificadas = false; // Nueva propiedad para rastrear cambios en imágenes
 
   constructor(
     private productoService: ProductoService,
     private route: ActivatedRoute,
     private router: Router,
-    private categoriaService : CategoriaService
-  ) { }
+    private categoriaService: CategoriaService,
+    private alertService: AlertService
+  ) {}
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
       this.cargarProducto(id);
     }
-    this.cargarCategorias(); // Cargar las categorías al inicio
+    this.cargarCategorias();
     this.mediaBaseUrl = this.productoService.getMediaBaseUrl();
   }
 
   cargarProducto(id: string): void {
     this.productoService.getItemById(id).subscribe(
       (producto: Producto) => {
-        this.producto = producto;
+        this.producto = { ...producto };
+        this.productoOriginal = { ...producto }; // Guardar copia exacta para comparar cambios
         this.producto.categoria_id = producto.categoria?.id || undefined;
       },
       (error) => {
-        console.error('Error al cargar el producto:', error);
-        alert('Error al cargar el producto.');
+        this.alertService.modalConIconoError('Error al cargar el producto.');
       }
     );
   }
-
 
   cargarCategorias(): void {
     this.categoriaService.getCategorias().subscribe(
@@ -101,19 +85,19 @@ export class EditComponent implements OnInit {
         this.categorias = categorias;
       },
       (error) => {
-        console.error('Error al cargar las categorías:', error);
-        alert('Error al cargar las categorías.');
+        this.alertService.modalConIconoError('Error al cargar las categorias.');
       }
     );
   }
 
-
   guardarCambios(): void {
-    console.log('Producto antes de guardar:', this.producto);
+    if (!this.verificarCambios()) {
+      this.alertService.warning('No hay cambios en el formulario.');
+      return;
+    }
 
     if (this.validarFormulario()) {
       const formData = new FormData();
-
       formData.append('nombre', this.producto.nombre);
       formData.append('descripcion', this.producto.descripcion);
       formData.append('stock', this.producto.stock.toString());
@@ -127,43 +111,62 @@ export class EditComponent implements OnInit {
       }
 
       if (this.selectedImage) {
-        formData.append('media', this.selectedImage); // Agregar el archivo al FormData
+        formData.append('media', this.selectedImage);
       }
 
       if (this.producto.id) {
         this.productoService.updateItem(formData, this.producto.id).subscribe(
           (response) => {
-            alert('Producto actualizado correctamente.');
+            // this.toastr.success('Producto actualizado correctamente.', 'Éxito', { timeOut: 3000 });
+            this.alertService.success('Producto actualizado exitosamente.');
             this.router.navigate(['/admin/inventario/general']);
           },
           (error) => {
-            console.error('Error al guardar los cambios:', error);
-            alert('Hubo un error al guardar los cambios.');
+            this.alertService.error('Error al guardar los cambios.');
           }
         );
       } else {
-        alert('ID de producto no válido.');
+        this.alertService.error('ID del producto no valido.');
       }
     } else {
-      alert('Por favor, complete todos los campos correctamente.');
+      // this.toastr.error('Por favor, complete todos los campos correctamente.', 'Error', { timeOut: 3000 });
+      this.alertService.modalConIconoError('Por favor complete todos los campos correctamente.');
     }
   }
-
 
   validarFormulario(): boolean {
     let valid = true;
-    // Verificar que los campos editables sean correctos
-    if (!this.producto.nombre || !this.producto.descripcion) {
-      valid = false;
-    }
-    if (this.producto.stock <= 0) {
-      valid = false;
-    }
-    if (this.producto.precio_actual <= 0) {
-      valid = false;
-    }
+    if (!this.producto.nombre || !this.producto.descripcion) valid = false;
+    if (this.producto.stock <= 0) valid = false;
+    if (this.producto.precio_actual <= 0) valid = false;
     return valid;
   }
+
+  verificarCambios(): boolean {
+    if (!this.productoOriginal) {
+      console.log('No hay producto original. Se asumen cambios.');
+      return true; // Si no hay datos originales, asume que hay cambios
+    }
+
+    const camposCambiados =
+      this.producto.nombre !== this.productoOriginal.nombre ||
+      this.producto.descripcion !== this.productoOriginal.descripcion ||
+      this.producto.stock !== this.productoOriginal.stock ||
+      this.producto.precio_actual !== this.productoOriginal.precio_actual ||
+      this.producto.categoria_id !== this.productoOriginal.categoria?.id;
+
+    const nuevasImagenesAgregadas = !!this.producto.media && this.producto.media.length > 0;
+
+    const resultado = camposCambiados || this.imagenesModificadas || nuevasImagenesAgregadas;
+
+    console.log('Campos cambiados:', camposCambiados);
+    console.log('Nuevas imágenes agregadas:', nuevasImagenesAgregadas);
+    console.log('Imágenes modificadas:', this.imagenesModificadas);
+    console.log('Resultado final de verificarCambios:', resultado);
+
+    return resultado;
+  }
+
 
   onCategoriaChange(event: Event): void {
     const selectElement = event.target as HTMLSelectElement;
@@ -171,11 +174,30 @@ export class EditComponent implements OnInit {
   }
 
   eliminarImagen(index: number): void {
-    if (confirm('¿Estás seguro de que deseas eliminar esta imagen?')) {
-      this.producto.media_relacionado.splice(index, 1); // Eliminar la imagen de la lista
-    }
+    this.alertService.showConfirmAlert(
+      '¿Estás seguro de que deseas eliminar esta imagen?'
+    ).then((result) => {
+      if (result.isConfirmed) {
+        this.producto.media_relacionado.splice(index, 1); // Elimina la imagen del arreglo
+        this.imagenesModificadas = true; // Marca que las imágenes han sido modificadas
+        console.log('Imagen eliminada. Imágenes modificadas:', this.imagenesModificadas);
+      }
+    });
   }
 
+  onImageSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input?.files && input.files.length === 1) {
+      const file = input.files[0];
+      const reader = new FileReader();
 
+      reader.onload = () => {
+        const imageString = reader.result as string;
+        this.imageUrl.set(imageString);
+        this.selectedImage = file;
+      };
 
+      reader.readAsDataURL(file);
+    }
+  }
 }

@@ -5,6 +5,8 @@ import { AlertService } from '../../../../../../../services/alert.service';
 import {FormPaqueteComponent} from "../../../../../../components/common/form-paquete/form-paquete.component";
 import {Categoria} from "../../../../../../../models/categoria.models";
 import {Producto} from "../../../../../../../models/producto.models";
+import {CategoriaService} from "../../../../../../../services/categoria.service";
+import {ProductoService} from "../../../../../../../services/producto.service";
 
 @Component({
   selector: 'app-editar',
@@ -32,6 +34,7 @@ export class EditarComponent implements OnInit {
     cantidad: number;
     categoria: string;
     producto: number;
+    // producto: string;
     descuento?: number | null;
     items: Producto[];
     // detalles_producto: any;
@@ -39,6 +42,8 @@ export class EditarComponent implements OnInit {
 
   constructor(
     private activatedRoute: ActivatedRoute,
+    private categoriaService: CategoriaService,
+    private productoService: ProductoService,
     private paqueteService: PaquetesService,
     private alertService: AlertService,
     private router: Router
@@ -47,28 +52,49 @@ export class EditarComponent implements OnInit {
   ngOnInit(): void {
     this.paqueteId = this.activatedRoute.snapshot.params['id'];
     this.loadPaquete();
+
+    // Cargar categorías
+    this.loadCategorias();
   }
 
+  // Cargar categorías desde el servicio
+  loadCategorias(): void {
+    this.categoriaService.getCategorias().subscribe({
+      next: (categorias) => (this.categorias = categorias),
+      error: () => this.alertService.error('Error al cargar las categorías.'),
+    });
+  }
+
+  // Cargar paquete por ID
   loadPaquete(): void {
     this.paqueteService.getPaqueteById(this.paqueteId).subscribe({
       next: (paquete) => {
-        // Cargar datos del paquete
+        // Cargar datos generales del paquete
         this.formData.nombrePaquete = paquete.nombre;
         this.formData.descripcionPaquete = paquete.descripcion;
 
-
-        // Configurar las filas de productos en el formulario
+        // Configurar las filas de productos
         this.rows = paquete.detalles.map((detalle) => ({
           cantidad: detalle.cantidad,
-          // categoria: detalle.detalles_producto?.categoria.id!.toString() || '',
-          categoria: detalle.detalles_producto?.categoria.nombre!,
-          producto: detalle.producto,
+          categoria: detalle.detalles_producto?.categoria.id!.toString() || '', // Usar ID de la categoría
+          producto: detalle.detalles_producto?.id || null!, // Usar ID del producto
           descuento: detalle.precio_con_descuento || null,
-          items: [], // Los ítems se cargarán en el componente de formulario
-          detalles_producto: detalle.detalles_producto!,
+          items: [], // Los productos se cargarán por categoría
         }));
 
-
+        // Cargar los productos por cada categoría
+        this.rows.forEach((row, index) => {
+          if (row.categoria) {
+            this.productoService.getProductosPorCategoria(parseInt(row.categoria, 10)).subscribe({
+              next: (productos) => {
+                this.rows[index].items = productos; // Llenar los productos
+              },
+              error: () => {
+                this.rows[index].items = [];
+              },
+            });
+          }
+        });
       },
       error: () => this.alertService.error('Error al cargar el paquete.'),
     });

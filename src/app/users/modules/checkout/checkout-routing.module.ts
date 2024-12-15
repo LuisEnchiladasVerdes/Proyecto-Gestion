@@ -3,6 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 import {revisarGuard} from "../../../guards/revisar.guard";
 import {confirmacionGuard} from "../../../guards/confirmacion.guard";
 import {realizadoGuard} from "../../../guards/realizado.guard";
+import { formChangesGuard } from "../../../guards/confirm-exit.guard";
 
 const routes: Routes = [
   {
@@ -13,7 +14,8 @@ const routes: Routes = [
   {
     path: 'confirmar',
     loadComponent: () => import('./pages/confirmacion/confirmacion.component')
-      .then(m => m.ConfirmacionComponent), canActivate: [confirmacionGuard]
+      .then(m => m.ConfirmacionComponent), canActivate: [confirmacionGuard],
+    canDeactivate: [formChangesGuard]
   },
   {
     path: 'realizado',

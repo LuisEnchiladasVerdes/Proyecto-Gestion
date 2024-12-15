@@ -1,19 +1,29 @@
-import {Producto} from "./producto.models";
+import { Producto } from "./producto.models";
 
 export interface Paquetes {
   id?: number;
   nombre: string;
   descripcion: string;
-  precio?: number;
-  precio_total_sin_descuento?: number;
-  ahorro_total?: number;
-  descuento_total?: number;
-  detalles: paqueteDetails[]
+  descuento_general?: number | null;
+
+  precio_original?: number;
+  descuento_aplicado?: number;
+  precio_final?: number;
+
+  detalles?: paquetePost[]; // Para creación/edición
+  media?: File[];
+
+  detalles_relacionados?: paqueteGet[]; // Para respuestas de API
+  media_urls?: string[];
 }
 
-export interface paqueteDetails {
-  producto: number;
-  detalles_producto?: Producto;
+export interface paquetePost {
+  producto: number ;
   cantidad: number;
-  precio_con_descuento?: number;
+}
+
+export interface paqueteGet {
+  producto: Producto;
+  producto_id: number;
+  cantidad: number;
 }

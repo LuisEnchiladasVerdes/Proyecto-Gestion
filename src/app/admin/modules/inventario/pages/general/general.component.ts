@@ -8,7 +8,6 @@ import {ProductoService} from "../../../../../services/producto.service";
 import {Producto} from "../../../../../models/producto.models";
 import { AuthService } from '../../../../../services/auth.service';
 import {AlertService} from "../../../../../services/alert.service";
-import Swal from "sweetalert2";
 import {PdfService} from "../../../../../services/pdf.service";
 import {ExcelService} from "../../../../../services/excel.service";
 
@@ -70,11 +69,6 @@ export class GeneralComponent implements OnInit{
         this.productos = productos;
 
         this.productosParaImprimir = productos;
-        console.log(this.productos);
-
-        console.log('213', this.productos);
-
-        this.imprimirProd();
       },
       error: (err) => {
         if (err.message.includes('401')) {
@@ -325,10 +319,6 @@ export class GeneralComponent implements OnInit{
   exportarExcel(): void {
     const columnas = ['nombre', 'categoria', 'codigo', 'stock', 'precio_actual'];
     this.excelService.exportToExcel(this.productosParaImprimir, columnas);
-  }
-
-  imprimirProd(){
-    console.log('imprimir productos', this.productosParaImprimir)
   }
 
 }

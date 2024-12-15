@@ -74,7 +74,7 @@
             </td>
             <td class="px-6 py-4 whitespace-nowrap">
               <div class="text-sm text-gray-900">
-                {{ paquete.precio_total_sin_descuento ? '$' + paquete.precio_total_sin_descuento : 'No definido' }}
+                {{ paquete.precio_final ? '$' + paquete.precio_final : 'No definido' }}
               </div>
             </td>
             <td
@@ -83,6 +83,7 @@
               <button
                 class="text-indigo-600 hover:text-indigo-900 mr-3"
                 [routerLink]="['/admin/inventario/paquetes/edit', paquete.id]"
+                (click)="onEdit(paquete.id!)"
               >
                 Editar
               </button>

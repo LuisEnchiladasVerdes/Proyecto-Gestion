@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import {HttpClient, HttpHeaders} from "@angular/common/http";
 import {AuthService} from "./auth.service";
 import {Observable, throwError} from "rxjs";
-import {Producto} from "../models/producto.models";
 import {catchError} from "rxjs/operators";
 import {Paquetes} from "../models/paquetes.models";
 
@@ -37,16 +36,7 @@ export class PaquetesService {
     );
   }
 
-  // addPaquete(formData: FormData): Observable<Paquetes> {
-  //   return this.http.post<Paquetes>(this.apiUrl, formData, { headers: this.getHeaders() }).pipe(
-  //     catchError((error) => {
-  //       console.error('Error al agregar producto:', error);
-  //       return throwError(() => new Error('Error al agregar producto.'));
-  //     })
-  //   );
-  // }
-
-  addPaquete(paquete: Paquetes): Observable<Paquetes> {
+  addPaquete(paquete: FormData): Observable<Paquetes> {
     return this.http.post<Paquetes>(this.apiUrl, paquete, { headers: this.getHeaders() }).pipe(
       catchError((error) => {
         console.error('Error al agregar paquete:', error);
@@ -64,12 +54,24 @@ export class PaquetesService {
     );
   }
 
-  updatePaquete(paquete: Paquetes, id: number): Observable<any> {
+  updatePaquete(paquete: FormData, id: number): Observable<any> {
     return this.http.put(`${this.apiUrl}${id}/`, paquete, { headers: this.getHeaders() });
   }
 
   deletePaquete(id: number): Observable<any> {
     return this.http.delete(`${this.apiUrl}${id}/`, { headers: this.getHeaders() });
+  }
+
+  deleteProductoFromPaquete(paqueteId: number, productoId: number): Observable<any> {
+    const url = `${this.apiUrl}${paqueteId}/delete-producto/`;
+    const body = { producto_id: productoId };
+
+    return this.http.delete(url, { headers: this.getHeaders(), body }).pipe(
+      catchError((error) => {
+        console.error('Error al eliminar el producto del paquete:', error);
+        return throwError(() => new Error('Error al eliminar el producto del paquete.'));
+      })
+    );
   }
 
   getMediaBaseUrl(): string {

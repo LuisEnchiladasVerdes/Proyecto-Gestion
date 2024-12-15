@@ -10,6 +10,7 @@ import {ToastrService} from "ngx-toastr";
 import {NavigationStateService} from "../../../../../services/navigation-state.service";
 import {Reserva} from "../../../../../models/Reserva.models";
 import {SharedDataService} from "../../../../../services/shared-data.service";
+import { ComponentCanDeactivate } from "../../../../../guards/confirm-exit.guard";
 
 @Component({
   selector: 'app-confirmacion',
@@ -22,7 +23,7 @@ import {SharedDataService} from "../../../../../services/shared-data.service";
   templateUrl: './confirmacion.component.html',
   styleUrl: './confirmacion.component.css'
 })
-export class ConfirmacionComponent implements OnInit {
+export class ConfirmacionComponent implements OnInit, ComponentCanDeactivate {
   formulario: FormGroup;
   botonDeshabilitado = true;
   mostrarModal = false; // Controla la visibilidad del modal
@@ -41,6 +42,8 @@ export class ConfirmacionComponent implements OnInit {
   fechaSeleccionada: string = ''; // Fecha recibida
   horaSeleccionada: string = ''; // Hora recibida
 
+  formGuardado = false;
+
   constructor(private fb: FormBuilder, private router: Router, private alertService: AlertService, private cartService: CartService, private verify: VerifyService, private toastr: ToastrService, private navigationStateService: NavigationStateService, private sharedDataService: SharedDataService) {
     this.formulario = this.fb.group({
       // numero: ['', [Validators.required, Validators.pattern(/^\d{10}$/)]],
@@ -58,6 +61,15 @@ export class ConfirmacionComponent implements OnInit {
       referencia: ['', [Validators.required]],
       metodo_pago: [null, [Validators.required]],
     });
+
+    this.formulario.valueChanges.subscribe(() => {
+      this.formGuardado =false;
+    });
+  }
+
+  canDeactivate(): boolean {
+    // Si el formulario está guardado o no tiene cambios, permite salir
+    return this.formGuardado || !this.formulario.dirty;
   }
 
   ngOnInit(): void {

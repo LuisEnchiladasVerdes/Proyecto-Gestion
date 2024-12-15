@@ -2,8 +2,9 @@ import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { Categoria } from '../../../../models/categoria.models';
 import { Producto } from '../../../../models/producto.models';
 import { FormsModule} from "@angular/forms";
-import {NgForOf} from "@angular/common";
-import {ProductoService} from "../../../../services/producto.service";
+import { NgForOf } from "@angular/common";
+import { ProductoService } from "../../../../services/producto.service";
+import { paquetePost} from "../../../../models/paquetes.models";
 
 @Component({
   selector: 'app-form-paquete',
@@ -13,43 +14,98 @@ import {ProductoService} from "../../../../services/producto.service";
     FormsModule,
     NgForOf
   ],
-  styleUrls: ['./form-paquete.component.html']
+  styleUrls: ['./form-paquete.component.css']
 })
 export class FormPaqueteComponent implements OnInit {
-@Input() isEditMode = false;
-  @Input() formData: { nombrePaquete: string; descripcionPaquete: string } = {
+  // @Input() isEditMode = false;
+  // @Input() formData: { nombrePaquete: string; descripcionPaquete: string; descuentoGeneral: number | null } = {
+  //   nombrePaquete: '',
+  //   descripcionPaquete: '',
+  //   descuentoGeneral: null
+  // };
+  // @Input() rows: Array<{
+  //   cantidad: number;
+  //   categoria: string;
+  //   producto: number | null;
+  //   descuento?: number | null;
+  //   items: Producto[];
+  // }> = [];
+  // @Input() categorias: Categoria[] = [];
+  //
+  // @Output() savePaquete = new EventEmitter<any>();
+  // @Output() cancelPaquete = new EventEmitter<void>();
+  //
+  // constructor(private productoService: ProductoService) {}
+  //
+  // ngOnInit(): void {
+  //   // Agrega una fila inicial si no existen filas
+  //   if (!this.rows.length) {
+  //     this.agregarFila();
+  //   }
+  // }
+  //
+  // agregarFila(): void {
+  //   this.rows.push({ cantidad: 1, categoria: '', producto: null, descuento: null, items: [] });
+  // }
+  //
+  // eliminarFila(index: number): void {
+  //   this.rows.splice(index, 1);
+  // }
+  //
+  // // Filtra productos al seleccionar una categoría
+  // filterItemsByCategory(index: number): void {
+  //   const categoriaId = parseInt(this.rows[index].categoria, 10);
+  //
+  //   if (!categoriaId) {
+  //     this.rows[index].items = []; // Si no hay categoría válida, limpia los productos
+  //     return;
+  //   }
+  //
+  //   this.productoService.getProductosPorCategoria(categoriaId).subscribe({
+  //     next: (productos) => (this.rows[index].items = productos),
+  //     error: () => {
+  //       console.error('Error al cargar los productos por categoría');
+  //       this.rows[index].items = [];
+  //     }
+  //   });
+  // }
+  //
+  // onSubmit(): void {
+  //   const formOutput = {
+  //     nombrePaquete: this.formData.nombrePaquete,
+  //     descripcionPaquete: this.formData.descripcionPaquete,
+  //     descuentoGeneral: this.formData.descuentoGeneral ?? null,
+  //     rows: this.rows
+  //   };
+  //
+  //   this.savePaquete.emit(formOutput);
+  // }
+  //
+  // cancel(): void {
+  //   this.cancelPaquete.emit();
+  // }
+
+  @Input() isEditMode = false;
+  @Input() formData = {
     nombrePaquete: '',
-    descripcionPaquete: ''
+    descripcionPaquete: '',
+    descuentoGeneral: null as number | null,
   };
-  @Input() rows: Array<{
-    cantidad: number;
-    categoria: string;
-    producto: number | null | undefined;
-    descuento?: number | null;
-    items: Producto[];
-  }> = [];
+
+  @Input() rows: Array<{ cantidad: number; categoria: string; producto_id: number | null; items: Producto[] }> = [];
   @Input() categorias: Categoria[] = [];
 
-  @Output() savePaquete = new EventEmitter<{ nombrePaquete: string; descripcionPaquete: string; rows: any[] }>();
+  @Output() savePaquete = new EventEmitter<any>();
   @Output() cancelPaquete = new EventEmitter<void>();
 
-  constructor(private productoService: ProductoService) { }
+  constructor(private productoService: ProductoService) {}
 
   ngOnInit(): void {
-    // Si no hay filas iniciales, agrega una por defecto
-    if (!this.rows.length) {
-      this.agregarFila();
-    }
+    if (!this.rows.length) this.agregarFila();
   }
 
   agregarFila(): void {
-    this.rows.push({
-      cantidad: 1,
-      categoria: '',
-      producto: null,
-      descuento: 0,
-      items: []
-    });
+    this.rows.push({ cantidad: 1, categoria: '', producto_id: null, items: [] });
   }
 
   eliminarFila(index: number): void {
@@ -58,41 +114,32 @@ export class FormPaqueteComponent implements OnInit {
 
   filterItemsByCategory(index: number): void {
     const categoriaId = parseInt(this.rows[index].categoria, 10);
-
-    if (isNaN(categoriaId)) {
-      this.rows[index].items = []; // Limpia productos si la categoría no es válida
-      return;
+    if (!isNaN(categoriaId)) {
+      this.productoService.getProductosPorCategoria(categoriaId).subscribe({
+        next: (productos) => (this.rows[index].items = productos),
+        error: () => (this.rows[index].items = []),
+      });
     }
-
-    this.productoService.getProductosPorCategoria(categoriaId).subscribe({
-      next: (productos) => {
-        this.rows[index].items = productos; // Carga productos para la categoría seleccionada
-      },
-      error: (err) => {
-        console.error('Error al cargar los productos:', err);
-        this.rows[index].items = []; // Limpia productos si hay un error
-      }
-    });
   }
 
   onSubmit(): void {
-    if (!this.formData.nombrePaquete || !this.formData.descripcionPaquete) {
-      alert('Por favor, completa todos los campos obligatorios.');
-      return;
-    }
+    const detalles: paquetePost[] = this.rows.map((row) => ({
+      producto: row.producto_id!,
+      cantidad: row.cantidad,
+    }));
 
-    // Emitir el evento con los datos esperados
-    this.savePaquete.emit({
+    const paquete = {
       nombrePaquete: this.formData.nombrePaquete,
       descripcionPaquete: this.formData.descripcionPaquete,
-      rows: this.rows,
-    });
-  }
+      descuentoGeneral: this.formData.descuentoGeneral,
+      detalles,
+      rows: this.rows // Asegúrate de emitir 'rows'
+    };
 
+    this.savePaquete.emit(paquete);
+  }
 
   cancel(): void {
-    // Emitimos el evento de cancelar
     this.cancelPaquete.emit();
   }
-
 }

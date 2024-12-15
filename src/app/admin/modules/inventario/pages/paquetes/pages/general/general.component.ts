@@ -3,6 +3,7 @@ import {Router, RouterLink} from '@angular/router';
 import { PaquetesService } from '../../../../../../../services/paquetes.service';
 import { Paquetes } from '../../../../../../../models/paquetes.models';
 import {NgForOf} from "@angular/common";
+import {AlertService} from "../../../../../../../services/alert.service";
 
 @Component({
   selector: 'app-general',
@@ -17,7 +18,7 @@ import {NgForOf} from "@angular/common";
 export class GeneralComponent implements OnInit {
   paquetes: Paquetes[] = [];
 
-  constructor(private paquetesService: PaquetesService, private router: Router) {}
+  constructor(private paquetesService: PaquetesService, private router: Router, private alertService: AlertService) { }
 
   ngOnInit(): void {
     this.cargarPaquetes();
@@ -35,16 +36,29 @@ export class GeneralComponent implements OnInit {
   }
 
   eliminarPaquete(id: number): void {
-    if (confirm('¿Estás seguro de que deseas eliminar este paquete?')) {
-      this.paquetesService.deletePaquete(id).subscribe({
-        next: () => {
-          this.paquetes = this.paquetes.filter((paquete) => paquete.id !== id);
-          alert('Paquete eliminado con éxito.');
-        },
-        error: (err) => {
-          console.error('Error al eliminar paquete:', err);
-        },
-      });
-    }
+    this.alertService.showConfirmAlert(
+      'Este paquete sera eliminado de manera permanente'
+    ).then((result) => {
+      if (result.isConfirmed) {
+        this.paquetesService.deletePaquete(id).subscribe({
+          next: () => {
+            this.paquetes = this.paquetes.filter((paquete) => paquete.id !== id);
+            this.alertService.success('Producto eliminado correctamente.');
+          },
+          error: (err) => {
+            console.error('Error al eliminar paquete:', err);
+          },
+        });
+      }
+    });
+  }
+
+  onEdit(paqueteId: number): void {
+    this.paquetesService.getPaqueteById(paqueteId).subscribe({
+      next: (paquete: Paquetes) => {
+        console.log('Paquete completo seleccionado:', paquete);
+      },
+      error: () => this.alertService.error('Error al obtener el paquete seleccionado.'),
+    });
   }
 }

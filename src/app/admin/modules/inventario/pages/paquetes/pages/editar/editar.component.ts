@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import {Categoria} from "../../../../../../../models/categoria.models";
 import {PaquetesService} from "../../../../../../../services/paquetes.service";
@@ -6,10 +6,6 @@ import {CategoriaService} from "../../../../../../../services/categoria.service"
 import {AlertService} from "../../../../../../../services/alert.service";
 import {FormPaqueteComponent} from "../../../../../../components/common/form-paquete/form-paquete.component";
 import { Paquetes} from "../../../../../../../models/paquetes.models";
-import {
-  ImageUploaderComponentComponent
-} from "../../../../../../components/common/image-uploader-component/image-uploader-component.component";
-import {NgForOf, NgIf} from "@angular/common";
 import {ProductoService} from "../../../../../../../services/producto.service";
 
 @Component({
@@ -17,14 +13,11 @@ import {ProductoService} from "../../../../../../../services/producto.service";
   templateUrl: './editar.component.html',
   standalone: true,
   imports: [
-    FormPaqueteComponent,
-    ImageUploaderComponentComponent,
-    NgIf,
-    NgForOf
+    FormPaqueteComponent
   ],
   styleUrl: './editar.component.css'
 })
-export class EditarComponent  {
+export class EditarComponent  implements OnInit {
   paqueteId!: number;
   formData = {
     nombrePaquete: '',
@@ -36,6 +29,10 @@ export class EditarComponent  {
   productosEliminados: number[] = []; // Guarda los IDs de productos eliminados
   selectedImages: File[] = []; // Guarda las nuevas imágenes seleccionadas
   mediaUrls: string[] = []; // Imágenes existentes del paquete
+
+  existingImages: string[] = []; // Almacena las URLs de imágenes existentes
+  mediaBaseUrl: string = '';
+  imagenesModificadas: boolean = false;
 
   constructor(
     private paqueteService: PaquetesService,
@@ -50,6 +47,8 @@ export class EditarComponent  {
     this.paqueteId = +this.route.snapshot.paramMap.get('id')!;
     this.loadPaquete();
     this.loadCategorias();
+
+    this.mediaBaseUrl = this.paqueteService.getMediaBaseUrl();
   }
 
   // Carga los datos del paquete a editar
@@ -74,6 +73,10 @@ export class EditarComponent  {
             items: [], // Lista de productos filtrados se llenará dinámicamente
           };
         });
+
+        // this.existingImages = paquete.media_urls || [];
+        this.existingImages = paquete.media_urls!.map((url) => `${this.mediaBaseUrl}${url}`);
+
 
         console.log('Rows cargados:', this.rows);
         this.cargarProductosIniciales();
@@ -160,8 +163,9 @@ export class EditarComponent  {
     this.router.navigate(['/admin/inventario/paquetes/general']);
   }
 
-  onImageError(message: string): void {
-    console.error(message);
-    this.alertService.warning(message);
+  onImagesChanged(images: File[]): void {
+    this.selectedImages = images; // Guardar las nuevas imágenes seleccionadas
+    this.imagenesModificadas = true; // Indicar que las imágenes han cambiado
   }
+
 }

@@ -29,6 +29,8 @@ export class FormPaqueteComponent implements OnInit {
   @Input() rows: Array<{ cantidad: number; categoria: string; producto_id: number | null; items: Producto[] }> = [];
   @Input() categorias: Categoria[] = [];
 
+  @Input() existingImages: string[] = [];
+
   @Output() savePaquete = new EventEmitter<any>();
   @Output() cancelPaquete = new EventEmitter<void>();
 
@@ -37,7 +39,6 @@ export class FormPaqueteComponent implements OnInit {
   @ViewChild(ImageUploaderComponentComponent)
   imageUploaderComponent!: ImageUploaderComponentComponent;
 
-  imageUrls: string[] = []; // URLs de imágenes precargadas
   selectedImages: File[] = []; // Archivos seleccionados
 
 
@@ -45,6 +46,10 @@ export class FormPaqueteComponent implements OnInit {
 
   ngOnInit(): void {
     if (!this.rows.length) this.agregarFila();
+
+    if (this.imageUploaderComponent) {
+      this.imageUploaderComponent.imageUrls = [...this.existingImages];
+    }
   }
 
   agregarFila(): void {

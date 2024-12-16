@@ -140,7 +140,7 @@
         <app-image-uploader-component
           #uploader
           [maxFiles]="5"
-          [imageUrls]="imageUrls"
+          [imageUrls]="existingImages"
           (imagesChanged)="onImagesChanged($event)"
           (error)="onImageError($event)"
         ></app-image-uploader-component>

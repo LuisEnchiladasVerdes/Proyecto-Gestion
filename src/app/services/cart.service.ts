@@ -4,7 +4,6 @@ import {Observable, Subject, throwError} from "rxjs";
 import {catchError, tap,} from "rxjs/operators";
 import {AlertService} from "./alert.service";
 import {CookieService} from "ngx-cookie-service";
-import {error} from "@angular/compiler-cli/src/transformers/util";
 import {Reserva} from "../models/Reserva.models";
 
 @Injectable({
@@ -123,6 +122,25 @@ export class CartService {
       catchError((error) => {
         console.error('Error al consultar la disponibilidad:', error);
         return throwError(() => new Error('Error al consultar la disponibilidad.'));
+      })
+    );
+  }
+
+
+  // SECCION DE PAQUETES
+  addPaqueteToCart(paqueteId: number, cantidad: number): Observable<any> {
+    const body = {
+      paqueteId: paqueteId,
+      cantidad: cantidad,
+    };
+
+    // Verificar si el cart_token está presente en las cookies
+    const cartToken = this.getCartTokenFromCookies();
+
+    return this.http.post<any>(`${this.apiUrl}add-package-to-cart/`, body, { withCredentials: true }).pipe(
+      catchError((error) => {
+        console.error('Error al agregar al carrito:', error);
+        return throwError(() => new Error('Error al agregar al carrito.'));
       })
     );
   }

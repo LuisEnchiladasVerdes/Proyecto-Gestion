@@ -24,9 +24,9 @@ export class PaquetesService {
   }
 
   getPaquetes(): Observable<Paquetes[]> {
-    if (!this.authService.isAdminUser()) {
-      return throwError(() => new Error('Acceso denegado: No tienes permisos administrativos.'));
-    }
+    // if (!this.authService.isAdminUser()) {
+    //   return throwError(() => new Error('Acceso denegado: No tienes permisos administrativos.'));
+    // }
 
     return this.http.get<Paquetes[]>(this.apiUrl, { headers: this.getHeaders() }).pipe(
       catchError((error) => {

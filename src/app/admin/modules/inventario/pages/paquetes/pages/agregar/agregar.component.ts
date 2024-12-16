@@ -79,6 +79,11 @@ export class AgregarComponent {
 
   // Enviar datos al backend
   onSavePaquete(event: any): void {
+    if (!this.validarFormulario()) {
+      this.alertService.error('Completa todos los campos obligatorios.');
+      return;
+    }
+
     if (!event.rows || !Array.isArray(event.rows) || event.rows.length === 0) {
       this.alertService.error('Debes agregar al menos un producto.');
       return;
@@ -131,5 +136,19 @@ export class AgregarComponent {
   // Cancelar acción
   cancelPaquete(): void {
     this.router.navigate(['/admin/inventario/paquetes/general']);
+  }
+
+  validarFormulario(): boolean {
+    // Verificar que los campos generales no estén vacíos
+    if (!this.formData.nombrePaquete || !this.formData.descripcionPaquete) {
+      return false;
+    }
+
+    // Verificar que las filas de productos tengan categoría, producto y cantidad válidos
+    const filasValidas = this.rows.every(
+      (row) => row.categoria && row.producto_id && row.cantidad > 0
+    );
+
+    return filasValidas;
   }
 }

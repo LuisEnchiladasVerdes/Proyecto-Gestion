@@ -17,7 +17,6 @@ export class ImageUploaderComponentComponent {
   @Output() error = new EventEmitter<string>(); // Emite mensajes de error
   @Input() imageUrls: string[] = []; // URLs de imágenes precargadas
 
-  // imageUrls: string[] = []; // URLs de vista previa
   selectedImages: File[] = []; // Archivos seleccionados
   isDragging = false; // Controla el estilo de arrastre
 

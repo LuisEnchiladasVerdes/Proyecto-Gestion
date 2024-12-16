@@ -28,11 +28,12 @@ export class EditarComponent  implements OnInit {
   categorias: any[] = []; // Lista de categorías disponibles
   productosEliminados: number[] = []; // Guarda los IDs de productos eliminados
   selectedImages: File[] = []; // Guarda las nuevas imágenes seleccionadas
-  mediaUrls: string[] = []; // Imágenes existentes del paquete
 
   existingImages: string[] = []; // Almacena las URLs de imágenes existentes
   mediaBaseUrl: string = '';
   imagenesModificadas: boolean = false;
+
+  paqueteOriginal: any = null;
 
   constructor(
     private paqueteService: PaquetesService,
@@ -55,6 +56,8 @@ export class EditarComponent  implements OnInit {
   loadPaquete(): void {
     this.paqueteService.getPaqueteById(this.paqueteId).subscribe({
       next: (paquete: Paquetes) => {
+        this.paqueteOriginal = { ...paquete };
+
         this.formData = {
           nombrePaquete: paquete.nombre,
           descripcionPaquete: paquete.descripcion,
@@ -77,8 +80,6 @@ export class EditarComponent  implements OnInit {
         // this.existingImages = paquete.media_urls || [];
         this.existingImages = paquete.media_urls!.map((url) => `${this.mediaBaseUrl}${url}`);
 
-
-        console.log('Rows cargados:', this.rows);
         this.cargarProductosIniciales();
       },
       error: () => this.alertService.error('Error al cargar el paquete.'),
@@ -119,6 +120,16 @@ export class EditarComponent  implements OnInit {
 
   // Guarda el paquete editado
   onSavePaquete(event: any): void {
+    if (!this.validarFormulario()) {
+      this.alertService.error('Completa todos los campos obligatorios antes de guardar.');
+      return;
+    }
+
+    if (!this.verificarCambios()) {
+      this.alertService.warning('No se detectaron cambios para guardar.');
+      return;
+    }
+
     const paqueteActualizado = {
       nombre: event.nombrePaquete,
       descripcion: event.descripcionPaquete,
@@ -130,6 +141,7 @@ export class EditarComponent  implements OnInit {
       media: this.selectedImages,
     };
 
+    // Eliminar productos eliminados en el formulario
     const deleteRequests = this.productosEliminados.map((productoId) =>
       this.paqueteService.deleteProductoFromPaquete(this.paqueteId, productoId).toPromise()
     );
@@ -142,9 +154,8 @@ export class EditarComponent  implements OnInit {
         formData.append('descuento_general', String(paqueteActualizado.descuento_general));
         formData.append('detalles', JSON.stringify(paqueteActualizado.detalles));
 
-        if (paqueteActualizado.media) {
-          paqueteActualizado.media.forEach((file) => formData.append('media', file));
-        }
+        // Añadir nuevas imágenes al FormData
+        paqueteActualizado.media.forEach((file) => formData.append('media', file));
 
         return this.paqueteService.updatePaquete(formData, this.paqueteId).toPromise();
       })
@@ -158,6 +169,7 @@ export class EditarComponent  implements OnInit {
       });
   }
 
+
   // Cancelar edición y regresar a la vista general
   cancel(): void {
     this.router.navigate(['/admin/inventario/paquetes/general']);
@@ -167,5 +179,63 @@ export class EditarComponent  implements OnInit {
     this.selectedImages = images; // Guardar las nuevas imágenes seleccionadas
     this.imagenesModificadas = true; // Indicar que las imágenes han cambiado
   }
+
+  verificarCambios(): boolean {
+    if (!this.paqueteOriginal) {
+      console.warn('No se encontró un paquete original. Se asumen cambios.');
+      return true; // Si no hay paquete original, asume que hay cambios
+    }
+    // Comparar campos generales del formulario
+    const cambiosFormulario =
+      this.formData.nombrePaquete !== this.paqueteOriginal.nombre ||
+      this.formData.descripcionPaquete !== this.paqueteOriginal.descripcion ||
+      Number(this.formData.descuentoGeneral || 0) !== Number(this.paqueteOriginal.descuento_general || 0);
+
+    // Comparar productos (detalles)
+    const productosOriginales = this.paqueteOriginal.detalles_relacionados.map((detalle: any) => ({
+      producto_id: detalle.producto.id,
+      cantidad: detalle.cantidad,
+    }));
+    const productosActuales = this.rows.map((row) => ({
+      producto_id: row.producto_id,
+      cantidad: row.cantidad,
+    }));
+    const cambiosProductos = JSON.stringify(productosOriginales) !== JSON.stringify(productosActuales);
+
+    // Comparar imágenes
+    const imagenesOriginales = this.paqueteOriginal.media_urls.map(
+      (url: string) => `${this.mediaBaseUrl}${url}`
+    );
+    const cambiosImagenes =
+      JSON.stringify(imagenesOriginales) !== JSON.stringify(this.existingImages) ||
+      this.selectedImages.length > 0;
+
+    // Resultado final
+    const resultado = cambiosFormulario || cambiosProductos || cambiosImagenes;
+
+    console.log('Cambios en el formulario:', cambiosFormulario);
+    console.log('Cambios en los productos:', cambiosProductos);
+    console.log('Cambios en las imágenes:', cambiosImagenes);
+
+    return resultado;
+  }
+
+
+
+  validarFormulario(): boolean {
+    // Verificar que los campos generales no estén vacíos
+    if (!this.formData.nombrePaquete || !this.formData.descripcionPaquete) {
+      return false;
+    }
+
+    // Verificar que las filas de productos tengan categoría, producto y cantidad válidos
+    const filasValidas = this.rows.every(
+      (row) => row.categoria && row.producto_id && row.cantidad > 0
+    );
+
+    return filasValidas;
+  }
+
+
 
 }

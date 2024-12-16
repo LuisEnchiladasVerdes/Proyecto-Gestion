@@ -2,7 +2,7 @@ import {Component, Input, Output, EventEmitter, OnInit, ViewChild} from '@angula
 import { Categoria } from '../../../../models/categoria.models';
 import { Producto } from '../../../../models/producto.models';
 import { FormsModule} from "@angular/forms";
-import { NgForOf } from "@angular/common";
+import {NgClass, NgForOf, NgIf} from "@angular/common";
 import { ProductoService } from "../../../../services/producto.service";
 import { paquetePost} from "../../../../models/paquetes.models";
 import {ImageUploaderComponentComponent} from "../image-uploader-component/image-uploader-component.component";
@@ -14,7 +14,9 @@ import {ImageUploaderComponentComponent} from "../image-uploader-component/image
   imports: [
     FormsModule,
     NgForOf,
-    ImageUploaderComponentComponent
+    ImageUploaderComponentComponent,
+    NgClass,
+    NgIf
   ],
   styleUrls: ['./form-paquete.component.css']
 })

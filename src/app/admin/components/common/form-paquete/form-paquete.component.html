@@ -13,9 +13,11 @@
           [(ngModel)]="formData.nombrePaquete"
           name="nombrePaquete"
           class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+          [ngClass]="{'border-red-500': !formData.nombrePaquete}"
           placeholder="Ej: Paquete Diviértete"
           required
         />
+        <p *ngIf="!formData.nombrePaquete" class="text-red-500 text-xs mt-1">El nombre no puede estar vacío</p>
       </div>
 
       <!-- Descripción del paquete -->
@@ -27,9 +29,11 @@
           name="descripcionPaquete"
           rows="3"
           class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+          [ngClass]="{'border-red-500': !formData.descripcionPaquete}"
           placeholder="Descripción del paquete"
           required
         ></textarea>
+        <p *ngIf="!formData.descripcionPaquete" class="text-red-500 text-xs mt-1">La descripción no puede estar vacía</p>
       </div>
 
       <!-- Descuento General -->
@@ -83,14 +87,15 @@
                 name="categoria{{ i }}"
                 class="block w-full px-2 py-1 border border-gray-300 rounded-md shadow-sm"
                 (change)="filterItemsByCategory(i)"
+                [ngClass]="{'border-red-500': !row.categoria}"
                 required
-                [disabled]="isEditMode"
               >
                 <option value="" disabled selected hidden>Selecciona una categoría</option>
                 <option *ngFor="let categoria of categorias" [value]="categoria.id">
                   {{ categoria.nombre }}
                 </option>
               </select>
+              <p *ngIf="!row.categoria" class="text-red-500 text-xs mt-1">Selecciona una categoría</p>
             </td>
 
             <!-- Producto -->
@@ -99,14 +104,15 @@
                 [(ngModel)]="row.producto_id"
                 name="producto{{ i }}"
                 class="block w-full px-2 py-1 border border-gray-300 rounded-md shadow-sm"
+                [ngClass]="{'border-red-500': !row.producto_id}"
                 required
-                [disabled]="isEditMode"
               >
                 <option value="" disabled selected hidden>Selecciona un producto</option>
                 <option *ngFor="let producto of row.items" [value]="producto.id">
                   {{ producto.nombre }}
                 </option>
               </select>
+              <p *ngIf="!row.producto_id" class="text-red-500 text-xs mt-1">Selecciona un producto</p>
             </td>
 
             <!-- Acciones -->

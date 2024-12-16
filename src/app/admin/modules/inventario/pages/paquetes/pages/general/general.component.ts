@@ -56,7 +56,6 @@ export class GeneralComponent implements OnInit {
   onEdit(paqueteId: number): void {
     this.paquetesService.getPaqueteById(paqueteId).subscribe({
       next: (paquete: Paquetes) => {
-        console.log('Paquete completo seleccionado:', paquete);
       },
       error: () => this.alertService.error('Error al obtener el paquete seleccionado.'),
     });

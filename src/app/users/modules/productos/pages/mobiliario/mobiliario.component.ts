@@ -3,7 +3,7 @@ import {Producto} from "../../../../../models/producto.models";
 import {ProductoService} from "../../../../../services/producto.service";
 import {CategoriaService} from "../../../../../services/categoria.service";
 import {Categoria} from "../../../../../models/categoria.models";
-import {NgForOf} from "@angular/common";
+import {NgForOf, NgIf} from "@angular/common";
 import {FormsModule} from "@angular/forms";
 import {CartService} from "../../../../../services/cart.service";
 import {AlertService} from "../../../../../services/alert.service";
@@ -16,7 +16,8 @@ import {Paquetes} from "../../../../../models/paquetes.models";
   standalone: true,
   imports: [
     NgForOf,
-    FormsModule
+    FormsModule,
+    NgIf
   ],
   templateUrl: './mobiliario.component.html',
   styleUrl: './mobiliario.component.css'
@@ -31,6 +32,10 @@ export class MobiliarioComponent implements OnInit{
   paquetes: Paquetes[] = [];
 
   mediaBaseUrl: string = '';
+
+  showDetailsModal: boolean = false; // Controla la visibilidad del modal
+  selectedItem: any = null; // Almacena el producto/paquete seleccionado
+  selectedType: string = ''; // Indica si es producto o paquete
 
   constructor(private productoService : ProductoService, private categoriaService : CategoriaService,
               private cartService : CartService, private alertService: AlertService, private toastr: ToastrService,
@@ -130,6 +135,49 @@ export class MobiliarioComponent implements OnInit{
         this.toastr.error('Error al cargar al carrito', error);
       },
     });
+  }
+
+  openDetailsModal(item: any, type: string): void {
+    this.selectedItem = item; // Almacena el producto o paquete
+    this.selectedType = type; // Guarda si es producto o paquete
+    this.showDetailsModal = true; // Abre el modal
+
+    // Depuración de imágenes
+    if (type === 'producto' && this.selectedItem.media_relacionado?.length > 0) {
+      console.log('Imagen del producto encontrada:', this.mediaBaseUrl + this.selectedItem.media_relacionado[0]);
+    } else if (type === 'paquete' && this.selectedItem.media_urls?.length > 0) {
+      console.log('Imagen del paquete encontrada:', this.mediaBaseUrl + this.selectedItem.media_urls[0]);
+    } else {
+      console.warn('No se encontraron imágenes para este elemento.');
+    }
+  }
+
+
+  closeDetailsModal(): void {
+    this.showDetailsModal = false; // Cierra el modal
+    this.selectedItem = null; // Limpia la selección
+    this.selectedType = '';
+  }
+
+  addItemToCart(item: any, type: string): void {
+    const cantidad = 1;
+    if (type === 'producto') {
+      this.cartService.addToCart(item.id, cantidad).subscribe({
+        next: () => {
+          this.toastr.success('Producto agregado al carrito', 'Éxito');
+          this.cartService.notifyCartUpdated();
+        },
+        error: () => this.toastr.error('Error al agregar producto al carrito'),
+      });
+    } else if (type === 'paquete') {
+      this.cartService.addPaqueteToCart(item.id, cantidad).subscribe({
+        next: () => {
+          this.toastr.success('Paquete agregado al carrito', 'Éxito');
+          this.cartService.notifyCartUpdated();
+        },
+        error: () => this.toastr.error('Error al agregar paquete al carrito'),
+      });
+    }
   }
 
 }

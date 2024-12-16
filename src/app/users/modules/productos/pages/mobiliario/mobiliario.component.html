@@ -38,7 +38,18 @@
           <h3 class="text-lg font-bold mb-2">{{ producto.nombre }}</h3>
           <p class="text-sm mb-1">{{ producto.descripcion }}</p>
           <br>
-          <p class="text-sm">Categoría: {{ producto.categoria.nombre }}</p>
+          <p class="text-sm pb-2">Categoría: {{ producto.categoria.nombre }}</p>
+
+          <button
+            class="w-auto px-3 py-1 bg-gray-700 text-white rounded-md text-sm flex items-center gap-1 shadow-md hover:bg-gray-800 hover:shadow-lg transition-all duration-300"
+            (click)="openDetailsModal(producto, 'producto')"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M10 2a8 8 0 11-.001 16.001A8 8 0 0110 2zm0 14a6 6 0 100-12 6 6 0 000 12z" />
+              <path d="M10 5a5 5 0 00-4.546 2.916A5 5 0 0110 5zm0 10a5 5 0 004.546-2.916A5 5 0 0110 15z" />
+            </svg>
+            <span>Ver detalles</span>
+          </button>
         </div>
 
       </div>
@@ -96,6 +107,17 @@
           <p class="text-sm mb-1">{{ paquete.descripcion }}</p>
           <br>
           <p class="text-sm">Categoría: Paquete</p>
+
+          <button
+            class="w-auto px-3 py-1 bg-gray-700 text-white rounded-md text-sm flex items-center gap-1 shadow-md hover:bg-gray-800 hover:shadow-lg transition-all duration-300"
+            (click)="openDetailsModal(paquete, 'paquete')"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M10 2a8 8 0 11-.001 16.001A8 8 0 0110 2zm0 14a6 6 0 100-12 6 6 0 000 12z" />
+              <path d="M10 5a5 5 0 00-4.546 2.916A5 5 0 0110 5zm0 10a5 5 0 004.546-2.916A5 5 0 0110 15z" />
+            </svg>
+            <span>Ver detalles</span>
+          </button>
         </div>
 
       </div>
@@ -135,5 +157,58 @@
 
     </div>
 
+  </div>
+</div>
+
+
+
+<!-- Modal -->
+<div *ngIf="showDetailsModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+  <div class="bg-white rounded-lg shadow-lg w-full max-w-3xl p-6 relative">
+    <!-- Botón para cerrar el modal -->
+    <button
+      (click)="closeDetailsModal()"
+      class="absolute top-2 right-2 bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center"
+    >
+      &times;
+    </button>
+
+    <!-- Contenido del Modal -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <!-- Imágenes -->
+      <div *ngIf="selectedType === 'producto'">
+        <img
+          *ngFor="let img of selectedItem.media_relacionado; let i = index"
+          [src]="mediaBaseUrl + img"
+          alt="Imagen del producto"
+          class="w-full rounded-lg mb-2"
+        />
+      </div>
+
+      <div *ngIf="selectedType === 'paquete'">
+        <img
+          *ngFor="let img of selectedItem.media_urls; let i = index"
+          [src]="mediaBaseUrl + img"
+          alt="Imagen del paquete"
+          class="w-full rounded-lg mb-2"
+        />
+      </div>
+
+      <!-- Detalles del Producto/Paquete -->
+      <div>
+        <h2 class="text-2xl font-bold mb-2">{{ selectedItem.nombre }}</h2>
+        <p class="text-gray-600 mb-4">{{ selectedItem.descripcion }}</p>
+        <p class="text-sm text-gray-800"><strong>Categoría:</strong> {{ selectedItem.categoria?.nombre || 'Paquete' }}</p>
+        <p class="text-lg font-bold text-gray-900 mt-2">Precio: ${{ selectedItem.precio_actual || selectedItem.precio_final }}</p>
+
+        <!-- Botón Agregar al Carrito -->
+        <button
+          class="mt-6 bg-teal-600 hover:bg-teal-700 text-white py-2 px-4 rounded-md font-medium w-full"
+          (click)="addItemToCart(selectedItem, selectedType)"
+        >
+          Agregar al carrito
+        </button>
+      </div>
+    </div>
   </div>
 </div>

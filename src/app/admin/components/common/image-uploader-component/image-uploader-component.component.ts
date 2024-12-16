@@ -15,8 +15,9 @@ export class ImageUploaderComponentComponent {
   @Input() maxFiles: number = 10; // Máximo número de archivos permitidos
   @Output() imagesChanged = new EventEmitter<File[]>(); // Emite los archivos seleccionados
   @Output() error = new EventEmitter<string>(); // Emite mensajes de error
+  @Input() imageUrls: string[] = []; // URLs de imágenes precargadas
 
-  imageUrls: string[] = []; // URLs de vista previa
+  // imageUrls: string[] = []; // URLs de vista previa
   selectedImages: File[] = []; // Archivos seleccionados
   isDragging = false; // Controla el estilo de arrastre
 
@@ -85,6 +86,7 @@ export class ImageUploaderComponentComponent {
   resetUploader(): void {
     this.imageUrls = [];
     this.selectedImages = [];
+    this.imagesChanged.emit(this.selectedImages);
     console.log('Uploader reseteado');
   }
 }

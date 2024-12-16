@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import {Component, ViewChild} from '@angular/core';
 import { Router } from '@angular/router';
 import {PaquetesService} from "../../../../../../../services/paquetes.service";
 import {AlertService} from "../../../../../../../services/alert.service";
@@ -16,6 +16,8 @@ import {CategoriaService} from "../../../../../../../services/categoria.service"
   styleUrls: ['./agregar.component.css']
 })
 export class AgregarComponent {
+  @ViewChild(FormPaqueteComponent) formPaquete!: FormPaqueteComponent;
+
   formData: {
     nombrePaquete: string;
     descripcionPaquete: string;
@@ -34,27 +36,23 @@ export class AgregarComponent {
   }> = []; // Filas de productos inicializadas.
 
   categorias: any[] = []; // Lista de categorías para el formulario.
-  mediaFiles: File[] = []; // Almacena los archivos multimedia opcionales.
+  mediaFiles: File[] = []; // Archivos multimedia seleccionados.
 
   constructor(
     private paqueteService: PaquetesService,
     private alertService: AlertService,
     private router: Router,
-    private categoriaService : CategoriaService
+    private categoriaService: CategoriaService
   ) {
-    this.agregarFila(); // Inicia con una fila por defecto.
-    this.cargarCategorias(); // Cargar categorías al inicio.
+    this.agregarFila();
+    this.cargarCategorias();
   }
 
   // Cargar las categorías desde el servicio
   cargarCategorias(): void {
     this.categoriaService.getCategorias().subscribe(
-      (data: Categoria[]) => {
-        this.categorias = data;
-      },
-      (error) => {
-        this.alertService.modalConIconoError('Error al cargar las categorias.');
-      }
+      (data: Categoria[]) => (this.categorias = data),
+      () => this.alertService.modalConIconoError('Error al cargar las categorías.')
     );
   }
 
@@ -73,9 +71,10 @@ export class AgregarComponent {
     this.rows.splice(index, 1);
   }
 
-  // Manejar archivos multimedia seleccionados
-  onFileSelected(event: any): void {
-    this.mediaFiles = Array.from(event.target.files);
+  // Actualizar archivos multimedia seleccionados desde form-paquete
+  onImagesChanged(images: File[]): void {
+    this.mediaFiles = images;
+    console.log('Imágenes recibidas:', this.mediaFiles);
   }
 
   // Enviar datos al backend
@@ -88,6 +87,7 @@ export class AgregarComponent {
     const formData = new FormData();
     formData.append('nombre', event.nombrePaquete);
     formData.append('descripcion', event.descripcionPaquete);
+
     if (event.descuentoGeneral !== null) {
       formData.append('descuento_general', event.descuentoGeneral.toString());
     }
@@ -98,13 +98,15 @@ export class AgregarComponent {
     }));
     formData.append('detalles', JSON.stringify(detalles));
 
-    this.mediaFiles.forEach((file) => formData.append('media', file));
+    // Agregar imágenes seleccionadas
+    if (this.mediaFiles.length > 0) {
+      this.mediaFiles.forEach((file) => formData.append('media', file));
+    }
 
+    // Enviar la solicitud al backend
     this.paqueteService.addPaquete(formData).subscribe({
       next: () => {
         this.alertService.success('Paquete creado exitosamente.');
-
-        // Limpia el formulario y las filas sin redireccionar
         this.limpiarFormulario();
       },
       error: () => this.alertService.error('Error al crear el paquete.')
@@ -112,20 +114,18 @@ export class AgregarComponent {
   }
 
   limpiarFormulario(): void {
-    // Reinicia el objeto formData a su estado inicial
     this.formData = {
       nombrePaquete: '',
       descripcionPaquete: '',
       descuentoGeneral: null
     };
 
-    // Reinicia las filas a un arreglo vacío o una fila por defecto
-    this.rows = [
-      { cantidad: 1, categoria: '', producto_id: null, items: [] }
-    ];
-
-    // Reinicia la lista de archivos multimedia
+    this.rows = [{ cantidad: 1, categoria: '', producto_id: null, items: [] }];
     this.mediaFiles = [];
+
+    // this.resetImageUploader();
+
+    this.formPaquete.resetImages();
   }
 
   // Cancelar acción

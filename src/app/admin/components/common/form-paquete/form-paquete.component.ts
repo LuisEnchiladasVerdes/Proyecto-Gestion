@@ -1,10 +1,11 @@
-import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
+import {Component, Input, Output, EventEmitter, OnInit, ViewChild} from '@angular/core';
 import { Categoria } from '../../../../models/categoria.models';
 import { Producto } from '../../../../models/producto.models';
 import { FormsModule} from "@angular/forms";
 import { NgForOf } from "@angular/common";
 import { ProductoService } from "../../../../services/producto.service";
 import { paquetePost} from "../../../../models/paquetes.models";
+import {ImageUploaderComponentComponent} from "../image-uploader-component/image-uploader-component.component";
 
 @Component({
   selector: 'app-form-paquete',
@@ -12,79 +13,12 @@ import { paquetePost} from "../../../../models/paquetes.models";
   standalone: true,
   imports: [
     FormsModule,
-    NgForOf
+    NgForOf,
+    ImageUploaderComponentComponent
   ],
   styleUrls: ['./form-paquete.component.css']
 })
 export class FormPaqueteComponent implements OnInit {
-  // @Input() isEditMode = false;
-  // @Input() formData: { nombrePaquete: string; descripcionPaquete: string; descuentoGeneral: number | null } = {
-  //   nombrePaquete: '',
-  //   descripcionPaquete: '',
-  //   descuentoGeneral: null
-  // };
-  // @Input() rows: Array<{
-  //   cantidad: number;
-  //   categoria: string;
-  //   producto: number | null;
-  //   descuento?: number | null;
-  //   items: Producto[];
-  // }> = [];
-  // @Input() categorias: Categoria[] = [];
-  //
-  // @Output() savePaquete = new EventEmitter<any>();
-  // @Output() cancelPaquete = new EventEmitter<void>();
-  //
-  // constructor(private productoService: ProductoService) {}
-  //
-  // ngOnInit(): void {
-  //   // Agrega una fila inicial si no existen filas
-  //   if (!this.rows.length) {
-  //     this.agregarFila();
-  //   }
-  // }
-  //
-  // agregarFila(): void {
-  //   this.rows.push({ cantidad: 1, categoria: '', producto: null, descuento: null, items: [] });
-  // }
-  //
-  // eliminarFila(index: number): void {
-  //   this.rows.splice(index, 1);
-  // }
-  //
-  // // Filtra productos al seleccionar una categoría
-  // filterItemsByCategory(index: number): void {
-  //   const categoriaId = parseInt(this.rows[index].categoria, 10);
-  //
-  //   if (!categoriaId) {
-  //     this.rows[index].items = []; // Si no hay categoría válida, limpia los productos
-  //     return;
-  //   }
-  //
-  //   this.productoService.getProductosPorCategoria(categoriaId).subscribe({
-  //     next: (productos) => (this.rows[index].items = productos),
-  //     error: () => {
-  //       console.error('Error al cargar los productos por categoría');
-  //       this.rows[index].items = [];
-  //     }
-  //   });
-  // }
-  //
-  // onSubmit(): void {
-  //   const formOutput = {
-  //     nombrePaquete: this.formData.nombrePaquete,
-  //     descripcionPaquete: this.formData.descripcionPaquete,
-  //     descuentoGeneral: this.formData.descuentoGeneral ?? null,
-  //     rows: this.rows
-  //   };
-  //
-  //   this.savePaquete.emit(formOutput);
-  // }
-  //
-  // cancel(): void {
-  //   this.cancelPaquete.emit();
-  // }
-
   @Input() isEditMode = false;
   @Input() formData = {
     nombrePaquete: '',
@@ -97,6 +31,15 @@ export class FormPaqueteComponent implements OnInit {
 
   @Output() savePaquete = new EventEmitter<any>();
   @Output() cancelPaquete = new EventEmitter<void>();
+
+  @Output() imagesChanged = new EventEmitter<File[]>(); // Crear el @Output()
+
+  @ViewChild(ImageUploaderComponentComponent)
+  imageUploaderComponent!: ImageUploaderComponentComponent;
+
+  imageUrls: string[] = []; // URLs de imágenes precargadas
+  selectedImages: File[] = []; // Archivos seleccionados
+
 
   constructor(private productoService: ProductoService) {}
 
@@ -141,5 +84,21 @@ export class FormPaqueteComponent implements OnInit {
 
   cancel(): void {
     this.cancelPaquete.emit();
+  }
+
+  onImagesChanged(images: File[]): void {
+    this.imagesChanged.emit(images);
+    this.selectedImages = images; // Actualiza las imágenes seleccionadas
+    console.log('Imágenes seleccionadas:', this.selectedImages);
+  }
+
+  onImageError(message: string): void {
+    console.error('Error de subida:', message);
+  }
+
+  resetImages(): void {
+    if (this.imageUploaderComponent) {
+      this.imageUploaderComponent.resetUploader();
+    }
   }
 }

@@ -18,16 +18,16 @@
 <!--  </div>-->
 
 <!--  &lt;!&ndash; Dropdown &ndash;&gt;-->
-<!--  <div *ngIf="isOpen" class="absolute right-0 mt-2 w-96 bg-white rounded-lg shadow-xl z-50">-->
+<!--  <div *ngIf="isOpen" class="absolute right-0 mt-2 w-80 max-w-[calc(100vw-2rem)] bg-white rounded-lg shadow-xl z-50 overflow-hidden">-->
 <!--    <div class="p-4">-->
 <!--      <h3 class="text-lg font-semibold mb-3">Mi Carrito</h3>-->
 
 <!--      &lt;!&ndash; Lista de productos &ndash;&gt;-->
 <!--      <div class="max-h-48 overflow-y-auto">-->
-<!--        <div *ngFor="let product of products" class="flex items-center gap-4 border-b pb-4 pt-4">-->
+<!--        <div *ngFor="let product of products" class="flex items-center gap-2 border-b pb-4 pt-4">-->
 <!--          &lt;!&ndash; Botón de eliminar &ndash;&gt;-->
-<!--          <button class="text-red-500 hover:text-red-700 p-1" (click)="removeItem(product.producto.id ?? 0); $event.stopPropagation()">-->
-<!--            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-8">-->
+<!--          <button class="text-red-500 hover:text-red-700 p-1 flex-shrink-0" (click)="removeItem(product.producto.id ?? 0); $event.stopPropagation()">-->
+<!--            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">-->
 <!--              <rect x="5" y="7" width="14" height="13" rx="2" ry="2" stroke="currentColor" />-->
 <!--              <path d="M3 7h18M8 7V5a2 2 0 012-2h4a2 2 0 012 2v2" />-->
 <!--              <path d="M10 11v6M14 11v6" />-->
@@ -37,25 +37,25 @@
 <!--          &lt;!&ndash; Imagen del producto &ndash;&gt;-->
 <!--          <img [src]="mediaBaseUrl + product.producto.media_relacionado[0]"-->
 <!--               [alt]="product.producto.nombre"-->
-<!--               class="w-16 h-16 object-cover rounded-lg"-->
+<!--               class="w-12 h-12 object-cover rounded-lg flex-shrink-0"-->
 <!--          >-->
 
 <!--          &lt;!&ndash; Información del producto &ndash;&gt;-->
-<!--          <div class="flex-1">-->
+<!--          <div class="flex-1 min-w-0 mr-2">-->
 <!--            <h4 class="text-sm font-medium text-gray-800 truncate mb-1">{{ product.producto.nombre }}</h4>-->
-<!--            <div class="text-sm text-gray-500 mb-2">Cantidad: {{ product.cantidad }}</div>-->
+<!--            <div class="text-xs text-gray-500 mb-1">Cantidad: {{ product.cantidad }}</div>-->
 <!--            <div class="text-sm font-semibold">Subtotal: ${{ product.total }}</div>-->
 <!--          </div>-->
 
 <!--          &lt;!&ndash; Botones de + y - &ndash;&gt;-->
-<!--          <div class="flex items-center gap-2">-->
+<!--          <div class="flex items-center gap-1 flex-shrink-0">-->
 <!--            <button class="text-gray-500 hover:text-gray-700 p-1" (click)="decrementQuantity(product.producto.id ?? 0)">-->
-<!--              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">-->
+<!--              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">-->
 <!--                <path stroke-linecap="round" stroke-linejoin="round" d="M18 12H6" />-->
 <!--              </svg>-->
 <!--            </button>-->
 <!--            <button class="text-gray-500 hover:text-gray-700 p-1" (click)="incrementQuantity(product.producto.id ?? 0)">-->
-<!--              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">-->
+<!--              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">-->
 <!--                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m6-6H6" />-->
 <!--              </svg>-->
 <!--            </button>-->
@@ -68,91 +68,114 @@
 <!--        Total: ${{ total }}-->
 <!--      </div>-->
 
-<!--      &lt;!&ndash; Botón para ver carrito &ndash;&gt;-->
+<!--      &lt;!&ndash; Botón para ver carrito  routerLink="/carrito/revisar"&ndash;&gt;-->
 <!--      <div class="mt-3">-->
-<!--        <button (click)="navigateToCart()" routerLink="/carrito/revisar" class="block w-full bg-blue-600 text-white text-center py-2 px-4 rounded-lg hover:bg-blue-700 transition duration-200">-->
+<!--        <button (click)="navigateToCart()"  class="block w-full bg-blue-600 text-white text-center py-2 px-4 rounded-lg hover:bg-blue-700 transition duration-200">-->
 <!--          Ver Carrito-->
 <!--        </button>-->
 <!--      </div>-->
 <!--    </div>-->
 <!--  </div>-->
 <!--</div>-->
+
+
+
+
+
 <div class="relative">
   <!-- Botón del carrito -->
-  <div class="text-white relative cursor-pointer"
-       [class.cursor-not-allowed]="products.length === 0"
-       [class.cursor-pointer]="products.length > 0"
-       (click)="products.length > 0 && toggleDropdown($event)">
+  <div
+    class="text-white relative cursor-pointer"
+    [class.cursor-not-allowed]="cartIsEmpty"
+    [class.cursor-pointer]="!cartIsEmpty"
+    (click)="!cartIsEmpty && toggleDropdown($event)"
+  >
     <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2" class="w-6 h-6" viewBox="0 0 24 24">
       <circle cx="9" cy="21" r="1"></circle>
       <circle cx="20" cy="21" r="1"></circle>
       <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
     </svg>
 
-    <!-- Mostrar solo si hay productos -->
-    <span *ngIf="products.length > 0"
+    <!-- Mostrar si hay productos en el carrito -->
+    <span *ngIf="!cartIsEmpty"
           class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full text-xs w-5 h-5 flex items-center justify-center">
-      {{ products.length }}
+      {{ totalItems }}
     </span>
   </div>
 
   <!-- Dropdown -->
-  <div *ngIf="isOpen" class="absolute right-0 mt-2 w-80 max-w-[calc(100vw-2rem)] bg-white rounded-lg shadow-xl z-50 overflow-hidden">
+  <div *ngIf="isOpen" class="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-xl z-50 overflow-hidden">
     <div class="p-4">
       <h3 class="text-lg font-semibold mb-3">Mi Carrito</h3>
 
-      <!-- Lista de productos -->
       <div class="max-h-48 overflow-y-auto">
-        <div *ngFor="let product of products" class="flex items-center gap-2 border-b pb-4 pt-4">
-          <!-- Botón de eliminar -->
-          <button class="text-red-500 hover:text-red-700 p-1 flex-shrink-0" (click)="removeItem(product.producto.id ?? 0); $event.stopPropagation()">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
-              <rect x="5" y="7" width="14" height="13" rx="2" ry="2" stroke="currentColor" />
-              <path d="M3 7h18M8 7V5a2 2 0 012-2h4a2 2 0 012 2v2" />
-              <path d="M10 11v6M14 11v6" />
-            </svg>
-          </button>
 
-          <!-- Imagen del producto -->
-          <img [src]="mediaBaseUrl + product.producto.media_relacionado[0]"
-               [alt]="product.producto.nombre"
-               class="w-12 h-12 object-cover rounded-lg flex-shrink-0"
-          >
+        <!-- Encabezado de Productos -->
+        <div *ngIf="products && products.length > 0">
+          <h4 class="text-sm font-bold text-gray-700 mb-2">Productos</h4>
+          <div *ngFor="let product of products" class="flex items-center gap-2 border-b pb-3">
+<!--            <button class="text-red-500 hover:text-red-700" (click)="removeItem(product.producto?.id || 0)">-->
+<!--              &#x2715;-->
+<!--            </button>-->
+            <!-- Botón de eliminar -->
+            <button class="text-red-500 hover:text-red-700 p-1 flex-shrink-0" (click)="removeItem(product.producto?.id || 0); $event.stopPropagation()">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                <rect x="5" y="7" width="14" height="13" rx="2" ry="2" stroke="currentColor" />
+                <path d="M3 7h18M8 7V5a2 2 0 012-2h4a2 2 0 012 2v2" />
+                <path d="M10 11v6M14 11v6" />
+              </svg>
+            </button>
+            <img
+              [src]="mediaBaseUrl + (product.producto?.media_relacionado?.[0] || '')"
+              class="w-12 h-12 rounded-lg object-cover"
+            />
 
-          <!-- Información del producto -->
-          <div class="flex-1 min-w-0 mr-2">
-            <h4 class="text-sm font-medium text-gray-800 truncate mb-1">{{ product.producto.nombre }}</h4>
-            <div class="text-xs text-gray-500 mb-1">Cantidad: {{ product.cantidad }}</div>
-            <div class="text-sm font-semibold">Subtotal: ${{ product.total }}</div>
+            <div class="flex-1">
+              <div class="text-sm font-medium">{{ product.producto?.nombre || 'Producto sin nombre' }}</div>
+              <div class="text-xs text-gray-500">Cantidad: {{ product.cantidad }}</div>
+              <div class="text-sm font-semibold">Subtotal: ${{ product.total }}</div>
+            </div>
+            <div class="flex items-center gap-1">
+              <button class="p-1 text-gray-500 hover:text-gray-700" (click)="decrementQuantity(product.producto?.id || 0)">-</button>
+              <button class="p-1 text-gray-500 hover:text-gray-700" (click)="incrementQuantity(product.producto?.id || 0)">+</button>
+            </div>
           </div>
+        </div>
 
-          <!-- Botones de + y - -->
-          <div class="flex items-center gap-1 flex-shrink-0">
-            <button class="text-gray-500 hover:text-gray-700 p-1" (click)="decrementQuantity(product.producto.id ?? 0)">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M18 12H6" />
+        <!-- Encabezado de Paquetes -->
+        <div *ngIf="paquetes && paquetes.length > 0" class="mt-4">
+          <h4 class="text-sm font-bold text-gray-700 mb-2">Paquetes</h4>
+          <div *ngFor="let paquete of paquetes" class="flex items-center gap-2 border-b pb-3">
+<!--            <button class="text-red-500 hover:text-red-700" (click)="removePaquete(paquete.id || 0)">-->
+<!--              &#x2715;-->
+<!--            </button>-->
+            <!-- Botón de eliminar -->
+            <button class="text-red-500 hover:text-red-700 p-1 flex-shrink-0" (click)="removePaquete(paquete.id || 0); $event.stopPropagation()">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                <rect x="5" y="7" width="14" height="13" rx="2" ry="2" stroke="currentColor" />
+                <path d="M3 7h18M8 7V5a2 2 0 012-2h4a2 2 0 012 2v2" />
+                <path d="M10 11v6M14 11v6" />
               </svg>
             </button>
-            <button class="text-gray-500 hover:text-gray-700 p-1" (click)="incrementQuantity(product.producto.id ?? 0)">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m6-6H6" />
-              </svg>
-            </button>
+            <img [src]="mediaBaseUrl + (paquete.productos?.[0]?.producto?.media_relacionado?.[0] || '')" class="w-12 h-12 rounded-lg object-cover" />
+            <div class="flex-1">
+              <div class="text-sm font-medium">{{ paquete.nombre || 'Paquete sin nombre' }}</div>
+              <div class="text-xs text-gray-500">Cantidad: 1</div>
+              <div class="text-sm font-semibold">Total: ${{ paquete.precio_final }}</div>
+            </div>
+            <div class="flex items-center gap-1">
+              <button class="p-1 text-gray-500 hover:text-gray-700" (click)="decrementQuantity(paquete.id || 0)">-</button>
+              <button class="p-1 text-gray-500 hover:text-gray-700" (click)="incrementarPaquete(paquete.id || 0)">+</button>
+            </div>
           </div>
         </div>
       </div>
 
       <!-- Total -->
-      <div class="mt-3 text-right font-bold">
-        Total: ${{ total }}
-      </div>
-
-      <!-- Botón para ver carrito  routerLink="/carrito/revisar"-->
-      <div class="mt-3">
-        <button (click)="navigateToCart()"  class="block w-full bg-blue-600 text-white text-center py-2 px-4 rounded-lg hover:bg-blue-700 transition duration-200">
-          Ver Carrito
-        </button>
-      </div>
+      <div class="mt-4 text-right font-bold">Total: ${{ total }}</div>
+      <button class="mt-3 w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700" (click)="navigateToCart()">
+        Ver Carrito
+      </button>
     </div>
   </div>
 </div>

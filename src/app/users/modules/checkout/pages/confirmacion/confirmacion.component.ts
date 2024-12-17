@@ -75,12 +75,6 @@ export class ConfirmacionComponent implements OnInit, ComponentCanDeactivate {
   ngOnInit(): void {
     this.loadCart(); // Carga los productos del carrito al iniciar
 
-    const fecha = this.sharedDataService.getFechaSeleccionada();
-    const hora = this.sharedDataService.getHoraSeleccionada();
-
-    console.log('Fecha seleccionada:', fecha);
-    console.log('Hora seleccionada:', hora);
-
     this.fechaSeleccionada = this.sharedDataService.getFechaSeleccionada() ?? '';
     this.horaSeleccionada = this.sharedDataService.getHoraSeleccionada()  ?? '';
   }
@@ -218,7 +212,6 @@ export class ConfirmacionComponent implements OnInit, ComponentCanDeactivate {
       id: 1
     };
 
-
     // Construir el objeto de reserva desde el formulario
     const reserva: Reserva = {
       cliente: {
@@ -235,26 +228,34 @@ export class ConfirmacionComponent implements OnInit, ComponentCanDeactivate {
         estado: 'Ciudad de México',
         codigo_postal: this.formulario.get('codigo_postal')?.value
       },
-      metodo_pago: metodoPago,
+      metodo_pago: metodoPago, // Para tu lógica local
       fecha_entrega: this.fechaSeleccionada,
       hora_entrega: this.horaSeleccionada,
       verification_token: this.verificationToken!
     };
-    console.log(reserva);
 
-    this.alertService.loading('Procesando pago ...')
+    // Preparar el objeto para envío (solo el ID de metodo_pago)
+    const reservaParaEnvio = {
+      ...reserva,
+      metodo_pago: metodoPago.id // Extraemos solo el ID para el servidor
+    };
 
-    this.cartService.crearReserva(reserva).subscribe({
+    this.alertService.loading('Procesando pago ...');
+
+    // Enviar reserva corregida al servidor
+    this.cartService.crearReserva({
+      ...reserva,
+      metodo_pago: metodoPago.id // Sobrescribimos solo para el envío
+    } as unknown as Reserva).subscribe({
       next: (response) => {
-        console.log('Reserva creada exitosamente:', response);
         this.alertService.success('¡Reserva creada exitosamente!');
         this.finalizeOrder();
       },
       error: (error) => {
-        console.error('Error al crear la reserva:', error);
         this.alertService.error('No se pudo crear la reserva. Intenta nuevamente.');
       }
     });
+
   }
 
   permitirSoloNumeros(event: KeyboardEvent): void {

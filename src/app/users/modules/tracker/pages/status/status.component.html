@@ -1,69 +1,165 @@
 <div class="h-[calc(100vh-140px)]">
-  <div class="bg-color2 p-[85px] px-10 pb-12">
-    <h2 class="text-center mb-4">ESTADO DE RESERVA</h2>
+  <div class="bg-color2 p-[85px] px-10 pb-12 py-12">
+    <h2 class="text-center mb-6 font-bold text-2xl">ESTADO DE RESERVA</h2>
 
-    <div class="mx-auto max-w-[600px] bg-gray-100 rounded-lg shadow-lg">
+
+
+
+    <div class="mx-auto max-w-[700px] bg-gray-100 rounded-lg shadow-lg">
       <div class="p-6">
-        <!-- Información de la reserva -->
-        <div class="mb-4">
-          <div class="flex mb-2">
-            <div class="w-1/2">
-              <span class="text-gray-600">Código de Reserva:</span>
-            </div>
-            <div class="w-1/2 text-right">
-              <span class="font-semibold">#RS12345</span>
-            </div>
+        <!-- Código de Reserva -->
+        <div class="mb-6">
+          <div class="flex justify-between items-center">
+            <span class="text-gray-600">Código de Reserva:</span>
+            <span class="font-semibold text-lg text-indigo-600">#{{ reserva.codigo_pedido }}</span>
           </div>
-          <div class="flex mb-2">
-            <div class="w-1/2">
-              <span class="text-gray-600">Fecha:</span>
-            </div>
-            <div class="w-1/2 text-right">
-              <span class="font-semibold">27 de Octubre, 2024</span>
-            </div>
+          <div class="flex justify-between items-center">
+            <span class="text-gray-600">Fecha de Creación:</span>
+            <span class="font-semibold">{{ reserva.fecha_reserva | date: 'medium' }}</span>
           </div>
-          <div class="flex mb-2">
-            <div class="w-1/2">
-              <span class="text-gray-600">Hora:</span>
-            </div>
-            <div class="w-1/2 text-right">
-              <span class="font-semibold">15:30</span>
+          <div class="flex justify-between items-center">
+            <span class="text-gray-600">Estado General:</span>
+            <span class="py-1 px-3 rounded-full text-sm font-medium"
+                  [ngClass]="{
+                    'bg-green-100 text-green-600': reserva.estado === 'CONFIRMADA',
+                    'bg-yellow-100 text-yellow-600': reserva.estado === 'PENDIENTE',
+                    'bg-red-100 text-red-600': reserva.estado === 'CANCELADA'
+                  }">
+              {{ reserva.estado }}
+            </span>
+          </div>
+
+          <div class="flex justify-between items-center mt-4">
+            <span class="text-gray-600">Estado de Solicitud:</span>
+            <span class="py-1 px-3 rounded-full text-sm font-medium"
+                  [ngClass]="{
+                'bg-gray-200 text-gray-600': reserva.estado_solicitud === 'SIN_SOLICITUD',
+                'bg-blue-100 text-blue-600': reserva.estado_solicitud === 'PENDIENTE',
+                'bg-red-100 text-red-600': reserva.estado_solicitud === 'CANCELAR'
+              }">
+              {{ reserva.estado_solicitud }}
+            </span>
+          </div>
+
+
+
+
+        </div>
+
+        <!-- Información del Cliente -->
+        <div class="mb-6">
+          <h3 class="font-bold text-lg mb-2">Información del Cliente</h3>
+          <p class="text-gray-700"><strong>Nombre:</strong> {{ reserva.cliente.nombre }}</p>
+          <p class="text-gray-700"><strong>Teléfono:</strong> {{ reserva.cliente.telefono }}</p>
+          <p class="text-gray-700"><strong>Correo:</strong> {{ reserva.cliente.correo }}</p>
+        </div>
+
+        <!-- Dirección de Entrega -->
+        <div class="mb-6">
+          <h3 class="font-bold text-lg mb-2">Dirección de Entrega</h3>
+          <p class="text-gray-700">
+            {{ reserva.direccion.nombre_direccion }}, {{ reserva.direccion.calle }} #{{ reserva.direccion.numero_casa }},
+            {{ reserva.direccion.colonia }}, {{ reserva.direccion.estado }}, CP: {{ reserva.direccion.codigo_postal }}
+          </p>
+        </div>
+
+        <!-- Lista de Productos -->
+        <div class="mb-6">
+          <h3 class="font-bold text-lg mb-2">Detalles de la Reserva</h3>
+          <div *ngFor="let detalle of reserva.detalles" class="mb-4 border-b pb-2 last:border-none last:pb-0">
+            <div class="flex items-center">
+              <!-- Imagen del producto -->
+              <div class="w-16 h-16 mr-4">
+                <img *ngIf="detalle.producto.media_relacionado.length > 0"
+                     [src]="BASE_URL + detalle.producto.media_relacionado[0]"
+                     alt="{{ detalle.producto.nombre }}"
+                     class="w-full h-full object-cover rounded-md">
+
+              </div>
+              <!-- Detalles del producto -->
+              <div class="flex-1">
+                <p class="text-gray-800 font-semibold">{{ detalle.producto.nombre }}</p>
+                <p class="text-sm text-gray-500">
+                  <span>Cantidad:</span> {{ detalle.cantidad }}
+                </p>
+                <p class="text-sm text-gray-500">
+                  <span>Precio Unitario:</span> ${{ detalle.precio_unitario }}
+                </p>
+              </div>
+              <!-- Subtotal -->
+              <div class="text-right">
+                <p class="text-gray-800 font-semibold">${{ detalle.precio_total }}</p>
+              </div>
             </div>
           </div>
         </div>
 
-        <!-- Estado actual -->
-        <div class="flex items-center mb-4 pb-3 border-b border-gray-300">
-          <span class="text-gray-600 mr-3">Estado actual:</span>
-          <span class="bg-blue-100 text-blue-600 py-1 px-2 rounded-full text-sm font-medium">Confirmada</span>
+        <!-- Total de la Reserva -->
+        <div class="mb-6">
+          <h3 class="font-bold text-lg mb-2">Resumen de Pago</h3>
+          <div class="flex justify-between items-center">
+            <span class="text-gray-600">Método de Pago:</span>
+            <span class="font-semibold">{{ reserva.metodo_pago.nombre_metodo }}</span>
+          </div>
+          <div class="flex justify-between items-center mt-2">
+            <span class="text-gray-600">Total:</span>
+            <span class="font-bold text-xl text-indigo-600">${{ reserva.total }}</span>
+          </div>
         </div>
 
-        <!-- Línea de tiempo -->
-        <div class="relative pt-4">
-          <div class="flex justify-center">
-            <div class="w-1/3">
-              <div class="relative z-10">
-                <div class="w-8 h-8 bg-gray-300 rounded-full mx-auto"></div>
-                <p class="mt-2 mb-0 text-center font-medium">Solicitud Recibida</p>
-              </div>
+        <!-- Notas -->
+        <div *ngIf="reserva.estado_solicitud !== 'PENDIENTE'" class="mt-6">
+          <p class="text-sm text-gray-500">Estado de solicitud: {{ reserva.estado_solicitud }}</p>
+
+
+
+          <!-- Contenedor del slider -->
+          <div *ngIf="reserva.estado === 'CONFIRMADA' && reserva.estado_solicitud === 'SIN_SOLICITUD'"
+               class="slider-container relative mx-auto mt-6" [style.backgroundColor]="sliderBackgroundColor">
+
+            <!-- Flechas animadas -->
+            <div
+              class="arrow-container move-ahead"
+              [ngStyle]="{'--arrow-offset': arrowOffsetStyle}"
+            >
+              <i class="fas fa-chevron-right animate-arrow"></i>
+              <i class="fas fa-chevron-right animate-arrow delay"></i>
+              <i class="fas fa-chevron-right animate-arrow delay-2"></i>
             </div>
-            <div class="w-1/3">
-              <div class="relative z-10">
-                <div class="w-8 h-8 bg-gray-300 rounded-full mx-auto"></div>
-                <p class="mt-2 mb-0 text-center font-medium">Confirmada</p>
-              </div>
-            </div>
-            <div class="w-1/3">
-              <div class="relative z-10">
-                <div class="w-8 h-8 bg-gray-300 rounded-full mx-auto"></div>
-                <p class="mt-2 mb-0 text-center font-medium">Finalizada</p>
-              </div>
+
+            <!-- Texto que se mueve inversamente -->
+            <span
+              class="slider-placeholder absolute"
+              [style.right]="textPosition"
+              [style.opacity]="textOpacity"
+            >
+            Desliza para cancelar
+          </span>
+
+            <!-- Botón deslizante -->
+            <div
+              class="slider-thumb"
+              (mousedown)="onMouseDown($event)"
+              (touchstart)="onTouchStart($event)"
+              [style.transform]="thumbPosition"
+            >
+              <i class="fas fa-hand-pointer"></i>
             </div>
           </div>
-          <div class="absolute left-12 right-12 top-8 h-1 bg-gray-300"></div>
+
+
+          <!-- Mensaje de éxito o error -->
+          <p *ngIf="mensaje" class="mt-4 text-center font-semibold text-red-600">{{ mensaje }}</p>
+
+          <!-- Mensaje si no se puede cancelar -->
+          <div *ngIf="reserva.estado !== 'CONFIRMADA'" class="mt-4 text-center">
+            <p class="text-gray-600 font-semibold">
+              La reserva debe estar <span class="text-green-600">CONFIRMADA</span> para solicitar una cancelación.
+            </p>
+          </div>
+
         </div>
       </div>
     </div>
   </div>
 </div>
-

@@ -1,121 +1,92 @@
+<!-- detalles-reserva.component.html -->
 <div class="min-h-screen bg-gray-50 py-6 px-4 sm:px-6 lg:px-8">
-  <div class="max-w-6xl mx-auto">
-    <!-- Encabezado de la página -->
+  <div class="max-w-4xl mx-auto bg-white rounded-lg shadow-md p-6">
+    <!-- Encabezado -->
     <div class="mb-6">
-      <h1 class="text-2xl font-bold text-gray-900 mb-2">Pagos</h1>
-      <p class="text-gray-600">Gestiona y revisa los pagos</p>
+      <h1 class="text-2xl font-bold text-gray-900">Detalles de la Reserva</h1>
+      <p class="text-gray-600">Información completa de la reserva #0001</p>
     </div>
 
-    <!-- Barra de búsqueda y menú desplegable -->
-    <div class="mb-6 flex items-center space-x-4">
-      <!-- Cuadro de búsqueda -->
-      <input
-        type="text"
-        placeholder="Buscar por nombre o ID de pago"
-        class="w-full p-3 border border-gray-300 rounded-md focus:border-indigo-500 focus:ring-indigo-500"
-      />
-
-      <!-- Menú desplegable para método de pago -->
-      <select
-        class="p-3 border border-gray-300 rounded-md focus:border-indigo-500 focus:ring-indigo-500"
-      >
-        <option value="" disabled selected hidden>Todos los métodos</option>
-        <option value="tarjeta">Tarjeta</option>
-        <option value="mercado_pago">Mercado Pago</option>
-        <option value="transferencia">Transferencia</option>
-        <option value="efectivo">Efectivo</option>
-      </select>
-
-      <select
-        class="p-3 border border-gray-300 rounded-md focus:border-indigo-500 focus:ring-indigo-500"
-      >
-        <option value="" disabled selected hidden>Status del pago</option>
-        <option value="tarjeta">Confirmado</option>
-        <option value="mercado_pago">Sin Confirmar</option>
-      </select>
-    </div>
-
-    <!-- Lista de reservas -->
+    <!-- Información detallada de la reserva -->
     <div class="space-y-4">
-      <!-- Preview de reserva -->
-      <div class="bg-white rounded-lg shadow-sm p-4 flex items-center justify-between">
-        <!-- Información de la reserva -->
-        <div class="flex items-center space-x-12 flex-grow">
-          <!-- Ícono del método de pago -->
-          <div class="h-15 w-15 flex-shrink-0">
-            <img class="h-15 w-15 rounded-full" src="" alt="Método de pago">
-          </div>
+      <!-- Imagen de la reserva -->
+      <!--      <div class="flex justify-center">-->
+      <!--        <img class="h-40 w-40 rounded-full" src="" alt="Imagen de la reserva">-->
+      <!--      </div>-->
 
-          <!-- Detalles de la reserva -->
-          <div>
-            <p class="text-sm text-gray-500">
-              ID del Pago: <span class="font-medium text-gray-900">#12345</span>
-            </p>
-            <p class="text-sm text-gray-500">
-              Cliente: <span class="font-medium text-gray-900">Juan Pérez</span>
-            </p>
-            <p class="text-sm text-gray-500">
-              Fecha y Hora: <span class="font-medium text-gray-900">2024-11-10, 15:30</span>
-            </p>
-          </div>
-
-          <div>
-            <p class="text-sm text-gray-500">
-              Monto: <span class="font-medium text-gray-900">$1,500.00</span>
-            </p>
-            <p class="text-sm text-gray-500">
-              Método de Pago: <span class="font-medium text-gray-900">Tarjeta de Crédito</span>
-            </p>
-          </div>
-        </div>
-
-        <!-- Botón a la derecha -->
-        <div>
-          <button class="bg-blue-600 text-white font-medium py-2 px-4 rounded-md hover:bg-blue-500 transition duration-200">
-            Ver Detalles
-          </button>
-        </div>
+      <!-- Detalles de la reserva -->
+      <div class="mt-4">
+        <h2 class="text-lg font-semibold text-gray-900">Reserva #0001</h2>
+        <p class="text-sm text-gray-500">Cliente: Juan Pérez</p>
+        <p class="text-sm text-gray-500">Fecha de reserva: 2024-11-10</p>
+        <p class="text-sm text-gray-500">Hora de reserva: 10:00 AM</p>
+        <p class="text-sm text-gray-500">Fecha de entrega: 2024-11-10</p>
+        <p class="text-sm text-gray-500">Hora de entrega: 4:00 PM</p>
+        <br>
+        <p class="text-sm text-gray-500">Metodo de pago: Mercado Pago</p>
+        <p class="text-sm text-gray-500">Monto: $27,110</p>
+        <p class="text-md text-gray-500 ">Estado: Confirmada</p>
       </div>
 
-      <div class="bg-white rounded-lg shadow-sm p-4 flex items-center justify-between">
-        <!-- Información de la reserva -->
-        <div class="flex items-center space-x-12 flex-grow">
-          <!-- Ícono del método de pago -->
-          <div class="h-15 w-15 flex-shrink-0">
-            <img class="h-15 w-15 rounded-full" src="" alt="Método de pago">
-          </div>
+      <!-- Descripción adicional -->
+      <div class="mt-6">
+        <h3 class="text-lg font-medium text-gray-900">Descripción</h3>
 
-          <!-- Detalles de la reserva -->
-          <div>
-            <p class="text-sm text-gray-500">
-              ID del Pago: <span class="font-medium text-gray-900">#12345</span>
-            </p>
-            <p class="text-sm text-gray-500">
-              Cliente: <span class="font-medium text-gray-900">Juan Pérez</span>
-            </p>
-            <p class="text-sm text-gray-500">
-              Fecha y Hora: <span class="font-medium text-gray-900">2024-11-10, 15:30</span>
-            </p>
-          </div>
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+          <tr>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Cantidad
+            </th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Item
+            </th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Nota
+            </th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Precio
+            </th>
+          </tr>
+          </thead>
 
-          <div>
-            <p class="text-sm text-gray-500">
-              Monto: <span class="font-medium text-gray-900">$1,500.00</span>
-            </p>
-            <p class="text-sm text-gray-500">
-              Método de Pago: <span class="font-medium text-gray-900">Tarjeta de Crédito</span>
-            </p>
-          </div>
-        </div>
+          <tbody class="bg-white divide-y divide-gray-200">
 
-        <!-- Botón a la derecha -->
-        <div>
-          <button class="bg-blue-600 text-white font-medium py-2 px-4 rounded-md hover:bg-blue-500 transition duration-200">
-            Ver Detalles
-          </button>
-        </div>
+          <!-- Filas -->
+          <!--          *ngFor="let item of items"-->
+          <tr >
+
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="text-sm font-medium text-gray-900">Cantidad</div>
+            </td>
+
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="text-sm text-gray-900">Item</div>
+            </td>
+
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="text-sm text-gray-900">Nota</div>
+            </td>
+
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="text-sm text-gray-900">Precio</div>
+            </td>
+
+          </tr>
+
+          </tbody>
+        </table>
       </div>
     </div>
+
+
+
+    <!-- Botón para regresar -->
+    <div class="mt-8">
+      <button class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" routerLink="/admin/reservas/preview">
+        Regresar a Reservas
+      </button>
+    </div>
+
   </div>
 </div>
-

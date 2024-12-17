@@ -8,7 +8,7 @@ import {DetallerCart} from "../../../../../models/detaller-cart.models";
 import {VerifyService} from "../../../../../services/verify.service";
 import {ToastrService} from "ngx-toastr";
 import {NavigationStateService} from "../../../../../services/navigation-state.service";
-import {Reserva} from "../../../../../models/Reserva.models";
+import {MetodoPago, Reserva} from "../../../../../models/Reserva.models";
 import {SharedDataService} from "../../../../../services/shared-data.service";
 import { ComponentCanDeactivate } from "../../../../../guards/confirm-exit.guard";
 
@@ -214,6 +214,11 @@ export class ConfirmacionComponent implements OnInit, ComponentCanDeactivate {
       return;
     }
 
+    const metodoPago: MetodoPago = {
+      id: 1
+    };
+
+
     // Construir el objeto de reserva desde el formulario
     const reserva: Reserva = {
       cliente: {
@@ -230,7 +235,7 @@ export class ConfirmacionComponent implements OnInit, ComponentCanDeactivate {
         estado: 'Ciudad de México',
         codigo_postal: this.formulario.get('codigo_postal')?.value
       },
-      metodo_pago: 1,
+      metodo_pago: metodoPago,
       fecha_entrega: this.fechaSeleccionada,
       hora_entrega: this.horaSeleccionada,
       verification_token: this.verificationToken!

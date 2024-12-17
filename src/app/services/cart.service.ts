@@ -130,7 +130,7 @@ export class CartService {
   // SECCION DE PAQUETES
   addPaqueteToCart(paqueteId: number, cantidad: number): Observable<any> {
     const body = {
-      paqueteId: paqueteId,
+      paquete_id: paqueteId,
       cantidad: cantidad,
     };
 

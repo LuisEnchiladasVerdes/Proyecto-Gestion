@@ -21,7 +21,6 @@ export class LoginComponent {
   username = '';
   password = '';
   errorMessage = '';
-  showPassword: boolean = false;
 
   constructor(private authService: AuthService, private router: Router) {}
 
@@ -32,9 +31,5 @@ export class LoginComponent {
         this.errorMessage = err.error?.detail || 'Error al iniciar sesión';
       },
     });
-  }
-
-  togglePasswordVisibility() {
-    this.showPassword = !this.showPassword;
   }
 }

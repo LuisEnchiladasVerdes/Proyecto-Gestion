@@ -45,7 +45,7 @@ const routes: Routes = [
   {
     path: 'login',
     loadComponent: () => import('./components/aplication/login/login.component')
-    .then(m => m.LoginComponent),
+      .then(m => m.LoginComponent),
   },
   {
     path: 'forget',

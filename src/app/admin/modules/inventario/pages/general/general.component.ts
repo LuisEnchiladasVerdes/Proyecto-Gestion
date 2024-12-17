@@ -125,7 +125,7 @@ export class GeneralComponent implements OnInit{
           console.error('Error al agregar la categoría', error);
           // alert('Error al agregar la categoria')
           // this.toastr.error('Error al agregar la categoria.', 'Error',{timeOut: 3000});
-          this.alertService.modalConIconoError('Error al agregar la categoria.');
+          this.alertService.modalConIconoError('Nombre de la categoria en uso.');
         }
       );
     }

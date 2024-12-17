@@ -49,6 +49,13 @@ export class EditComponent implements OnInit {
 
   imagenesModificadas = false; // Nueva propiedad para rastrear cambios en imágenes
 
+  nameError = '';
+  categoryError = '';
+  quantityError = '';
+  descriptionError = '';
+  precioError = '';
+  imageError = '';
+
   constructor(
     private productoService: ProductoService,
     private route: ActivatedRoute,
@@ -134,13 +141,29 @@ export class EditComponent implements OnInit {
     }
   }
 
+  // validarFormulario(): boolean {
+  //   let valid = true;
+  //   if (!this.producto.nombre || !this.producto.descripcion) valid = false;
+  //   if (this.producto.stock <= 0) valid = false;
+  //   if (this.producto.precio_actual <= 0) valid = false;
+  //   return valid;
+  // }
+
   validarFormulario(): boolean {
-    let valid = true;
-    if (!this.producto.nombre || !this.producto.descripcion) valid = false;
-    if (this.producto.stock <= 0) valid = false;
-    if (this.producto.precio_actual <= 0) valid = false;
+    this.validateName();
+    this.validateQuantity();
+    this.validateDescription();
+    this.validatePrecio();
+
+    const valid =
+      !this.nameError &&
+      !this.quantityError &&
+      !this.descriptionError &&
+      !this.precioError;
+
     return valid;
   }
+
 
   verificarCambios(): boolean {
     if (!this.productoOriginal) {
@@ -198,6 +221,52 @@ export class EditComponent implements OnInit {
       };
 
       reader.readAsDataURL(file);
+    }
+  }
+
+  validateName(): void {
+    this.nameError = this.producto.nombre.trim()
+      ? /^[^0-9]+$/.test(this.producto.nombre)
+        ? ''
+        : 'El nombre no debe contener números'
+      : 'El nombre es obligatorio';
+  }
+
+  validateQuantity(): void {
+    this.quantityError = this.producto.stock > 0
+      ? ''
+      : 'La cantidad debe ser mayor que 0';
+  }
+
+  validateDescription(): void {
+    this.descriptionError = this.producto.descripcion.trim()
+      ? ''
+      : 'La descripción no debe estar vacía';
+  }
+
+  validatePrecio(): void {
+    this.precioError = this.producto.precio > 0
+      ? ''
+      : 'El precio debe ser mayor que 0.';
+  }
+
+  permitirSoloNumeros(event: KeyboardEvent): void {
+    const charCode = event.which ? event.which : event.keyCode;
+
+    // Permitir solo números (códigos de 0 a 9) y teclas especiales como backspace
+    if (charCode < 48 || charCode > 57) {
+      event.preventDefault();
+    }
+  }
+
+  permitirSoloLetras(event: KeyboardEvent): void {
+    const charCode = event.which || event.keyCode;
+    const char = String.fromCharCode(charCode);
+    const regex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/;
+
+    // Permitir solo letras, la ñ, espacios y teclas especiales
+    if (!regex.test(char) && charCode > 32 && charCode !== 0) {
+      event.preventDefault();
     }
   }
 }

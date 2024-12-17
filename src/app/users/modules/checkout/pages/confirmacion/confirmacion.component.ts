@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {ChangeDetectorRef, Component, OnInit} from '@angular/core';
 import {Router} from "@angular/router";
 import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from "@angular/forms";
 import {NgIf} from "@angular/common";
@@ -44,22 +44,35 @@ export class ConfirmacionComponent implements OnInit, ComponentCanDeactivate {
 
   formGuardado = false;
 
-  constructor(private fb: FormBuilder, private router: Router, private alertService: AlertService, private cartService: CartService, private verify: VerifyService, private toastr: ToastrService, private navigationStateService: NavigationStateService, private sharedDataService: SharedDataService) {
+  constructor(private fb: FormBuilder, private router: Router, private alertService: AlertService, private cartService: CartService, private verify: VerifyService, private toastr: ToastrService, private navigationStateService: NavigationStateService, private sharedDataService: SharedDataService, private cdr: ChangeDetectorRef) {
+    // this.formulario = this.fb.group({
+    //   // numero: ['', [Validators.required, Validators.pattern(/^\d{10}$/)]],
+    //   numero: ['', [Validators.required, Validators.pattern(/^\d{10}$/), Validators.maxLength(10)]], // Teléfono: 10 dígitos
+    //   nombre: ['', [Validators.required, Validators.pattern(/^[a-zA-ZáéíóúñÁÉÍÓÚÑ\s]+$/)]],
+    //   correo: ['', [Validators.required, Validators.email]],
+    //   calle: ['', [Validators.required]],
+    //   colonia: ['', [Validators.required]],
+    //   // codigo_postal: ['', [Validators.required, Validators.pattern(/^\d{5}$/)]],
+    //   // numero_exterior: ['', [Validators.required, Validators.pattern(/^\d+$/)]],
+    //   // numero_interior: [''],
+    //   codigo_postal: ['', [Validators.required, Validators.pattern(/^\d{5}$/), Validators.maxLength(5)]], // Código postal: 5 dígitos
+    //   numero_exterior: ['', [Validators.required, Validators.pattern(/^\d+$/), Validators.maxLength(5)]], // Número exterior: solo números (máx. 5)
+    //   numero_interior: ['', [Validators.pattern(/^\d*$/), Validators.maxLength(5)]], // Número interior: opcional, solo números (máx. 5)
+    //   referencia: ['', [Validators.required]],
+    //   metodo_pago: [null, [Validators.required]],
+    // });
+
     this.formulario = this.fb.group({
-      // numero: ['', [Validators.required, Validators.pattern(/^\d{10}$/)]],
-      numero: ['', [Validators.required, Validators.pattern(/^\d{10}$/), Validators.maxLength(10)]], // Teléfono: 10 dígitos
-      nombre: ['', [Validators.required, Validators.pattern(/^[a-zA-ZáéíóúñÁÉÍÓÚÑ\s]+$/)]],
-      correo: ['', [Validators.required, Validators.email]],
-      calle: ['', [Validators.required]],
-      colonia: ['', [Validators.required]],
-      // codigo_postal: ['', [Validators.required, Validators.pattern(/^\d{5}$/)]],
-      // numero_exterior: ['', [Validators.required, Validators.pattern(/^\d+$/)]],
-      // numero_interior: [''],
-      codigo_postal: ['', [Validators.required, Validators.pattern(/^\d{5}$/), Validators.maxLength(5)]], // Código postal: 5 dígitos
-      numero_exterior: ['', [Validators.required, Validators.pattern(/^\d+$/), Validators.maxLength(5)]], // Número exterior: solo números (máx. 5)
-      numero_interior: ['', [Validators.pattern(/^\d*$/), Validators.maxLength(5)]], // Número interior: opcional, solo números (máx. 5)
-      referencia: ['', [Validators.required]],
-      metodo_pago: [null, [Validators.required]],
+      numero: ['', [Validators.required, Validators.pattern(/^\d{10}$/), Validators.maxLength(10)]], // Teléfono habilitado por defecto
+      nombre: [{ value: '', disabled: true }, [Validators.required, Validators.pattern(/^[a-zA-ZáéíóúñÁÉÍÓÚÑ\s]+$/)]],
+      correo: [{ value: '', disabled: true }, [Validators.required, Validators.email]],
+      calle: [{ value: '', disabled: true }, [Validators.required]],
+      colonia: [{ value: '', disabled: true }, [Validators.required]],
+      codigo_postal: [{ value: '', disabled: true }, [Validators.required, Validators.pattern(/^\d{5}$/), Validators.maxLength(5)]],
+      numero_exterior: [{ value: '', disabled: true }, [Validators.required, Validators.pattern(/^\d+$/), Validators.maxLength(5)]],
+      numero_interior: [{ value: '', disabled: true }, [Validators.pattern(/^\d*$/), Validators.maxLength(5)]],
+      referencia: [{ value: '', disabled: true }, [Validators.required]],
+      metodo_pago: [{ value: null, disabled: true }, [Validators.required]],
     });
 
     this.formulario.valueChanges.subscribe(() => {
@@ -105,7 +118,7 @@ export class ConfirmacionComponent implements OnInit, ComponentCanDeactivate {
     this.verify.sendVerificationCode(phoneNumber).subscribe({
       next: (response) => {
         this.alertService.success('¡Código enviado correctamente!');
-        // console.log('Respuesta del servidor:', response);
+        console.log('Respuesta del servidor:', response);
         this.abrirModal()
       },
       error: (error) => {
@@ -141,6 +154,14 @@ export class ConfirmacionComponent implements OnInit, ComponentCanDeactivate {
       next: (response) => {
         if (response.message === 'Código de verificación correcto. Cliente verificado o creado.') {
           this.alertService.success('¡Código verificado exitosamente!');
+
+          // Habilitar todos los campos del formulario
+          Object.keys(this.formulario.controls).forEach(controlName => {
+            if (controlName !== 'numero') { // Evitar habilitar el número
+              this.formulario.get(controlName)?.enable();
+            }
+          });
+
 
           this.verificationToken = response.verification_token;
 
@@ -266,4 +287,16 @@ export class ConfirmacionComponent implements OnInit, ComponentCanDeactivate {
       event.preventDefault();
     }
   }
+
+  permitirSoloLetras(event: KeyboardEvent): void {
+    const charCode = event.which || event.keyCode;
+    const char = String.fromCharCode(charCode);
+    const regex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/;
+
+    // Permitir solo letras, la ñ, espacios y teclas especiales
+    if (!regex.test(char) && charCode > 32 && charCode !== 0) {
+      event.preventDefault();
+    }
+  }
+
 }

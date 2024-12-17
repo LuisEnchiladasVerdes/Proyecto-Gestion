@@ -28,7 +28,7 @@ export class PaquetesService {
     //   return throwError(() => new Error('Acceso denegado: No tienes permisos administrativos.'));
     // }
 
-    return this.http.get<Paquetes[]>(this.apiUrl, { headers: this.getHeaders() }).pipe(
+    return this.http.get<Paquetes[]>(this.apiUrl).pipe(
       catchError((error) => {
         console.error('Error al obtener paquetes:', error);
         return throwError(() => new Error('Error al obtener paquetes.'));

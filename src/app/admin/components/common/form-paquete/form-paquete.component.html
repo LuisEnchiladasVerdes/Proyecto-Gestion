@@ -4,20 +4,38 @@
     <div class="space-y-4">
       <h2 class="text-lg font-medium text-gray-900">Información básica</h2>
 
-      <!-- Nombre del paquete -->
-      <div>
-        <label for="name" class="block text-sm font-medium text-gray-700">Nombre del paquete</label>
-        <input
-          type="text"
-          id="name"
-          [(ngModel)]="formData.nombrePaquete"
-          name="nombrePaquete"
-          class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-          [ngClass]="{'border-red-500': !formData.nombrePaquete}"
-          placeholder="Ej: Paquete Diviértete"
-          required
-        />
-        <p *ngIf="!formData.nombrePaquete" class="text-red-500 text-xs mt-1">El nombre no puede estar vacío</p>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- Nombre del paquete -->
+        <div>
+          <label for="name" class="block text-sm font-medium text-gray-700">Nombre del paquete</label>
+          <input
+            type="text"
+            id="name"
+            [(ngModel)]="formData.nombrePaquete"
+            name="nombrePaquete"
+            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+            [ngClass]="{'border-red-500': !formData.nombrePaquete}"
+            placeholder="Ej: Paquete Diviértete"
+            required
+            max="20"
+          />
+          <p *ngIf="!formData.nombrePaquete" class="text-red-500 text-xs mt-1">El nombre no puede estar vacío</p>
+        </div>
+
+        <!-- Descuento General -->
+        <div>
+          <label for="descuentoGeneral" class="block text-sm font-medium text-gray-700">Descuento General (%)</label>
+          <input
+            type="number"
+            id="descuentoGeneral"
+            [(ngModel)]="formData.descuentoGeneral"
+            name="descuentoGeneral"
+            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+            placeholder="Ej: 10"
+            min="0"
+            max="90"
+          />
+        </div>
       </div>
 
       <!-- Descripción del paquete -->
@@ -32,24 +50,12 @@
           [ngClass]="{'border-red-500': !formData.descripcionPaquete}"
           placeholder="Descripción del paquete"
           required
+          maxlength="100"
         ></textarea>
         <p *ngIf="!formData.descripcionPaquete" class="text-red-500 text-xs mt-1">La descripción no puede estar vacía</p>
       </div>
 
-      <!-- Descuento General -->
-      <div>
-        <label for="descuentoGeneral" class="block text-sm font-medium text-gray-700">Descuento General (%)</label>
-        <input
-          type="number"
-          id="descuentoGeneral"
-          [(ngModel)]="formData.descuentoGeneral"
-          name="descuentoGeneral"
-          class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-          placeholder="Ej: 10"
-          min="0"
-          max="100"
-        />
-      </div>
+
     </div>
 
     <!-- Detalles del paquete -->
@@ -134,7 +140,7 @@
           class="mt-4 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700"
           (click)="agregarFila()"
         >
-          Agregar fila
+          Agregar Producto
         </button>
       </div>
 

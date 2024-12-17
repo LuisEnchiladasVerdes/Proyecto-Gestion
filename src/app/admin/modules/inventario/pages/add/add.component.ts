@@ -195,21 +195,21 @@ export class AddComponent {
     }
 
     if (this.producto.stock <= 0) {
-      this.quantityError = 'El stock debe ser mayor que 0.';
+      this.quantityError = 'El stock debe ser mayor que 10.';
       valid = false;
     } else {
       this.quantityError = '';
     }
 
-    if (this.producto.precio <= 0) {
-      this.precioError = 'El precio debe ser mayor que 0.';
+    if (this.producto.precio <= 10) {
+      this.precioError = 'El precio debe ser mayor que 10.';
       valid = false;
     } else {
       this.precioError = '';
     }
 
     if (!this.selectedCategory) {
-      this.categoryError = 'Por favor selecciona una categoría.';
+      this.categoryError = 'Seleccionar una categoría.';
       valid = false;
     } else {
       this.categoryError = '';
@@ -252,44 +252,63 @@ export class AddComponent {
   }
 
 
-isDragging = false; // Variable para gestionar el estilo del área de arrastre
+  isDragging = false; // Variable para gestionar el estilo del área de arrastre
 
-onDragOver(event: DragEvent): void {
-  event.preventDefault(); // Previene el comportamiento predeterminado del navegador
-  this.isDragging = true; // Activa el estado de arrastre
-}
-
-onDragLeave(event: DragEvent): void {
-  event.preventDefault(); // Opcional, asegura que el evento no tenga efectos colaterales
-  this.isDragging = false; // Desactiva el estado de arrastre
-}
-
-onDrop(event: DragEvent): void {
-  event.preventDefault(); // Evita el comportamiento predeterminado
-  this.isDragging = false; // Restablece el estado de arrastre
-
-  // Procesa el archivo arrastrado
-  if (event.dataTransfer && event.dataTransfer.files.length > 0) {
-    const file = event.dataTransfer.files[0];
-    this.handleImage(file);
+  onDragOver(event: DragEvent): void {
+    event.preventDefault(); // Previene el comportamiento predeterminado del navegador
+    this.isDragging = true; // Activa el estado de arrastre
   }
-}
 
-handleImage(file: File): void {
-  const reader = new FileReader();
+  onDragLeave(event: DragEvent): void {
+    event.preventDefault(); // Opcional, asegura que el evento no tenga efectos colaterales
+    this.isDragging = false; // Desactiva el estado de arrastre
+  }
 
-  reader.onload = () => {
-    this.imageUrls.push(reader.result as string); // Agrega la URL base64
-    this.selectedImages.push(file); // Guarda el archivo en selectedImages
-  };
+  onDrop(event: DragEvent): void {
+    event.preventDefault(); // Evita el comportamiento predeterminado
+    this.isDragging = false; // Restablece el estado de arrastre
 
-  reader.readAsDataURL(file); // Convierte la imagen a Base64
-}
+    // Procesa el archivo arrastrado
+    if (event.dataTransfer && event.dataTransfer.files.length > 0) {
+      const file = event.dataTransfer.files[0];
+      this.handleImage(file);
+    }
+  }
 
-removeImage(index: number): void {
-  this.imageUrls.splice(index, 1); // Elimina la URL de la vista previa
-  this.selectedImages.splice(index, 1); // Elimina el archivo del array
-}
+  handleImage(file: File): void {
+    const reader = new FileReader();
 
+    reader.onload = () => {
+      this.imageUrls.push(reader.result as string); // Agrega la URL base64
+      this.selectedImages.push(file); // Guarda el archivo en selectedImages
+    };
+
+    reader.readAsDataURL(file); // Convierte la imagen a Base64
+  }
+
+  removeImage(index: number): void {
+    this.imageUrls.splice(index, 1); // Elimina la URL de la vista previa
+    this.selectedImages.splice(index, 1); // Elimina el archivo del array
+  }
+
+  permitirSoloNumeros(event: KeyboardEvent): void {
+    const charCode = event.which ? event.which : event.keyCode;
+
+    // Permitir solo números (códigos de 0 a 9) y teclas especiales como backspace
+    if (charCode < 48 || charCode > 57) {
+      event.preventDefault();
+    }
+  }
+
+  permitirSoloLetras(event: KeyboardEvent): void {
+    const charCode = event.which || event.keyCode;
+    const char = String.fromCharCode(charCode);
+    const regex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/;
+
+    // Permitir solo letras, la ñ, espacios y teclas especiales
+    if (!regex.test(char) && charCode > 32 && charCode !== 0) {
+      event.preventDefault();
+    }
+  }
 
 }

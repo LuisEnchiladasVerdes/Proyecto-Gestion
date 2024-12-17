@@ -37,6 +37,7 @@
               >
                 Valida tu número
               </button>
+
             </div>
           </div>
 
@@ -50,7 +51,8 @@
                 type="text"
                 id="nombre"
                 formControlName="nombre"
-                maxlength="50"
+                maxlength="30"
+                (keypress)="permitirSoloLetras($event)"
                 class="mt-1 p-2 border border-gray-300 rounded w-full focus:ring-indigo-500 focus:border-indigo-500"
                 placeholder="Ej. Juan Perez"
               />
@@ -95,7 +97,7 @@
                 type="text"
                 id="calle"
                 formControlName="calle"
-                maxlength="80"
+                maxlength="30"
                 class="mt-1 p-2 border border-gray-300 rounded w-full focus:ring-indigo-500 focus:border-indigo-500"
                 placeholder="Ej: Av. Principal"
               />
@@ -112,7 +114,7 @@
                 type="text"
                 id="colonia"
                 formControlName="colonia"
-                maxlength="50"
+                maxlength="20"
                 class="mt-1 p-2 border border-gray-300 rounded w-full focus:ring-indigo-500 focus:border-indigo-500"
                 placeholder="Ej: Centro"
               />

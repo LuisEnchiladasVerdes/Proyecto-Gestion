@@ -13,87 +13,98 @@
         <div class="space-y-4">
           <h2 class="text-lg font-medium text-gray-900">Información básica</h2>
 
-          <!-- Nombre del item -->
-          <div>
-            <label for="name" class="block text-sm font-medium text-gray-700">Nombre del item</label>
-            <input
-              type="text"
-              id="name"
-              name="name"
-              (keyup)="validateName()"
-              [(ngModel)]="producto.nombre"
-              class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-              placeholder="Ej: Mesa rectangular"
-            />
-            <p *ngIf="nameError" class="text-sm text-red-600">{{ nameError }}</p>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Nombre del item -->
+            <div>
+              <label for="name" class="block text-sm font-medium text-gray-700">Nombre del producto*</label>
+              <input
+                type="text"
+                id="name"
+                name="name"
+                (keyup)="validateName()"
+                [(ngModel)]="producto.nombre"
+                (keypress)="permitirSoloLetras($event)"
+                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                placeholder="Ej: Mesa rectangular"
+                maxlength="20"
+                pattern="[A-Za-z ]*"
+              />
+              <p *ngIf="nameError" class="text-sm text-red-600">{{ nameError }}</p>
+            </div>
+
+            <!-- Categoría -->
+            <div>
+              <label for="category" class="block text-sm font-medium text-gray-700">Categoría*</label>
+              <select
+                id="category"
+                name="category"
+                (change)="validateCategory()"
+                [(ngModel)]="selectedCategory"
+                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              >
+                <option value="" disabled selected hidden>Selecciona una categoría</option>
+                <option *ngFor="let categoria of categorias" [value]="categoria.id">
+                  {{ categoria.nombre }}
+                </option>
+              </select>
+              <p *ngIf="categoryError" class="text-sm text-red-600">{{ categoryError }}</p>
+            </div>
           </div>
 
-          <!-- Categoría -->
-          <div>
-            <label for="category" class="block text-sm font-medium text-gray-700">Categoría</label>
-            <select
-              id="category"
-              name="category"
-              (change)="validateCategory()"
-              [(ngModel)]="selectedCategory"
-              class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-            >
-              <option value="" disabled selected hidden>Selecciona una categoría</option>
-              <option *ngFor="let categoria of categorias" [value]="categoria.id">
-                {{ categoria.nombre }}
-              </option>
-            </select>
-            <p *ngIf="categoryError" class="text-sm text-red-600">{{ categoryError }}</p>
-          </div>
         </div>
 
         <!-- Detalles de inventario -->
         <div class="space-y-4">
           <h2 class="text-lg font-medium text-gray-900">Detalles de inventario</h2>
 
-          <!-- Cantidad -->
-          <div>
-            <label for="quantity" class="block text-sm font-medium text-gray-700">Cantidad</label>
-            <input
-              type="number"
-              id="quantity"
-              name="quantity"
-              (keyup)="validateQuantity()"
-              [(ngModel)]="producto.stock"
-              min="0"
-              class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-              placeholder="0"
-            />
-            <p *ngIf="quantityError" class="text-sm text-red-600">{{ quantityError }}</p>
-          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Cantidad -->
+            <div>
+              <label for="quantity" class="block text-sm font-medium text-gray-700">Cantidad*</label>
+              <input
+                type="number"
+                id="quantity"
+                name="quantity"
+                (keyup)="validateQuantity()"
+                [(ngModel)]="producto.stock"
+                min="10"
+                max = "100"
+                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                placeholder="10"
+              />
+              <p *ngIf="quantityError" class="text-sm text-red-600">{{ quantityError }}</p>
+            </div>
 
-          <!-- Precio -->
-          <div>
-            <label for="quantity" class="block text-sm font-medium text-gray-700">Precio</label>
-            <input
-              type="number"
-              id="precio"
-              name="precio"
-              (keyup)="validatePrecio()"
-              [(ngModel)]="producto.precio"
-              min="0"
-              class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-              placeholder="0"
-            />
-            <p *ngIf="quantityError" class="text-sm text-red-600">{{ quantityError }}</p>
+            <!-- Precio -->
+            <div>
+              <label for="quantity" class="block text-sm font-medium text-gray-700">Precio($)*</label>
+              <input
+                type="number"
+                id="precio"
+                name="precio"
+                (keyup)="validatePrecio()"
+                [(ngModel)]="producto.precio"
+                min="10"
+                max = "1000"
+                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                placeholder="10"
+              />
+              <p *ngIf="quantityError" class="text-sm text-red-600">{{ precioError }}</p>
+            </div>
           </div>
 
           <!-- Descripción -->
           <div>
-            <label for="description" class="block text-sm font-medium text-gray-700">Descripción</label>
+            <label for="description" class="block text-sm font-medium text-gray-700">Descripción*</label>
             <textarea
               id="description"
               name="description"
               (keyup)="validateDescription()"
               [(ngModel)]="producto.descripcion"
-              rows="3"
+              rows="2"
               class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
               placeholder="Ingresa una descripción detallada del item..."
+              maxlength="100"
             ></textarea>
             <p *ngIf="descriptionError" class="text-sm text-red-600">{{ descriptionError }}</p>
           </div>
@@ -129,6 +140,7 @@
           </button>
         </div>
       </form>
+      <div class="text-sm text-gray-500">* Campos obligatorios</div>
     </div>
   </div>
 </div>

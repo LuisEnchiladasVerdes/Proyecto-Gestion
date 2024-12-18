@@ -245,7 +245,7 @@ export class EditComponent implements OnInit {
   }
 
   validatePrecio(): void {
-    this.precioError = this.producto.precio > 0
+    this.precioError = this.producto.precio_actual > 0
       ? ''
       : 'El precio debe ser mayor que 0.';
   }

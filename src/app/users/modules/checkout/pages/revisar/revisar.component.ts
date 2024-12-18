@@ -7,6 +7,7 @@ import { DetallerCart } from "../../../../../models/detaller-cart.models";
 import {ToastrService} from "ngx-toastr";
 import {NavigationStateService} from "../../../../../services/navigation-state.service";
 import {SharedDataService} from "../../../../../services/shared-data.service";
+import {PaquetesCart, ProductosCart} from "../../../../../models/cart.models";
 
 @Component({
   selector: 'app-revisar',
@@ -22,7 +23,10 @@ import {SharedDataService} from "../../../../../services/shared-data.service";
 export class RevisarComponent implements OnInit {
   cartProducts: DetallerCart[] = []; // Reemplaza los datos estáticos por un arreglo vacío
   mediaBaseUrl: string = '';
-  total: number = 0;
+  cartIsEmpty = true;
+  total = 0;
+  totalCart = 0;
+  totalItems = 0;
 
   isProcessing = false;
 
@@ -33,6 +37,9 @@ export class RevisarComponent implements OnInit {
   horasDisponibles: string[] = []; // Almacena las horas disponibles para la fecha seleccionada
   fechaSeleccionada: string = ''; // Almacena la fecha seleccionada
   horaSeleccionadas: string = '';
+
+  products: ProductosCart[] = [];
+  paquetes: PaquetesCart[] = [];
 
   constructor(private cartService: CartService, private toastr: ToastrService, private router: Router, private navigationStateService: NavigationStateService, private sharedDataService: SharedDataService) {
     this.mediaBaseUrl = this.cartService.getMediaBaseUrl();
@@ -45,13 +52,44 @@ export class RevisarComponent implements OnInit {
   loadCart(): void {
     this.cartService.getCurrentCart().subscribe({
       next: (cart) => {
-        this.cartProducts = cart.detalles; // Carga los detalles reales del carrito
-        this.calculateTotal();
+        this.products = cart.productos_individuales || [];
+        this.paquetes = cart.paquetes || [];
+
+        this.calculateTotals(cart.total_carrito);
+
+        console.log('productos', this.products);
+        console.log('paquetes', this.paquetes);
       },
       error: (error) => {
         console.error('Error al cargar el carrito:', error);
       }
     });
+  }
+
+  calculateTotals(totalCarrito?: number): void {
+    // Asignar el total directamente desde el backend si está disponible
+    if (totalCarrito !== undefined) {
+      this.totalCart = totalCarrito;
+    } else {
+      this.totalCart = 0; // Total del carrito si no viene del backend
+    }
+
+    // Reiniciar el contador de ítems
+    this.totalItems = 0;
+
+    // Sumar todas las cantidades de productos individuales
+    this.products.forEach((item) => {
+      this.totalItems += item.cantidad || 0; // Asegurarse de que cantidad no sea nula
+    });
+
+    // Contar cada paquete como una unidad
+    this.totalItems += this.paquetes.length;
+
+    // Verificar si el carrito está vacío
+    this.cartIsEmpty = this.products.length === 0 && this.paquetes.length === 0;
+
+    console.log('Total del carrito:', this.totalCart);
+    console.log('Total de ítems:', this.totalItems);
   }
 
   // Decrementar cantidad
@@ -252,5 +290,9 @@ export class RevisarComponent implements OnInit {
     return todasLasHoras.filter((hora) => !horasOcupadasFormateadas.includes(hora));
   }
 
+  removePaquete(paqueteId: number): void {
+    // this.cartService.removePaqueteFromCart(paqueteId).subscribe(() => this.loadCart());
+    console.log('se eliminara paquete');
+  }
 
 }

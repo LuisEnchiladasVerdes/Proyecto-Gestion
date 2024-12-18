@@ -14,8 +14,9 @@ const routes: Routes = [
   {
     path: 'confirmar',
     loadComponent: () => import('./pages/confirmacion/confirmacion.component')
-      .then(m => m.ConfirmacionComponent), canActivate: [confirmacionGuard],
-    canDeactivate: [formChangesGuard]
+      .then(m => m.ConfirmacionComponent),
+    // canActivate: [confirmacionGuard],
+    // canDeactivate: [formChangesGuard]
   },
   {
     path: 'realizado',

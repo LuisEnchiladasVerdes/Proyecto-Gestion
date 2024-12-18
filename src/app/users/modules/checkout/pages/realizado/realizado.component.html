@@ -1,3 +1,92 @@
+<!--<div class="bg-gray-100 p-12 md:p-[85px] px-10 pb-12">-->
+<!--  <h2 class="text-center mb-6 text-xl md:text-2xl font-semibold">PEDIDO REALIZADO</h2>-->
+
+<!--  <div class="mx-auto max-w-[600px] bg-white rounded-lg shadow-lg">-->
+<!--    <div class="p-6">-->
+<!--      &lt;!&ndash; Información del pedido &ndash;&gt;-->
+<!--      <div class="mb-6">-->
+<!--        <div class="flex justify-between mb-3">-->
+<!--          <div class="w-1/2">-->
+<!--            <span class="text-gray-600">Código de Pedido:</span>-->
+<!--          </div>-->
+<!--          <div class="w-1/2 text-right">-->
+<!--            <span class="font-semibold">#{{ reserva?.codigo_pedido }}</span>-->
+<!--          </div>-->
+<!--        </div>-->
+<!--        <div class="flex justify-between mb-3">-->
+<!--          <div class="w-1/2">-->
+<!--            <span class="text-gray-600">Fecha:</span>-->
+<!--          </div>-->
+<!--          <div class="w-1/2 text-right">-->
+<!--            <span class="font-semibold">27 de Octubre, 2024</span>-->
+<!--          </div>-->
+<!--        </div>-->
+<!--        <div class="flex justify-between mb-3">-->
+<!--          <div class="w-1/2">-->
+<!--            <span class="text-gray-600">Hora:</span>-->
+<!--          </div>-->
+<!--          <div class="w-1/2 text-right">-->
+<!--            <span class="font-semibold">15:30</span>-->
+<!--          </div>-->
+<!--        </div>-->
+
+<!--        <div class="flex justify-between mb-3">-->
+<!--          <div class="w-1/2">-->
+<!--            <span class="text-gray-600">Forma de Pago</span>-->
+<!--          </div>-->
+<!--          <div class="w-1/2 text-right">-->
+<!--            <span class="font-semibold">Tarjeta</span>-->
+<!--          </div>-->
+<!--        </div>-->
+
+<!--        <div class="flex justify-between mb-3">-->
+<!--          <div class="w-1/2">-->
+<!--            <span class="text-gray-600">Monto</span>-->
+<!--          </div>-->
+<!--          <div class="w-1/2 text-right">-->
+<!--            <span class="font-semibold">$540</span>-->
+<!--          </div>-->
+<!--        </div>-->
+<!--      </div>-->
+
+<!--      &lt;!&ndash; Mensaje de confirmación &ndash;&gt;-->
+<!--      <div class="flex items-center mb-6 pb-4 border-b border-gray-300">-->
+<!--        <span class="text-gray-600 mr-3">Estado del pedido:</span>-->
+<!--        <span class="bg-yellow-100 text-yellow-600 py-1 px-2 rounded-full text-sm font-medium">Pendiente</span>-->
+<!--      </div>-->
+
+<!--      &lt;!&ndash; Detalle del pedido &ndash;&gt;-->
+<!--      <div class="mb-6">-->
+<!--        <h3 class="text-lg font-semibold">Detalles del Pedido</h3>-->
+
+<!--        <h5 *ngIf="products.length> 0">Productos</h5>-->
+<!--        <div >-->
+<!--          <ul *ngFor="let product of products" class="list-disc pl-5">-->
+<!--            <li>{{ product.producto?.nombre }} - Cantidad: {{ product.cantidad }}</li>-->
+<!--          </ul>-->
+<!--        </div>-->
+
+
+<!--        <h5 *ngIf="paquetes.length > 0">Paquetes</h5>-->
+<!--        <div >-->
+<!--          <ul *ngFor="let paquete of paquetes" class="list-disc pl-5">-->
+<!--            <li>{{ paquete.nombre }} - Cantidad: 1</li>-->
+<!--          </ul>-->
+<!--        </div>-->
+
+<!--      </div>-->
+
+<!--      &lt;!&ndash; Mensaje de agradecimiento &ndash;&gt;-->
+<!--      <div class="text-center">-->
+<!--        <p class="text-gray-600 text-lg">¡Gracias por tu compra!</p>-->
+<!--      </div>-->
+<!--    </div>-->
+<!--  </div>-->
+<!--</div>-->
+
+
+
+
 <div class="bg-gray-100 p-12 md:p-[85px] px-10 pb-12">
   <h2 class="text-center mb-6 text-xl md:text-2xl font-semibold">PEDIDO REALIZADO</h2>
 
@@ -10,23 +99,23 @@
             <span class="text-gray-600">Código de Pedido:</span>
           </div>
           <div class="w-1/2 text-right">
-            <span class="font-semibold">#PD67890</span>
+            <span class="font-semibold">#{{ reserva?.codigo_pedido }}</span>
           </div>
         </div>
         <div class="flex justify-between mb-3">
           <div class="w-1/2">
-            <span class="text-gray-600">Fecha:</span>
+            <span class="text-gray-600">Fecha de entrega:</span>
           </div>
           <div class="w-1/2 text-right">
-            <span class="font-semibold">27 de Octubre, 2024</span>
+            <span class="font-semibold">{{ reserva?.fecha_entrega }}</span>
           </div>
         </div>
         <div class="flex justify-between mb-3">
           <div class="w-1/2">
-            <span class="text-gray-600">Hora:</span>
+            <span class="text-gray-600">Hora de entrega:</span>
           </div>
           <div class="w-1/2 text-right">
-            <span class="font-semibold">15:30</span>
+            <span class="font-semibold">{{ reserva?.hora_entrega }}</span>
           </div>
         </div>
 
@@ -35,7 +124,10 @@
             <span class="text-gray-600">Forma de Pago</span>
           </div>
           <div class="w-1/2 text-right">
-            <span class="font-semibold">Tarjeta</span>
+            <span class="font-semibold">
+<!--              {{ reserva?.metodo_pago === 1 ? 'Tarjeta' : 'Transferencia' }}-->
+              Tarjeta
+            </span>
           </div>
         </div>
 
@@ -44,7 +136,7 @@
             <span class="text-gray-600">Monto</span>
           </div>
           <div class="w-1/2 text-right">
-            <span class="font-semibold">$540</span>
+            <span class="font-semibold">${{ reserva?.total }}.00</span>
           </div>
         </div>
       </div>
@@ -52,17 +144,37 @@
       <!-- Mensaje de confirmación -->
       <div class="flex items-center mb-6 pb-4 border-b border-gray-300">
         <span class="text-gray-600 mr-3">Estado del pedido:</span>
-        <span class="bg-yellow-100 text-yellow-600 py-1 px-2 rounded-full text-sm font-medium">Pendiente</span>
+        <span class="bg-yellow-100 text-yellow-600 py-1 px-2 rounded-full text-sm font-medium">
+          {{ reserva?.estado }}
+        </span>
       </div>
 
       <!-- Detalle del pedido -->
       <div class="mb-6">
         <h3 class="text-lg font-semibold">Detalles del Pedido</h3>
-        <ul class="list-disc pl-5">
-          <li>Artículo 1 - Cantidad: 2</li>
-          <li>Artículo 2 - Cantidad: 1</li>
-          <li>Artículo 3 - Cantidad: 3</li>
+
+        <!-- Productos -->
+        <h5 *ngIf="products.length > 0" class="mt-4">Productos</h5>
+        <ul *ngIf="products.length > 0" class="list-disc pl-5">
+          <li *ngFor="let product of products">
+            {{ product.producto }} - Cantidad: {{ product.cantidad }}
+          </li>
         </ul>
+
+        <!-- Paquetes -->
+        <h5 *ngIf="paquetes.length > 0" class="mt-4">Paquetes</h5>
+        <div *ngIf="paquetes.length > 0">
+          <ul *ngFor="let paquete of paquetes" class="list-disc pl-5">
+            <li>
+              {{ paquete.nombre }} - Cantidad: 1
+              <ul class="list-none pl-5">
+                <li *ngFor="let producto of paquete.productos" class="text-gray-600 text-sm">
+                  {{ producto.producto }} - Cantidad: {{ producto.cantidad }}
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </div>
       </div>
 
       <!-- Mensaje de agradecimiento -->

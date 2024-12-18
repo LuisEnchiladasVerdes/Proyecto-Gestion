@@ -11,6 +11,7 @@ import {NavigationStateService} from "../../../../../services/navigation-state.s
 import {MetodoPago, Reserva} from "../../../../../models/Reserva.models";
 import {SharedDataService} from "../../../../../services/shared-data.service";
 import { ComponentCanDeactivate } from "../../../../../guards/confirm-exit.guard";
+import {PaquetesCart, ProductosCart} from "../../../../../models/cart.models";
 
 @Component({
   selector: 'app-confirmacion',
@@ -44,24 +45,15 @@ export class ConfirmacionComponent implements OnInit, ComponentCanDeactivate {
 
   formGuardado = false;
 
-  constructor(private fb: FormBuilder, private router: Router, private alertService: AlertService, private cartService: CartService, private verify: VerifyService, private toastr: ToastrService, private navigationStateService: NavigationStateService, private sharedDataService: SharedDataService, private cdr: ChangeDetectorRef) {
-    // this.formulario = this.fb.group({
-    //   // numero: ['', [Validators.required, Validators.pattern(/^\d{10}$/)]],
-    //   numero: ['', [Validators.required, Validators.pattern(/^\d{10}$/), Validators.maxLength(10)]], // Teléfono: 10 dígitos
-    //   nombre: ['', [Validators.required, Validators.pattern(/^[a-zA-ZáéíóúñÁÉÍÓÚÑ\s]+$/)]],
-    //   correo: ['', [Validators.required, Validators.email]],
-    //   calle: ['', [Validators.required]],
-    //   colonia: ['', [Validators.required]],
-    //   // codigo_postal: ['', [Validators.required, Validators.pattern(/^\d{5}$/)]],
-    //   // numero_exterior: ['', [Validators.required, Validators.pattern(/^\d+$/)]],
-    //   // numero_interior: [''],
-    //   codigo_postal: ['', [Validators.required, Validators.pattern(/^\d{5}$/), Validators.maxLength(5)]], // Código postal: 5 dígitos
-    //   numero_exterior: ['', [Validators.required, Validators.pattern(/^\d+$/), Validators.maxLength(5)]], // Número exterior: solo números (máx. 5)
-    //   numero_interior: ['', [Validators.pattern(/^\d*$/), Validators.maxLength(5)]], // Número interior: opcional, solo números (máx. 5)
-    //   referencia: ['', [Validators.required]],
-    //   metodo_pago: [null, [Validators.required]],
-    // });
+  products: ProductosCart[] = [];
+  paquetes: PaquetesCart[] = [];
+  totalCart = 0;
 
+  botonValidarTelefonoDeshabilitado = false; // Nueva propiedad
+
+  mostrarModalTransferencia: boolean = false;
+
+  constructor(private fb: FormBuilder, private router: Router, private alertService: AlertService, private cartService: CartService, private verify: VerifyService, private toastr: ToastrService, private navigationStateService: NavigationStateService, private sharedDataService: SharedDataService, private cdr: ChangeDetectorRef) {
     this.formulario = this.fb.group({
       numero: ['', [Validators.required, Validators.pattern(/^\d{10}$/), Validators.maxLength(10)]], // Teléfono habilitado por defecto
       nombre: [{ value: '', disabled: true }, [Validators.required, Validators.pattern(/^[a-zA-ZáéíóúñÁÉÍÓÚÑ\s]+$/)]],
@@ -95,7 +87,12 @@ export class ConfirmacionComponent implements OnInit, ComponentCanDeactivate {
   loadCart(): void {
     this.cartService.getCurrentCart().subscribe({
       next: (cart) => {
-        this.cartProducts = cart.detalles; // Carga los detalles reales del carrito
+        this.products = cart.productos_individuales || [];
+        this.paquetes = cart.paquetes || [];
+
+        this.calculateTotals(cart.total_carrito);
+
+        this.sharedDataService.setCart(cart);
       },
       error: (error) => {
         console.error('Error al cargar el carrito:', error);
@@ -103,8 +100,13 @@ export class ConfirmacionComponent implements OnInit, ComponentCanDeactivate {
     });
   }
 
-  calculateTotal(): number {
-    return this.cartProducts.reduce((sum, product) => sum + product.cantidad * product.producto.precio_actual, 0);
+  calculateTotals(totalCarrito?: number): void {
+    // Asignar el total directamente desde el backend si está disponible
+    if (totalCarrito !== undefined) {
+      this.totalCart = totalCarrito;
+    } else {
+      this.totalCart = 0; // Total del carrito si no viene del backend
+    }
   }
 
   sendVerificationCode(): void {
@@ -118,7 +120,6 @@ export class ConfirmacionComponent implements OnInit, ComponentCanDeactivate {
     this.verify.sendVerificationCode(phoneNumber).subscribe({
       next: (response) => {
         this.alertService.success('¡Código enviado correctamente!');
-        console.log('Respuesta del servidor:', response);
         this.abrirModal()
       },
       error: (error) => {
@@ -155,13 +156,14 @@ export class ConfirmacionComponent implements OnInit, ComponentCanDeactivate {
         if (response.message === 'Código de verificación correcto. Cliente verificado o creado.') {
           this.alertService.success('¡Código verificado exitosamente!');
 
+          this.botonValidarTelefonoDeshabilitado = true;
+
           // Habilitar todos los campos del formulario
           Object.keys(this.formulario.controls).forEach(controlName => {
             if (controlName !== 'numero') { // Evitar habilitar el número
               this.formulario.get(controlName)?.enable();
             }
           });
-
 
           this.verificationToken = response.verification_token;
 
@@ -209,8 +211,11 @@ export class ConfirmacionComponent implements OnInit, ComponentCanDeactivate {
 
   submitForm() {
     if (this.formulario.valid) {
-      // console.log('Formulario válido:', this.formulario.value);
-      // this.finalizeOrder();
+      if (this.formulario.get('metodo_pago')?.value === 'transferencia') {
+        this.mostrarModalTransferencia = true; // Mostrar modal
+        return; // Detener el flujo hasta que se cierre el modal
+      }
+
       this.crearReserva();
     } else {
       this.alertService.error('Por favor, completa todos los campos obligatorios.');
@@ -267,8 +272,12 @@ export class ConfirmacionComponent implements OnInit, ComponentCanDeactivate {
     this.cartService.crearReserva({
       ...reserva,
       metodo_pago: metodoPago.id // Sobrescribimos solo para el envío
+
+
     } as unknown as Reserva).subscribe({
       next: (response) => {
+        this.sharedDataService.setReserva(response.reserva);
+
         this.alertService.success('¡Reserva creada exitosamente!');
         this.finalizeOrder();
       },
@@ -298,5 +307,15 @@ export class ConfirmacionComponent implements OnInit, ComponentCanDeactivate {
       event.preventDefault();
     }
   }
+
+  cerrarModalTransferencia(): void {
+    this.mostrarModalTransferencia = false;
+    this.crearReserva(); // Proceder con el pago al cerrar el modal
+  }
+
+  stopPropagation(event: Event): void {
+    event.stopPropagation(); // Evita que el clic cierre el modal
+  }
+
 
 }

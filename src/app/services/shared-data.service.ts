@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
 import {BehaviorSubject} from "rxjs";
+import {Reserva} from "../models/Reserva.models";
+import {Cart} from "../models/cart.models";
 
 @Injectable({
   providedIn: 'root'
@@ -27,4 +29,29 @@ export class SharedDataService {
   getHoraSeleccionada(): string | null {
     return this.horaSeleccionada;
   }
+
+
+  //TRANFERENCIA DE CARRITO
+  private cart : Cart | null = null;
+
+  setCart(cart : Cart): void {
+    this.cart = cart ;
+  }
+
+  getCart(): Cart | null {
+    return this.cart;
+  }
+
+
+  //TRASNFERENCIA DE RESERVA
+  private reserva: Reserva | null = null;
+
+  setReserva(reserva: Reserva ): void {
+    this.reserva = reserva;
+  }
+
+  getReserva(): Reserva | null {
+    return this.reserva;
+  }
+
 }

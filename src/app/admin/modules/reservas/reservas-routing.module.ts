@@ -3,10 +3,11 @@ import { RouterModule, Routes } from '@angular/router';
 
 const routes: Routes = [
   {
-    path: 'detalles',
+    path: 'detalles/:codigo_pedido',
     loadComponent: () => import('./pages/detalles/detalles.component')
       .then(m => m.DetallesComponent)
-  },
+  }
+  ,
   {
     path: 'preview',
     loadComponent: () => import('./pages/preview/preview.component')

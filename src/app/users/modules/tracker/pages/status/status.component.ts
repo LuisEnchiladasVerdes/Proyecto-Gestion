@@ -1,9 +1,11 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { ProductoService } from '../../../../../services/producto.service';
 import {Reserva} from "../../../../../models/Reserva.models";
+import { ReservacionService } from '../../../../../services/reservacion.service';
+
 
 @Component({
   selector: 'app-status',
@@ -12,7 +14,7 @@ import {Reserva} from "../../../../../models/Reserva.models";
   templateUrl: './status.component.html',
   styleUrls: ['./status.component.css']
 })
-export class StatusComponent {
+export class StatusComponent implements OnInit {
   reserva!: Reserva;
   BASE_URL: string; // URL base para las imágenes
   mensaje: string = '';
@@ -32,9 +34,14 @@ export class StatusComponent {
   public currentArrowOffset = 0; // Desplazamiento de las flechas
   public arrowOffsetStyle = '0px'; // Nueva variable de estilo dinámico
 
-  constructor(private router: Router, private http: HttpClient, private productoService: ProductoService) {
+  constructor(private router: Router, private http: HttpClient, private productoService: ProductoService,     private reservacionService: ReservacionService
+  ) {
     const navigation = this.router.getCurrentNavigation();
-    this.reserva = navigation?.extras.state?.['reserva'] as Reserva; // Tipado explícito
+    const state = navigation?.extras.state;
+
+    this.reserva = state?.['reserva'] ?? null; // Acceso seguro con index signature
+    console.log('Reserva inicial:', this.reserva);
+
 
     if (!this.reserva) {
       console.error('No se encontró información de la reserva.');
@@ -44,6 +51,27 @@ export class StatusComponent {
     // Asignar la URL base del servicio
     this.BASE_URL = this.productoService.getMediaBaseUrl();
   }
+
+
+
+
+  ngOnInit(): void {
+    setTimeout(() => {
+      const navigation = this.router.getCurrentNavigation();
+      const state = navigation?.extras.state;
+
+      if (state?.['reserva']) {
+        this.reserva = state['reserva'];
+        console.log('Reserva recibida con retraso:', this.reserva);
+      } else {
+        console.error('No se encontró información de la reserva.');
+      }
+    }, 100);
+  }
+
+
+
+
 
   // Método auxiliar para manejar imágenes faltantes
   onImageError(event: Event): void {

@@ -58,7 +58,6 @@ export class DropdownComponent  implements OnInit {
       this.paquetes = cart.paquetes || [];
       this.calculateTotals(cart.total_carrito);
     });
-    console.log('dropdown', this.products);
   }
 
   calculateTotals(totalCarrito?: number): void {
@@ -82,9 +81,6 @@ export class DropdownComponent  implements OnInit {
 
     // Verificar si el carrito está vacío
     this.cartIsEmpty = this.products.length === 0 && this.paquetes.length === 0;
-
-    console.log('Total del carrito:', this.total);
-    console.log('Total de ítems:', this.totalItems);
   }
 
 
@@ -93,15 +89,19 @@ export class DropdownComponent  implements OnInit {
   }
 
   decrementQuantity(productId: number): void {
-    this.cartService.decrementItemInCart(productId, 1).subscribe(() => this.loadCart());
+    this.cartService.decrementItemInCart(productId).subscribe(() => this.loadCart());
   }
 
-  incrementarPaquete(paqueteId: number): void {
-    // console.log('id', paqueteId);
+  removeItem(productId: number): void {
+    // this.cartService.removeItemFromCart(productId).subscribe(() => this.loadCart());
+    this.cartService.eliminarItemFromCart(productId).subscribe(() => this.loadCart());
+  }
 
+  //PAQUETES
+
+  incrementarPaquete(paqueteId: number): void {
     this.cartService.addPaqueteToCart(paqueteId, 1).subscribe({
       next: (response) => {
-        console.log('Respuesta del backend:', response); // Log para depuración
         this.loadCart();
       },
       error: (error) => {
@@ -111,16 +111,26 @@ export class DropdownComponent  implements OnInit {
   }
 
   decrementarPaquete(productId: number): void {
-
-  }
-
-  removeItem(productId: number): void {
-    this.cartService.removeItemFromCart(productId).subscribe(() => this.loadCart());
+    this.cartService.decrementPaqueteToCart(productId).subscribe({
+      next: (response) => {
+        this.loadCart();
+      },
+      error: (error) => {
+        console.error('Error al decrementar paquete:', error);
+      },
+    });
   }
 
   removePaquete(paqueteId: number): void {
     // this.cartService.removePaqueteFromCart(paqueteId).subscribe(() => this.loadCart());
-    console.log('se eliminara paquete');
+    this.cartService.eliminarPaqueteFormCart(paqueteId).subscribe({
+      next: (response) => {
+        this.loadCart();
+      },
+      error: (error) => {
+        console.error('Error al decrementar paquete:', error);
+      },
+    });
   }
 
   navigateToCart(): void {

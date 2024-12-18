@@ -5,6 +5,7 @@ import {catchError, tap,} from "rxjs/operators";
 import {AlertService} from "./alert.service";
 import {CookieService} from "ngx-cookie-service";
 import {Reserva} from "../models/Reserva.models";
+import {error} from "@angular/compiler-cli/src/transformers/util";
 
 @Injectable({
   providedIn: 'root'
@@ -48,17 +49,15 @@ export class CartService {
     this.cartUpdated.next();
   }
 
-  // AGREGAR PRODUCTOS AL CARRITO
+  // PRODUCTOS
   addToCart(productoId: number, cantidad: number): Observable<any> {
     const body = {
       producto_id: productoId,
       cantidad: cantidad,
     };
-    // console.log('Enviando solicitud para agregar al carrito con el body:', body);
 
     // Verificar si el cart_token está presente en las cookies
     const cartToken = this.getCartTokenFromCookies();
-    // console.log('Token del carrito en las cookies:', cartToken);
 
     return this.http.post<any>(`${this.apiUrl}add-to-cart/`, body, { withCredentials: true }).pipe(
       catchError((error) => {
@@ -68,11 +67,8 @@ export class CartService {
     );
   }
 
-  decrementItemInCart(productId: number, cantidad: number): Observable<any> {
-    const body = {
-      producto_id: productId,
-      cantidad: cantidad,
-    };
+  decrementItemInCart(productId: number): Observable<any> {
+    const body = { producto_id: productId };
     return this.http.post<any>(`${this.apiUrl}decrement-item/`, body, { withCredentials: true }).pipe(
       catchError((error) => {
         console.error('Error al decrementar el producto:', error);
@@ -92,6 +88,90 @@ export class CartService {
     );
   }
 
+  eliminarItemFromCart(productoId: number): Observable<any> {
+    const body = {producto_id: productoId };
+    return this.http.delete<any>(`${this.apiUrl}remove-item/`, { body, withCredentials: true }).pipe(
+      catchError((error) => {
+        console.log('Error al eliminar', error);
+        throw new Error('Error al eliminar el producto');
+      })
+    );
+  }
+
+  actualizarItemFromCart(productoId: number, cantidad: number): Observable<any> {
+    const body = {
+      producto_id: productoId,
+      cantidad: cantidad
+    };
+
+    return this.http.put(`${this.apiUrl}update-cantidad/`, body, { withCredentials: true }).pipe(
+      catchError((error) => {
+        console.log('Error al actualizar la cantidad', error);
+        throw new Error('Error al eliminar el producto');
+      })
+    );
+  }
+
+
+
+
+  // SECCION DE PAQUETES
+  addPaqueteToCart(paqueteId: number, cantidad: number): Observable<any> {
+    const body = {
+      paquete_id: paqueteId,
+      cantidad: cantidad,
+    };
+
+    // Verificar si el cart_token está presente en las cookies
+    const cartToken = this.getCartTokenFromCookies();
+
+    return this.http.post<any>(`${this.apiUrl}add-package-to-cart/`, body, { withCredentials: true }).pipe(
+      catchError((error) => {
+        console.error('Error al agregar al carrito:', error);
+        return throwError(() => new Error('Error al agregar al carrito.'));
+      })
+    );
+  }
+
+  decrementPaqueteToCart(paqueteId: number): Observable<any> {
+    const body = { paquete_id: paqueteId };
+
+    return this.http.post<any>(`${this.apiUrl}decrement-package/`,  body, { withCredentials: true }).pipe(
+      catchError((error) => {
+        console.log('Error al decrementar paquetes', error);
+        throw new Error('Error al decrementar paquetes');
+      }));
+  }
+
+  eliminarPaqueteFormCart(paqueteId: number): Observable<any> {
+    const body = {paquete_id: paqueteId };
+
+    return this.http.delete<any>(`${this.apiUrl}remove-item/`, { body, withCredentials: true }).pipe(
+      catchError((error) => {
+        console.error('Error al decrementar el paquete del carrito:', error);
+        return throwError(() => new Error('Error al decrementar el producto.'));
+      })
+    );
+  }
+
+  actualizarPaqueteFormCart(paqueteId: number, cantidad: number): Observable<any> {
+    const body = {
+      paquete_id: paqueteId,
+      cantidad: cantidad
+    };
+
+    return this.http.put<any>(`${this.apiUrl}update-cantidad/`, body, { withCredentials: true }).pipe(
+      catchError((error) => {
+        console.log('Error al actualizar la cantidad', error);
+        throw new Error('Error al eliminar el producto');
+      })
+    );
+  }
+
+
+
+
+  //
   confirmCart(): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}confirm-cart/`, {}, {withCredentials: true}).pipe(
       // tap(() => console.log(`Se confirmo el carrito`)),
@@ -125,26 +205,6 @@ export class CartService {
       })
     );
   }
-
-
-  // SECCION DE PAQUETES
-  addPaqueteToCart(paqueteId: number, cantidad: number): Observable<any> {
-    const body = {
-      paquete_id: paqueteId,
-      cantidad: cantidad,
-    };
-
-    // Verificar si el cart_token está presente en las cookies
-    const cartToken = this.getCartTokenFromCookies();
-
-    return this.http.post<any>(`${this.apiUrl}add-package-to-cart/`, body, { withCredentials: true }).pipe(
-      catchError((error) => {
-        console.error('Error al agregar al carrito:', error);
-        return throwError(() => new Error('Error al agregar al carrito.'));
-      })
-    );
-  }
-
 
 
 }

@@ -33,10 +33,13 @@ export class InputComponent {
   onSubmit(): void {
     if (this.formularioReserva.valid) {
       const { codigo, telefono } = this.formularioReserva.value;
+      console.log('Formulario válido. Enviando código:', { codigo, telefono }); // Verificar valores del formulario
 
       // Paso 1: Enviar código de verificación
       this.ReservacionService.sendVerificationCode(telefono, codigo).subscribe({
         next: () => {
+          console.log('Código de verificación enviado. Telefono:', telefono); // Confirmar que se envió correctamente
+
           this.alertService.success('Código enviado. Por favor, espera...');
           this.verifyCode(telefono); // Llamar a la verificación
         },
@@ -60,6 +63,7 @@ export class InputComponent {
         next: (response) => {
           this.alertService.success('Código verificado. Redirigiendo...');
           this.router.navigate(['/tracker/status'], { state: { reserva: response.reserva } });
+          console.log('Reserva enviada al estado:', response.reserva);
         },
         error: (error) => {
           this.alertService.error('Error al verificar el código.');

@@ -1,91 +1,184 @@
-<!-- detalles-reserva.component.html -->
 <div class="min-h-screen bg-gray-50 py-6 px-4 sm:px-6 lg:px-8">
   <div class="max-w-4xl mx-auto bg-white rounded-lg shadow-md p-6">
     <!-- Encabezado -->
-    <div class="mb-6">
-      <h1 class="text-2xl font-bold text-gray-900">Detalles de la Reserva</h1>
-      <p class="text-gray-600">Información completa de la reserva #0001</p>
+    <div class="mb-6 text-center sm:text-left">
+      <h1 class="text-xl sm:text-2xl font-bold text-gray-900">Detalles de la Reserva</h1>
+      <p class="text-sm sm:text-base text-gray-600">Información completa de la reserva #{{ reserva?.codigo_pedido }}</p>
     </div>
 
     <!-- Información detallada de la reserva -->
-    <div class="space-y-4">
-      <!-- Imagen de la reserva -->
-<!--      <div class="flex justify-center">-->
-<!--        <img class="h-40 w-40 rounded-full" src="" alt="Imagen de la reserva">-->
-<!--      </div>-->
+    <!-- Información detallada de la reserva -->
+    <div class="space-y-6">
+      <!-- Sección de información general -->
+      <div>
+        <h2 class="text-lg font-semibold text-gray-900 mb-4">Información General</h2>
 
-      <!-- Detalles de la reserva -->
-      <div class="mt-4">
-        <h2 class="text-lg font-semibold text-gray-900">Reserva #0001</h2>
-        <p class="text-sm text-gray-500">Cliente: Juan Pérez</p>
-        <p class="text-sm text-gray-500">Fecha de reserva: 2024-11-10</p>
-        <p class="text-sm text-gray-500">Hora de reserva: 10:00 AM</p>
-        <p class="text-sm text-gray-500">Fecha de entrega: 2024-11-10</p>
-        <p class="text-sm text-gray-500">Hora de entrega: 4:00 PM</p>
-        <br>
-        <p class="text-sm text-gray-500">Metodo de pago: Mercado Pago</p>
-        <p class="text-sm text-gray-500">Monto: $27,110</p>
-        <p class="text-md text-gray-500 ">Estado: Confirmada</p>
+        <!-- Código de Pedido -->
+        <p class="text-sm text-gray-500 mb-2">
+          Código de Pedido:
+          <span class="font-medium">{{ reserva.codigo_pedido }}</span>
+        </p>
+
+        <!-- Estado General -->
+        <p class="text-sm text-gray-500 mb-2">
+          Estado General:
+          <span class="py-1 px-2 ml-4 rounded-full text-sm font-medium inline-block"
+                [ngClass]="{
+                  'bg-green-100 text-green-600': reserva.estado === 'CONFIRMADA',
+                  'bg-yellow-100 text-yellow-600': reserva.estado === 'PENDIENTE',
+                  'bg-red-100 text-red-600': reserva.estado === 'CANCELADA'
+                }">
+            {{ reserva.estado }}
+          </span>
+        </p>
+
+        <!-- Estado de Solicitud -->
+        <p class="text-sm text-gray-500">
+          Estado de Solicitud:
+          <span class="py-1 px-4 ml-4 rounded-full text-sm font-medium inline-block"
+                [ngClass]="{
+                  'bg-gray-200 text-gray-600': reserva.estado_solicitud === 'SIN_SOLICITUD',
+                  'bg-blue-100 text-blue-600': reserva.estado_solicitud === 'PENDIENTE',
+                  'bg-red-100 text-red-600': reserva.estado_solicitud === 'CANCELAR'
+                }">
+            {{ reserva.estado_solicitud }}
+          </span>
+        </p>
       </div>
 
-      <!-- Descripción adicional -->
-      <div class="mt-6">
-        <h3 class="text-lg font-medium text-gray-900">Descripción</h3>
 
-        <table class="min-w-full divide-y divide-gray-200">
-          <thead class="bg-gray-50">
-          <tr>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Cantidad
-            </th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Item
-            </th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Nota
-            </th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Precio
-            </th>
-          </tr>
-          </thead>
 
-          <tbody class="bg-white divide-y divide-gray-200">
+      <!-- Información del cliente -->
+      <div>
+        <h2 class="text-lg font-semibold text-gray-900 mb-2">Cliente</h2>
+        <p class="text-sm text-gray-500">Nombre: <span class="font-medium">{{ reserva.cliente.nombre }}</span></p>
+        <p class="text-sm text-gray-500">Teléfono: <span class="font-medium">{{ reserva.cliente.telefono }}</span></p>
+        <p class="text-sm text-gray-500">Correo: <span class="font-medium">{{ reserva.cliente.correo }}</span></p>
+      </div>
 
-          <!-- Filas -->
-<!--          *ngFor="let item of items"-->
-          <tr >
+      <!-- Dirección -->
+      <div>
+        <h2 class="text-lg font-semibold text-gray-900 mb-2">Dirección de Entrega</h2>
+        <p class="text-sm text-gray-500">{{ reserva.direccion.nombre_direccion }}, {{ reserva.direccion.calle }} #{{ reserva.direccion.numero_casa }}</p>
+        <p class="text-sm text-gray-500">{{ reserva.direccion.colonia }}, {{ reserva.direccion.estado }}, CP: {{ reserva.direccion.codigo_postal }}</p>
+      </div>
 
-            <td class="px-6 py-4 whitespace-nowrap">
-              <div class="text-sm font-medium text-gray-900">Cantidad</div>
-            </td>
+      <!-- Resumen de pago -->
+      <div>
+        <h2 class="text-lg font-semibold text-gray-900 mb-2">Resumen de Pago</h2>
+        <p class="text-sm text-gray-500">Método de Pago: <span class="font-medium">{{ reserva.metodo_pago.nombre_metodo }}</span></p>
+        <p class="text-sm text-gray-500">Total: <span class="font-medium text-indigo-600">${{ reserva.total }}</span></p>
+      </div>
 
-            <td class="px-6 py-4 whitespace-nowrap">
-              <div class="text-sm text-gray-900">Item</div>
-            </td>
-
-            <td class="px-6 py-4 whitespace-nowrap">
-              <div class="text-sm text-gray-900">Nota</div>
-            </td>
-
-            <td class="px-6 py-4 whitespace-nowrap">
-              <div class="text-sm text-gray-900">Precio</div>
-            </td>
-
-          </tr>
-
-          </tbody>
-        </table>
+      <!-- Tabla de productos -->
+      <div>
+        <h2 class="text-lg font-semibold text-gray-900 mb-2">Productos</h2>
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200 text-sm sm:text-base">
+            <thead class="bg-gray-50">
+            <tr>
+              <th class="px-2 sm:px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Cantidad</th>
+              <th class="px-2 sm:px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Producto</th>
+              <th class="px-2 sm:px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Precio Unitario</th>
+              <th class="px-2 sm:px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Subtotal</th>
+            </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+            <tr *ngFor="let detalle of reserva.detalles">
+              <td class="px-2 sm:px-6 py-4">{{ detalle.cantidad }}</td>
+              <td class="px-2 sm:px-6 py-4">{{ detalle.producto.nombre }}</td>
+              <td class="px-2 sm:px-6 py-4">${{ detalle.precio_unitario }}</td>
+              <td class="px-2 sm:px-6 py-4">${{ detalle.precio_total }}</td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
 
+
+
+    <div class="space-y-8">
+
+      <!-- Botón deslizante para confirmar -->
+      <div *ngIf="reserva.estado === 'PENDIENTE'"
+           class="slider-container mx-auto"
+           [style.backgroundColor]="sliderBackgroundColor">
+
+        <div class="arrow-container move-ahead"
+             [ngStyle]="{'--arrow-offset': arrowOffsetStyle, 'color': '#5cb85c'}">
+
+          <i class="fas fa-chevron-right animate-arrow"></i>
+          <i class="fas fa-chevron-right animate-arrow delay"></i>
+          <i class="fas fa-chevron-right animate-arrow delay-2"></i>
+        </div>
+
+        <span class="slider-placeholder absolute"
+              [style.right]="textPosition"
+              [style.opacity]="textOpacity"
+              style="color: #5cb85c;">
+    Desliza para Confirmar
+    </span>
+
+        <div class="slider-thumb confirmar"
+             (mousedown)="onMouseDown($event, 'confirmar')"
+             (touchstart)="onTouchStart($event, 'confirmar')"
+             [style.transform]="thumbPosition">
+          <i class="fas fa-hand-pointer"></i>
+        </div>
+      </div>
+
+      <!-- Espaciado entre sliders -->
+      <div class="my-8"></div>
+
+      <!-- Botón deslizante para cancelar -->
+      <div *ngIf="reserva?.estado_solicitud === 'CANCELAR'"
+           class="slider-container mx-auto"
+           [style.backgroundColor]="sliderBackgroundColor">
+
+        <div class="arrow-container move-ahead"
+             [ngStyle]="{'--arrow-offset': arrowOffsetStyle, 'color': '#d9534f'}">
+          <i class="fas fa-chevron-right animate-arrow"></i>
+          <i class="fas fa-chevron-right animate-arrow delay"></i>
+          <i class="fas fa-chevron-right animate-arrow delay-2"></i>
+        </div>
+
+        <span class="slider-placeholder absolute"
+              [style.right]="textPosition"
+              [style.opacity]="textOpacity"
+              style="color: #d9534f;">
+      Desliza para Cancelar
+    </span>
+
+        <div class="slider-thumb cancelar"
+             (mousedown)="onMouseDown($event, 'cancelar')"
+             (touchstart)="onTouchStart($event, 'cancelar')"
+             [style.transform]="thumbPosition">
+          <i class="fas fa-hand-pointer"></i>
+        </div>
+      </div>
+
+      <!-- Mensaje de éxito o error -->
+      <p *ngIf="mensaje" class="text-center text-sm sm:text-base text-red-600 font-semibold">{{ mensaje }}</p>
+
+      <!-- Mensaje si no se puede cancelar -->
+      <div *ngIf="reserva.estado !== 'CONFIRMADA'" class="mt-4 text-center">
+        <p class="text-gray-600 font-semibold">
+          La reserva debe estar <span class="text-green-600">CONFIRMADA</span> para solicitar una cancelación.
+        </p>
+      </div>
+
+
+    </div>
+
+
     <!-- Botón para regresar -->
-    <div class="mt-8">
-      <button class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" routerLink="/admin/reservas/preview">
+    <div class="mt-8 flex justify-center sm:justify-start">
+      <button
+        class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+        routerLink="/admin/reservas/preview">
         Regresar a Reservas
       </button>
     </div>
-
   </div>
 </div>
-

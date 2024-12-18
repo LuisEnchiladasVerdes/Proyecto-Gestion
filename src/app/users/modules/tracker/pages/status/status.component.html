@@ -1,9 +1,6 @@
-<div class="h-[calc(100vh-140px)]">
+<div class="h-[calc(100vh-140px)] pb-12">
   <div class="bg-color2 p-[85px] px-10 pb-12 py-12">
-    <h2 class="text-center mb-6 font-bold text-2xl">ESTADO DE RESERVA</h2>
-
-
-
+    <h2 class="text-center mb-6 font-bold text-2xl pb-5">ESTADO DE RESERVA</h2>
 
     <div class="mx-auto max-w-[700px] bg-gray-100 rounded-lg shadow-lg">
       <div class="p-6">
@@ -40,10 +37,6 @@
               {{ reserva.estado_solicitud }}
             </span>
           </div>
-
-
-
-
         </div>
 
         <!-- Información del Cliente -->
@@ -74,7 +67,6 @@
                      [src]="BASE_URL + detalle.producto.media_relacionado[0]"
                      alt="{{ detalle.producto.nombre }}"
                      class="w-full h-full object-cover rounded-md">
-
               </div>
               <!-- Detalles del producto -->
               <div class="flex-1">
@@ -111,13 +103,10 @@
         <div *ngIf="reserva.estado_solicitud !== 'PENDIENTE'" class="mt-6">
           <p class="text-sm text-gray-500">Estado de solicitud: {{ reserva.estado_solicitud }}</p>
 
-
-
           <!-- Contenedor del slider -->
           <div *ngIf="reserva.estado === 'CONFIRMADA' && reserva.estado_solicitud === 'SIN_SOLICITUD'"
                class="slider-container relative mx-auto mt-6" [style.backgroundColor]="sliderBackgroundColor">
 
-            <!-- Flechas animadas -->
             <div
               class="arrow-container move-ahead"
               [ngStyle]="{'--arrow-offset': arrowOffsetStyle}"
@@ -127,7 +116,6 @@
               <i class="fas fa-chevron-right animate-arrow delay-2"></i>
             </div>
 
-            <!-- Texto que se mueve inversamente -->
             <span
               class="slider-placeholder absolute"
               [style.right]="textPosition"
@@ -136,7 +124,6 @@
             Desliza para cancelar
           </span>
 
-            <!-- Botón deslizante -->
             <div
               class="slider-thumb"
               (mousedown)="onMouseDown($event)"
@@ -146,7 +133,6 @@
               <i class="fas fa-hand-pointer"></i>
             </div>
           </div>
-
 
           <!-- Mensaje de éxito o error -->
           <p *ngIf="mensaje" class="mt-4 text-center font-semibold text-red-600">{{ mensaje }}</p>

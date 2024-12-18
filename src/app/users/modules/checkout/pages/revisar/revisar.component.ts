@@ -8,6 +8,7 @@ import {ToastrService} from "ngx-toastr";
 import {NavigationStateService} from "../../../../../services/navigation-state.service";
 import {SharedDataService} from "../../../../../services/shared-data.service";
 import {PaquetesCart, ProductosCart} from "../../../../../models/cart.models";
+import {AlertService} from "../../../../../services/alert.service";
 
 @Component({
   selector: 'app-revisar',
@@ -41,7 +42,7 @@ export class RevisarComponent implements OnInit {
   products: ProductosCart[] = [];
   paquetes: PaquetesCart[] = [];
 
-  constructor(private cartService: CartService, private toastr: ToastrService, private router: Router, private navigationStateService: NavigationStateService, private sharedDataService: SharedDataService) {
+  constructor(private cartService: CartService, private toastr: ToastrService, private router: Router, private navigationStateService: NavigationStateService, private sharedDataService: SharedDataService, private alertService: AlertService) {
     this.mediaBaseUrl = this.cartService.getMediaBaseUrl();
   }
 
@@ -56,9 +57,6 @@ export class RevisarComponent implements OnInit {
         this.paquetes = cart.paquetes || [];
 
         this.calculateTotals(cart.total_carrito);
-
-        console.log('productos', this.products);
-        console.log('paquetes', this.paquetes);
       },
       error: (error) => {
         console.error('Error al cargar el carrito:', error);
@@ -87,130 +85,6 @@ export class RevisarComponent implements OnInit {
 
     // Verificar si el carrito está vacío
     this.cartIsEmpty = this.products.length === 0 && this.paquetes.length === 0;
-
-    console.log('Total del carrito:', this.totalCart);
-    console.log('Total de ítems:', this.totalItems);
-  }
-
-  // Decrementar cantidad
-  decreaseQuantity(product: DetallerCart): void {
-    if (product.cantidad > 1) {
-      this.cartService.decrementItemInCart(product.producto.id!, 1).subscribe({
-        next: (updatedDetalle) => {
-          product.cantidad -= 1; // Decrementa la cantidad
-          product.total = product.cantidad * product.producto.precio_actual; // Actualiza el subtotal
-          this.calculateTotal(); // Recalcula el total del carrito
-        },
-        error: (error) => {
-          console.error("Error al decrementar la cantidad:", error);
-          this.toastr.error("No se pudo decrementar la cantidad", "Error");
-        }
-      });
-    } else {
-      // Si es 1, elimina el producto del carrito
-      this.removeProduct(product);
-    }
-  }
-
-  decreaseQuantityPersonalizada(product: DetallerCart): void {
-    if (product.cantidad > 1) {
-      this.cartService.decrementItemInCart(product.producto.id!, 1).subscribe({
-        next: (updatedDetalle) => {
-          product.cantidad -= 1; // Decrementa la cantidad
-          product.total = product.cantidad * product.producto.precio_actual; // Actualiza el subtotal
-          this.calculateTotal(); // Recalcula el total del carrito
-        },
-        error: (error) => {
-          console.error("Error al decrementar la cantidad:", error);
-          this.toastr.error("No se pudo decrementar la cantidad", "Error");
-        }
-      });
-    } else {
-      // Si es 1, elimina el producto del carrito
-      this.removeProduct(product);
-    }
-  }
-
-  increaseQuantity(product: any): void {
-    this.cartService.addToCart(product.producto.id, 1).subscribe({
-      next: (updatedItem) => {
-        product.cantidad = updatedItem.cantidad;
-        product.total = updatedItem.total;
-      },
-      error: (error) => console.error('Error al incrementar la cantidad:', error),
-      complete: () => {
-        this.calculateTotal();
-      }
-    });
-  }
-
-  removeProduct(product: any): void {
-    this.cartService.removeItemFromCart(product.producto.id).subscribe({
-      next: () => {
-        this.cartProducts = this.cartProducts.filter((p) => p.producto.id !== product.producto.id);
-      },
-      error: (error) => console.error('Error al eliminar el producto:', error),
-      complete: () => {
-        this.calculateTotal();
-      }
-    });
-  }
-
-  // Almacena la cantidad previa
-  storePreviousQuantity(product: DetallerCart): void {
-    (product as any).previousCantidad = product.cantidad; // Guardamos el valor anterior
-  }
-
-// Detecta y maneja cambios en el input de cantidad
-  onQuantityChange(product: DetallerCart): void {
-    const nuevaCantidad = Math.max(1, product.cantidad); // Asegurar que sea al menos 1
-    const cantidadAnterior = (product as any).previousCantidad || 0; // Valor almacenado
-
-    console.log('Cantidad anterior:', cantidadAnterior);
-    console.log('Nueva cantidad:', nuevaCantidad);
-
-    if (nuevaCantidad === cantidadAnterior) {
-      console.log('La cantidad no cambió. Saliendo...');
-      return;
-    }
-
-    if (nuevaCantidad > cantidadAnterior) {
-      // Incremento
-      const cantidadIncrementada = nuevaCantidad - cantidadAnterior;
-      console.log('Incrementando cantidad en:', cantidadIncrementada);
-
-      this.cartService.addToCart(product.producto.id!, cantidadIncrementada).subscribe({
-        next: (detalleActualizado) => {
-          product.cantidad = detalleActualizado.cantidad;
-          product.total = detalleActualizado.total;
-          this.calculateTotal(); // Actualizamos el total
-        },
-        error: (error) => {
-          console.error('Error al incrementar la cantidad:', error);
-          this.toastr.error('Error al incrementar la cantidad.');
-        },
-      });
-    } else {
-      // Decremento
-      const cantidadDecrementada = cantidadAnterior - nuevaCantidad;
-      console.log('Decrementando cantidad en:', cantidadDecrementada);
-
-      this.cartService.decrementItemInCart(product.producto.id!, cantidadDecrementada).subscribe({
-        next: (detalleActualizado) => {
-          product.cantidad = detalleActualizado.cantidad;
-          product.total = detalleActualizado.total;
-          this.calculateTotal(); // Actualizamos el total
-        },
-        error: (error) => {
-          console.error('Error al decrementar la cantidad:', error);
-          this.toastr.error('Error al decrementar la cantidad.');
-        },
-      });
-    }
-  }
-
-  calculateTotal(): void {
-    this.total = this.cartProducts.reduce((sum, item) => sum + item.total, 0);
   }
 
   onFechaChange(event: any): void {
@@ -246,11 +120,11 @@ export class RevisarComponent implements OnInit {
   navigateToRevisar(): void {
     // Validar que se hayan seleccionado una fecha y una hora
     if (!this.fechaSeleccionada) {
-      this.toastr.error('Por favor, selecciona una fecha.', 'Error');
+      this.alertService.error('Selecciona una fecha.', 'Error');
       return;
     }
     if (!this.horaSeleccionadas) {
-      this.toastr.error('Por favor, selecciona una hora.', 'Error');
+      this.alertService.error('Selecciona una hora.', 'Error');
       return;
     }
 
@@ -290,9 +164,78 @@ export class RevisarComponent implements OnInit {
     return todasLasHoras.filter((hora) => !horasOcupadasFormateadas.includes(hora));
   }
 
+  incrementarProd(productId: number): void {
+    this.cartService.addToCart(productId, 1).subscribe(() => this.loadCart());
+  }
+
+  decrementarProd(productId: number): void {
+    this.cartService.decrementItemInCart(productId).subscribe(() => this.loadCart());
+  }
+
+  editarCantProd(productId: number, cantidad: number): void {
+    this.cartService.actualizarItemFromCart(productId, cantidad).subscribe({
+      next: (response) => {
+        this.loadCart()
+      },
+      error: (error) => {
+        console.error('Error al actualizar cantidad de producto:', error);
+        this.toastr.error('Stock insuficiente');
+      }
+    });
+  }
+
+  removeItem(productId: number): void {
+    // this.cartService.removeItemFromCart(productId).subscribe(() => this.loadCart());
+    this.cartService.eliminarItemFromCart(productId).subscribe(() => this.loadCart());
+  }
+
+  //PAQUETES
+
+  incrementarPaquete(paqueteId: number): void {
+    this.cartService.addPaqueteToCart(paqueteId, 1).subscribe({
+      next: (response) => {
+        this.loadCart();
+      },
+      error: (error) => {
+        console.error('Error al agregar paquete al carrito:', error);
+      },
+    });
+  }
+
+  decrementarPaquete(productId: number): void {
+    this.cartService.decrementPaqueteToCart(productId).subscribe({
+      next: (response) => {
+        this.loadCart();
+      },
+      error: (error) => {
+        console.error('Error al decrementar paquete:', error);
+      },
+    });
+  }
+
   removePaquete(paqueteId: number): void {
     // this.cartService.removePaqueteFromCart(paqueteId).subscribe(() => this.loadCart());
-    console.log('se eliminara paquete');
+    this.cartService.eliminarPaqueteFormCart(paqueteId).subscribe({
+      next: (response) => {
+        this.loadCart();
+      },
+      error: (error) => {
+        console.error('Error al decrementar paquete:', error);
+      },
+    });
+  }
+
+  editarCantPaquete(paqueteId: number, cantidad: number): void {
+    this.cartService.actualizarPaqueteFormCart(paqueteId, cantidad).subscribe({
+      next: (response) => {
+        console.log('Cantidad de paquetes actualizado');
+        this.loadCart()
+      },
+      error: (error) => {
+        console.error('Error al actualizar cantidad de paquetes:', error);
+        this.toastr.error('Stock insuficiente');
+      }
+    });
   }
 
 }

@@ -1,0 +1,32 @@
+
+.border-green-500 {
+    border-left-color: #10b981; / Verde /
+  }
+  .border-yellow-500 {
+    border-left-color: #f59e0b; / Amarillo /
+  }
+  .border-red-500 {
+    border-left-color: #ef4444; / Rojo /
+  }
+  .border-yellow-300 {
+    border-left-color: #fbbf24; / Amarillo más claro /
+  }
+
+
+  .text-green-600 {
+    color: #047857; / Texto verde /
+  }
+  .text-yellow-600 {
+    color: #b45309; / Texto amarillo /
+  }
+  .text-red-600 {
+    color: #dc2626; / Texto rojo /
+  }
+  .text-indigo-600 {
+    color: #4f46e5; / Texto índigo /
+  }
+
+
+.border-b-2 {
+  border-bottom-width: 2px;
+}

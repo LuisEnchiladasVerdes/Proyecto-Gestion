@@ -1,43 +1,129 @@
-<!-- reservas.component.html -->
 <div class="min-h-screen bg-gray-50 py-6 px-4 sm:px-6 lg:px-8">
   <div class="max-w-6xl mx-auto">
     <!-- Encabezado de la página -->
     <div class="mb-6">
       <h1 class="text-2xl font-bold text-gray-900 mb-2">Reservas</h1>
       <p class="text-gray-600">Gestiona y revisa las reservas activas</p>
+    </div>
 
-      <div class="mt-8">
-        <button class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" routerLink="/admin/reservas/reportes">
-          Reportes
-        </button>
-      </div>
+    <!-- Buscador y Filtro -->
+    <div class="mb-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <!-- Buscador -->
+      <input
+        type="text"
+        placeholder="Buscar por código de reserva"
+        [(ngModel)]="codigoBusqueda"
+        (input)="filtrarReservas()"
+        class="border border-gray-300 rounded-lg p-2 w-full"
+      />
+
+      <!-- Filtro por método de pago -->
+      <select
+        [(ngModel)]="metodoFiltro"
+        (change)="filtrarReservas()"
+        class="border border-gray-300 rounded-lg p-2 w-full"
+      >
+        <option value="">Todos los métodos de pago</option>
+        <option *ngFor="let metodo of metodosPago" [value]="metodo">
+          {{ metodo }}
+        </option>
+      </select>
     </div>
 
     <!-- Lista de reservas -->
-    <div class="space-y-4">
-      <!-- Preview de reserva -->
-      <div class="bg-white rounded-lg shadow-sm p-4 flex flex-col sm:flex-row justify-between items-center">
+    <div class="space-y-4" *ngIf="reservasPaginadas.length > 0; else noReservas">
+      <div
+        *ngFor="let reserva of reservasPaginadas"
+        class="bg-white rounded-lg shadow-sm p-4 flex flex-col sm:flex-row justify-between items-center border-l-4"
+        [ngClass]="{
+          'border-green-500': getDisplayStatus(reserva) === 'CONFIRMADA',
+          'border-yellow-500': getDisplayStatus(reserva) === 'PENDIENTE',
+          'border-red-500': getDisplayStatus(reserva) === 'CANCELADA' || getDisplayStatus(reserva) === 'CANCELAR'
+        }"
+      >
         <!-- Información de la reserva -->
-        <div class="flex items-center space-x-4">
-          <div class="h-10 w-10 flex-shrink-0">
-            <img class="h-10 w-10 rounded-full" src="" alt="Imagen de reserva">
-          </div>
-          <div>
-            <h2 class="text-lg font-semibold text-gray-900">Reserva #0001</h2>
-            <p class="text-sm text-gray-500">Fecha: 2024-11-10</p>
-            <p class="text-sm text-gray-500">Cliente: Juan Pérez</p>
-          </div>
+        <div class="flex flex-col space-y-2">
+          <h2 class="text-lg font-semibold text-gray-900">
+            Reserva #{{ reserva.codigo_pedido }}
+          </h2>
+          <p class="text-sm text-gray-500">
+            Fecha: {{ reserva.fecha_reserva | date: 'short' }}
+          </p>
+          <p class="text-sm text-gray-500">
+            Cliente: {{ reserva.cliente.nombre }}
+          </p>
+
+          <!-- Lógica para mostrar Estado dinámico -->
+          <p class="font-semibold text-sm text-black">
+            {{ getDisplayLabel(reserva) }}:
+            <span
+              [ngClass]="{
+                'text-green-600': getDisplayStatus(reserva) === 'CONFIRMADA',
+                'text-yellow-600': getDisplayStatus(reserva) === 'PENDIENTE',
+                'text-red-600': getDisplayStatus(reserva) === 'CANCELADA' || getDisplayStatus(reserva) === 'CANCELAR'
+              }"
+            >
+              {{ getDisplayStatus(reserva) }}
+            </span>
+          </p>
+
+          <!-- Método de Pago -->
+          <p class="text-indigo-600 border-b-2 border-indigo-600 font-semibold inline-block">
+            Método de Pago: {{ reserva.metodo_pago.nombre_metodo }}
+          </p>
         </div>
 
         <!-- Botón de detalles -->
         <div class="mt-4 sm:mt-0">
-          <a class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" routerLink="/admin/reservas/detalles">
+          <button
+            class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            [routerLink]="['/admin/reservas/detalles', reserva.codigo_pedido]"
+          >
             Detalles
-          </a>
+          </button>
         </div>
       </div>
-
     </div>
+
+    <!-- Paginación -->
+    <div class="mt-6 flex justify-center items-center space-x-2" *ngIf="reservasFiltradas.length > itemsPorPagina">
+      <!-- Botón para página anterior -->
+      <button
+        class="px-3 py-1 border rounded-lg flex items-center"
+        [disabled]="paginaActual === 1"
+        (click)="cambiarPagina(paginaActual - 1)"
+        [ngClass]="{'text-gray-400': paginaActual === 1, 'text-indigo-600': paginaActual > 1}"
+      >
+        <i class="fas fa-chevron-left"></i>
+      </button>
+
+      <!-- Números de página -->
+      <button
+        class="px-3 py-1 border rounded-lg"
+        [class.bg-indigo-600]="pagina === paginaActual"
+        [class.text-white]="pagina === paginaActual"
+        [class.bg-gray-300]="pagina !== paginaActual"
+        [class.text-black]="pagina !== paginaActual"
+        *ngFor="let pagina of arrayPaginas"
+        (click)="cambiarPagina(pagina)"
+      >
+        {{ pagina }}
+      </button>
+
+      <!-- Botón para página siguiente -->
+      <button
+        class="px-3 py-1 border rounded-lg flex items-center"
+        [disabled]="paginaActual === paginasTotales"
+        (click)="cambiarPagina(paginaActual + 1)"
+        [ngClass]="{'text-gray-400': paginaActual === paginasTotales, 'text-indigo-600': paginaActual < paginasTotales}"
+      >
+        <i class="fas fa-chevron-right"></i>
+      </button>
+    </div>
+
+    <!-- Mensaje si no hay reservas -->
+    <ng-template #noReservas>
+      <p class="text-gray-600">No se encontraron reservas.</p>
+    </ng-template>
   </div>
 </div>
-

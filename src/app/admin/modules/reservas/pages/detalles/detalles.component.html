@@ -26,7 +26,9 @@
                 [ngClass]="{
                   'bg-green-100 text-green-600': reserva.estado === 'CONFIRMADA',
                   'bg-yellow-100 text-yellow-600': reserva.estado === 'PENDIENTE',
-                  'bg-red-100 text-red-600': reserva.estado === 'CANCELADA'
+                  'bg-red-100 text-red-600': reserva.estado === 'CANCELADA',
+                  'bg-blue-100 text-blue-600': reserva.estado === 'DEVUELTA'
+
                 }">
             {{ reserva.estado }}
           </span>
@@ -157,6 +159,55 @@
           <i class="fas fa-hand-pointer"></i>
         </div>
       </div>
+
+      <!-- Espaciado entre sliders -->
+      <div class="my-8"></div>
+
+
+      <div
+        *ngIf="reserva?.estado === 'CANCELADA' || reserva?.estado === 'CONFIRMADA' || reserva?.estado === 'PENDIENTE'"
+        class="slider-container mx-auto"
+        [style.backgroundColor]="devolverSliderBackgroundColor"
+      >
+        <!-- Flechas animadas -->
+        <div
+          class="arrow-container"
+          [style.transform]="devolverArrowOffsetStyle"
+        >
+          <i class="fas fa-chevron-left animate-arrow"></i>
+          <i class="fas fa-chevron-left animate-arrow delay"></i>
+          <i class="fas fa-chevron-left animate-arrow delay-2"></i>
+        </div>
+
+
+
+        <!-- Texto -->
+        <span
+          class="slider-placeholder absolute"
+          [style.left]="devolverTextPosition"
+          [style.opacity]="devolverTextOpacity"
+          style="color: #4f86d9;"
+        >
+        Desliza para confirmar devolución
+      </span>
+
+        <!-- Botón deslizante -->
+        <div
+          class="slider-thumb devolver"
+          (mousedown)="onMouseDownDevolver($event)"
+          (touchstart)="onTouchStartDevolver($event)"
+          [style.transform]="devolverThumbPosition"
+        >
+          <i class="fas fa-hand-pointer"></i>
+        </div>
+      </div>
+
+
+
+
+
+
+
 
       <!-- Mensaje de éxito o error -->
       <p *ngIf="mensaje" class="text-center text-sm sm:text-base text-red-600 font-semibold">{{ mensaje }}</p>

@@ -30,24 +30,32 @@ export class DetallesComponent implements OnInit {
   private currentDeltaX = 0;
   private targetDeltaX = 0;
 
-  sliderAction: 'confirmar' | 'cancelar' = 'cancelar'; // Acción dinámica (confirmar/cancelar)
+  sliderAction: 'confirmar' | 'cancelar' = 'cancelar';
 
+  // Variables generales
+  devolverSliderWidth = 400;
+  devolverThumbWidth = 60;
+  devolverCurrentDeltaX = 0;
+  devolverThumbPosition = 'translateX(0px)';
+  devolverArrowOffsetStyle = '0px';
+  devolverSliderBackgroundColor = '#f8f8f8';
+  devolverTextPosition = 'calc(100% - 150px)';
+  devolverTextOpacity = 1;
+  devolverIsSliding = false;
+  devolverActionCompleted = false;
 
-
-
-
-
-
+  private devolverTargetDeltaX = 0;
+  private devolverAnimationFrameId: number | null = null;
 
   constructor( private route: ActivatedRoute, private reservacionService: ReservacionService ) {}
 
-
-
-
-
   ngOnInit(): void {
-    this.codigoPedido = this.route.snapshot.paramMap.get('codigo_pedido') || '';
 
+    // Inicializar el slider en el extremo derecho
+    this.devolverCurrentDeltaX = this.devolverSliderWidth - this.devolverThumbWidth;
+    this.updateDevolverStyles();
+
+    this.codigoPedido = this.route.snapshot.paramMap.get('codigo_pedido') || '';
     if (!this.codigoPedido) {
       console.error('No se encontró el parámetro codigo_pedido en la URL');
       return;
@@ -96,6 +104,122 @@ export class DetallesComponent implements OnInit {
     });
   }
 
+  // Iniciar el deslizamiento específico para "Devolver"
+  onMouseDownDevolver(event: MouseEvent): void {
+    this.startSlidingDevolver(event.clientX);
+  }
+
+  onTouchStartDevolver(event: TouchEvent): void {
+    this.startSlidingDevolver(event.touches[0].clientX);
+  }
+
+// Modificaciones específicas para el slider de "Devolver"
+  private startSlidingDevolver(startX: number): void {
+    this.devolverIsSliding = true;
+
+    const onMove = (moveEvent: MouseEvent | TouchEvent) => {
+      if (!this.devolverIsSliding) return;
+
+      const currentX = moveEvent instanceof MouseEvent ? moveEvent.clientX : moveEvent.touches[0].clientX;
+      const delta = startX - currentX;
+
+      // Limitar el movimiento dentro de los límites
+      this.devolverTargetDeltaX = Math.max(
+        0,
+        Math.min(this.devolverSliderWidth - this.devolverThumbWidth, this.devolverSliderWidth - this.devolverThumbWidth - delta)
+      );
+
+      if (!this.devolverAnimationFrameId) {
+        this.animateThumbDevolver();
+      }
+    };
+
+    const onEnd = () => {
+      this.devolverIsSliding = false;
+      const sliderProgress = 1 - this.devolverTargetDeltaX / (this.devolverSliderWidth - this.devolverThumbWidth);
+
+      if (sliderProgress >= 0.95) {
+        this.devolverTargetDeltaX = 0;
+        this.animateThumbDevolver(() => this.completeActionDevolver());
+      } else {
+        this.resetSliderDevolver();
+      }
+
+      document.removeEventListener('mousemove', onMove);
+      document.removeEventListener('touchmove', onMove);
+      document.removeEventListener('mouseup', onEnd);
+      document.removeEventListener('touchend', onEnd);
+    };
+
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('touchmove', onMove);
+    document.addEventListener('mouseup', onEnd);
+    document.addEventListener('touchend', onEnd);
+  }
+
+  private animateThumbDevolver(callback?: () => void): void {
+    this.devolverAnimationFrameId = requestAnimationFrame(() => {
+      const smoothingFactor = 0.15;
+
+      // Animar suavemente el botón
+      this.devolverCurrentDeltaX +=
+        (this.devolverTargetDeltaX - this.devolverCurrentDeltaX) * smoothingFactor;
+
+      this.updateDevolverStyles();
+
+      if (Math.abs(this.devolverCurrentDeltaX - this.devolverTargetDeltaX) > 0.5) {
+        this.animateThumbDevolver(callback);
+      } else {
+        this.devolverAnimationFrameId = null;
+        if (callback) callback();
+      }
+    });
+  }
+
+  private updateDevolverStyles(): void {
+    // Posiciona dinámicamente el botón
+    this.devolverThumbPosition = `translateX(${this.devolverCurrentDeltaX}px)`;
+
+    // Posiciona las flechas pegadas al botón y centradas verticalmente
+    this.devolverArrowOffsetStyle = `translate(${this.devolverCurrentDeltaX - this.devolverThumbWidth}px, -50%)`;
+
+    // Progreso del slider (de 0 a 1)
+    const sliderProgress = 1 - this.devolverCurrentDeltaX / (this.devolverSliderWidth - this.devolverThumbWidth);
+
+    // Cambia dinámicamente el fondo
+    this.devolverSliderBackgroundColor = `rgba(79, 134, 217, ${sliderProgress})`;
+
+    // Posiciona el texto dinámicamente
+    this.devolverTextPosition = `calc(${50 + sliderProgress * 50}% - 170px)`;
+    this.devolverTextOpacity = 1 - sliderProgress; // El texto desaparece al deslizar
+  }
+
+  resetSliderDevolver(): void {
+    this.devolverTargetDeltaX = this.devolverSliderWidth - this.devolverThumbWidth;
+    this.devolverIsSliding = false;
+    if (!this.devolverAnimationFrameId) {
+      this.animateThumbDevolver();
+    }
+  }
+
+  // Devolver reserva
+  completeActionDevolver(): void {
+    this.reservacionService.devolverReservaAdmin(this.codigoPedido).subscribe({
+      next: (response) => {
+        console.log('Reserva devuelta exitosamente:', response);
+        this.mensaje = 'Reserva devuelta correctamente.';
+
+        // Actualizar el estado local de la reserva a 'DEVUELTA'
+        if (this.reserva) {
+          this.reserva.estado = 'DEVUELTA';
+        }
+      },
+      error: (error) => {
+        console.error('Error al devolver la reserva:', error);
+        this.mensaje = 'Error al procesar la devolución.';
+      }
+    });
+  }
 
   // Iniciar deslizamiento
   onMouseDown(event: MouseEvent, action: 'confirmar' | 'cancelar'): void {
@@ -164,6 +288,7 @@ export class DetallesComponent implements OnInit {
         this.sliderAction === 'confirmar'
           ? `rgba(92, 184, 92, ${sliderProgress})` // Verde para confirmar
           : `rgba(217, 83, 79, ${sliderProgress})`; // Rojo para cancelar
+
 
       this.textPosition = `${(1 - sliderProgress) * 100}%`;
       this.textOpacity = 1 - sliderProgress;

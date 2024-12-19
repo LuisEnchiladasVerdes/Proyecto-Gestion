@@ -115,7 +115,15 @@ export class ReservacionService {
     });
   }
 
-
+  // Devolver una reserva (Administrador)
+  devolverReservaAdmin(codigoPedido: string): Observable<any> {
+    const url = `${this.adminBaseUrl}/reservasAdmin/devolver/`;
+    return this.http.post(url, { codigo_pedido: codigoPedido }, { withCredentials: true }).pipe(
+      tap((response) => {
+        console.log('Devolución exitosa:', response);
+      })
+    );
+  }
 
 
 }

@@ -4,7 +4,12 @@ module.exports = {
     "./src/**/*.{html,ts}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        ultra: ['Ultra', 'serif'], // Agrega la fuente Ultra
+        roboto: ['"Roboto Slab"', 'serif'], // Registra la fuente
+      },
+    },
   },
   plugins: [],
 }

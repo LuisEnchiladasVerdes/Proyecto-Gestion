@@ -4,17 +4,17 @@
     <div class="flex justify-between items-center h-16">
       <!-- Lado izquierdo - Inicio -->
       <div class="flex items-center">
-        <a routerLink="/admin/home" class="text-gray-800 hover:text-indigo-600 text-lg font-medium">
+        <a routerLink="/admin/home" class="text-gray-800 hover:text-indigo-600 text-lg font-medium font-roboto">
           Inicio
         </a>
       </div>
 
       <!-- Menú principal - Visible en pantallas grandes -->
       <nav class="hidden md:flex items-center space-x-4">
-        <a routerLink="/admin/pagos/detalles"
-           class="px-4 py-2 text-sm font-medium text-gray-700 hover:text-indigo-600 hover:bg-gray-50 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
-          Pagos
-        </a>
+<!--        <a routerLink="/admin/pagos/detalles"-->
+<!--           class="px-4 py-2 text-sm font-medium text-gray-700 hover:text-indigo-600 hover:bg-gray-50 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">-->
+<!--          Pagos-->
+<!--        </a>-->
         <a routerLink="/admin/reservas/preview"
            class="px-4 py-2 text-sm font-medium text-gray-700 hover:text-indigo-600 hover:bg-gray-50 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
           Reservas
@@ -26,7 +26,7 @@
         <button
           class="px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
           (click)="onLogout()">
-          Logout
+          Cerrar Sesion
         </button>
       </nav>
 

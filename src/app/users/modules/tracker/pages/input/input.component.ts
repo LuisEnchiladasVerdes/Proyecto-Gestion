@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import {Router} from "@angular/router";
-import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
+import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from "@angular/forms";
 import {NgIf} from "@angular/common";
 import {AlertService} from "../../../../../services/alert.service";
 import { ReservacionService } from '../../../../../services/reservacion.service';
@@ -10,13 +10,18 @@ import { ReservacionService } from '../../../../../services/reservacion.service'
   standalone: true,
   imports: [
     NgIf,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    FormsModule
   ],
   templateUrl: './input.component.html',
   styleUrl: './input.component.css'
 })
 export class InputComponent {
   formularioReserva: FormGroup;
+
+  mostrarModal = false;
+  codigo: string = '';
+  phoneNumber: string = '';
 
   constructor(
     private fb: FormBuilder,
@@ -33,15 +38,15 @@ export class InputComponent {
   onSubmit(): void {
     if (this.formularioReserva.valid) {
       const { codigo, telefono } = this.formularioReserva.value;
-      console.log('Formulario válido. Enviando código:', { codigo, telefono }); // Verificar valores del formulario
+      this.phoneNumber ='+52' + telefono; // Guardar el número de teléfono para usarlo en el modal
+      console.log('numero de telefono',this.phoneNumber)
 
-      // Paso 1: Enviar código de verificación
-      this.ReservacionService.sendVerificationCode(telefono, codigo).subscribe({
+      // console.log('Formulario válido. Enviando código:', { codigo, telefono });
+
+      this.ReservacionService.sendVerificationCode(this.phoneNumber, codigo).subscribe({
         next: () => {
-          console.log('Código de verificación enviado. Telefono:', telefono); // Confirmar que se envió correctamente
-
-          this.alertService.success('Código enviado. Por favor, espera...');
-          this.verifyCode(telefono); // Llamar a la verificación
+          this.alertService.success('Código enviado.');
+          this.abrirModal(); // Abre el modal
         },
         error: (error) => {
           this.alertService.error('Error al enviar el código. Intenta nuevamente.');
@@ -54,22 +59,32 @@ export class InputComponent {
     }
   }
 
-  private verifyCode(phoneNumber: string): void {
-    // Solicitar código de verificación al usuario
-    const code = prompt('Introduce el código de verificación enviado a tu teléfono:');
-
-    if (code) {
-      this.ReservacionService.verifyCode(phoneNumber, code).subscribe({
-        next: (response) => {
-          this.alertService.success('Código verificado. Redirigiendo...');
-          this.router.navigate(['/tracker/status'], { state: { reserva: response.reserva } });
-          console.log('Reserva enviada al estado:', response.reserva);
-        },
-        error: (error) => {
-          this.alertService.error('Error al verificar el código.');
-          console.error(error);
-        },
-      });
+  validarCodigo(phoneNumber: string): void {
+    if (!/^\d{6}$/.test(this.codigo)) {
+      this.alertService.error('El código debe tener exactamente 6 dígitos.');
+      return;
     }
+
+    this.ReservacionService.verifyCode(this.phoneNumber, this.codigo).subscribe({
+      next: (response) => {
+        this.alertService.success('Código verificado. Redirigiendo...');
+        this.router.navigate(['/tracker/status'], { state: { reserva: response.reserva } });
+        console.log('Reserva enviada al estado:', response.reserva);
+        this.cerrarModal();
+      },
+      error: (error) => {
+        this.alertService.error('Error al verificar el código.');
+        console.error(error);
+      },
+    });
+  }
+
+  abrirModal() {
+    this.mostrarModal = true;
+  }
+
+  cerrarModal() {
+    this.mostrarModal = false;
+    this.codigo = ''; // Limpia el código al cerrar
   }
 }

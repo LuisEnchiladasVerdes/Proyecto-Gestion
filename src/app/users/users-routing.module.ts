@@ -28,9 +28,14 @@ const routes: Routes = [
           .then(m => m.TrackerModule)
 
       }
-
     ]
-  }
+
+  },
+  // {
+  //   path: 'prueba',
+  //   loadComponent: () => import('./components/common/image-carousel/image-carousel.component')
+  //     .then(m => m.ImageCarouselComponent)
+  // }
 
 
 ];

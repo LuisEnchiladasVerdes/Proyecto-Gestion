@@ -21,3 +21,18 @@ section img:hover{
 .acerca{
   height: 360px;
 }
+
+.section {
+  display: flex; /* Habilita el modelo de caja flexible */
+  justify-content: center; /* Centra horizontalmente el contenido */
+  align-items: center; /* Opcional: centra verticalmente si hay más altura */
+  width: 100%;
+}
+
+app-image-carousel {
+  width: 100%; /* Ajusta el ancho del carrusel */
+  max-width: 900px; /* Define un tamaño máximo para el carrusel */
+  height: auto; /* Mantiene proporciones automáticas */
+  padding: 10px; /* Opcional: añade algo de espacio interior */
+}
+

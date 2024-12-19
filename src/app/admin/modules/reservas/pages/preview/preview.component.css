@@ -1,29 +1,39 @@
-
+/*Verde*/
 .border-green-500 {
-    border-left-color: #10b981; / Verde /
+    border-left-color: #10b981;
   }
+
+  /*Amarillo*/
   .border-yellow-500 {
-    border-left-color: #f59e0b; / Amarillo /
+    border-left-color: #f59e0b;
   }
+
+  /*Rojo*/
   .border-red-500 {
-    border-left-color: #ef4444; / Rojo /
+    border-left-color: #ef4444; /* Rojo */
   }
   .border-yellow-300 {
-    border-left-color: #fbbf24; / Amarillo más claro /
+    border-left-color: #fbbf24; /* Amarillo más claro */
   }
 
-
+  /*Texto verde*/
   .text-green-600 {
-    color: #047857; / Texto verde /
+    color: #047857;
   }
+
+  /*Texto amarillo*/
   .text-yellow-600 {
-    color: #b45309; / Texto amarillo /
+    color: #b45309;
   }
+
+  /*Texto rojo*/
   .text-red-600 {
-    color: #dc2626; / Texto rojo /
+    color: #dc2626;
   }
+
+  /*Texto indigo*/
   .text-indigo-600 {
-    color: #4f46e5; / Texto índigo /
+    color: #4f46e5;
   }
 
 

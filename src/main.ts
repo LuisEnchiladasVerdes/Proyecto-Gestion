@@ -6,17 +6,10 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { importProvidersFrom } from '@angular/core';
 import {ToastrModule} from "ngx-toastr";
 
-// bootstrapApplication(AppComponent, {
-//   ...appConfig,
-//   providers: [
-//     ...(appConfig.providers || []),
-//     importProvidersFrom(BrowserAnimationsModule)
-//   ]
-// })
-//   .catch((err) => console.error(err));
+import { register as registerSwiperElements } from 'swiper/element/bundle';
 
-
-
+// Registra los elementos personalizados de Swiper
+registerSwiperElements();
 
 bootstrapApplication(AppComponent, {
   ...appConfig,

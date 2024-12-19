@@ -96,7 +96,16 @@
                </svg>
             </button>
 
-            <span class="w-12 text-center border border-gray-300 rounded text-sm">1</span>
+<!--            <span class="w-12 text-center border border-gray-300 rounded text-sm">1</span>-->
+
+            <input
+              type="number"
+              [(ngModel)]="paquete.cantidad_total_paquete"
+              class="w-12 text-center border border-gray-300 rounded text-sm"
+              min="1"
+              (change)="editarCantPaquete(paquete.id!, paquete.cantidad_total_paquete!)"
+              (keyup.enter)="editarCantPaquete(paquete.id!, paquete.cantidad_total_paquete!)"
+            />
 
             <!-- Botón de incrementar -->
             <button class="text-gray-500 hover:text-gray-700" (click)="incrementarPaquete(paquete.id || 0)">

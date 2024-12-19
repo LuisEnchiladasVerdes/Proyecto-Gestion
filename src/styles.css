@@ -27,3 +27,33 @@
 
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+
+
+.toast-container {
+  z-index: 1050;
+}
+
+.toast {
+  background-color: #1e293b !important;
+  color: #ffffff !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2) !important;
+  font-family: 'Arial', sans-serif;
+  font-size: 14px;
+}
+
+.toast-progress {
+  background-color: #38bdf8 !important;
+}
+
+.toast-top-right {
+  margin-top: 2.8rem !important;
+  right: 1rem;
+}
+
+
+.toast-bottom-right {
+  margin-bottom: 2rem !important;
+  right: 1rem;
+}

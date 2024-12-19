@@ -29,6 +29,8 @@ export interface PaquetesCart {
   descuento_general?: number;
   precio_original?: number;
   precio_final?: number;
+  cantidad_total_paquete?: number;
+  precio_total_paquete?: number;
   productos?: PaqueteProductoCart[]; // Lista de productos dentro del paquete
 }
 
